@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Submissions{% endblock %}
+
+{% block content %}
+
+<div class="row pt-5" id="quizz-header">
+    <h3>Welcome, <b>{{ username }}</b></span></h3>
+</div>
+
+<hr>
+<div class="row justify-content-center">
+    <div class="col-auto">
+        <table class="table table-hover">
+            <thead>
+            <tr class="table-light">
+                <th scope="col">Timestamp</th>
+                <th scope="col">Problem #</th>
+                <th scope="col">Dataset</th>
+                <th scope="col">Score</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for game in games %}
+                <tr>
+                    <th scope="row" class="text-center">{{ game.game_id }}</th>
+                    <td class="text-center">{{ game.num_questions }}</td>
+                    <td class="text-center">{{ game.num_players }}</td>
+                    <td class="text-center">
+                        <a href="{{ url_for('game.play', game_id=game.game_id) }}" class="btn btn-success btn-sm">Play</a>
+                        <a href="{{ url_for('game.end', game_id=game.game_id) }}" class="btn btn-info btn-sm">Leaderboard</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<hr>
+{% endblock %}
