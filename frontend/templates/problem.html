@@ -9,6 +9,11 @@
     <li><a href="{{ url_for('progcomp.download', p_name=problem.name, filename=name) }}">{{ name }}</a></li>
     {% endfor %}
 </ul>
+
+<form method=post enctype=multipart/form-data>
+    <input type=file name=file>
+    <input type=submit value=Upload>
+</form>
 <!-- <div class="row pt-5 pb-3" id="quizz-header">
     <div class="col">
         <h3>Question <span class="text-muted"></span> of <span class="text-muted"></span></h3>

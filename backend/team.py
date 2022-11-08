@@ -5,4 +5,4 @@ class Team:
         self.name = name
         self.password = password
         self.score = 0
-        self.submissions : list[Submission] = []
+        self.submissions : list[Submission] = [Submission("0", "example.txt")]

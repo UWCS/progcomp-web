@@ -4,8 +4,8 @@
 
 {% block content %}
 
-<div class="row pt-5" id="quizz-header">
-    <h3>Welcome, <b>{{ username }}</b></span></h3>
+<div class="row pt-5" id="header">
+    <h3>Welcome, <b>{{ team.name }}</b></span></h3>
 </div>
 
 <hr>
@@ -21,17 +21,14 @@
             </tr>
             </thead>
             <tbody>
-                <!-- {% for game in games %}
+                {% for submission in team.submissions %}
                 <tr>
-                    <th scope="row" class="text-center">{{ game.game_id }}</th>
-                    <td class="text-center">{{ game.num_questions }}</td>
-                    <td class="text-center">{{ game.num_players }}</td>
-                    <td class="text-center">
-                        <a href="{{ url_for('progcomp.play', game_id=game.game_id) }}" class="btn btn-success btn-sm">Play</a>
-                        <a href="{{ url_for('progcomp.end', game_id=game.game_id) }}" class="btn btn-info btn-sm">Leaderboard</a>
-                    </td>
+                    <th scope="row" class="text-center">{{ submission.timestamp }}</th>
+                    <td class="text-center">{{ submission.p_num }}</td>
+                    <td class="text-center">{{ submission.dataset }}</td>
+                    <td class="text-center">{{ submission.result }}</td>
                 </tr>
-                {% endfor %} -->
+                {% endfor %}
             </tbody>
         </table>
     </div>

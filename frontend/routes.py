@@ -1,5 +1,5 @@
-from flask import Blueprint, redirect, render_template, request, url_for, session, send_from_directory
-
+from flask import Blueprint, redirect, render_template, request, url_for, session, send_from_directory, flash
+from werkzeug.utils import secure_filename
 import os
 
 from backend.progcomp import Progcomp
@@ -14,7 +14,7 @@ bp = Blueprint("progcomp", __name__)
 
 @bp.route("/")
 def menu():
-    session[USERNAME_SESSION_KEY] = ""
+    # session[USERNAME_SESSION_KEY] = ""
     return render_template("menu.html")
 
 @bp.route("/start", methods=["POST"])
@@ -35,7 +35,6 @@ def start():
     
     # Check password against potentially existing team
     team = pc.get_team(username)
-    print(team)
     if team:
         if team.password != password:
             return redirect(url_for("progcomp.menu"))
@@ -47,7 +46,7 @@ def start():
 
     return redirect(url_for("progcomp.submit"))
 
-@bp.route("/submit", methods=["GET", "POST"])
+@bp.route("/submit", methods=["GET"])
 def submit():
     """
     The submission page / home page for the contest
@@ -56,14 +55,17 @@ def submit():
     username = session.get(USERNAME_SESSION_KEY)
     if not username:
         return redirect(url_for("progcomp.menu"))
-    # team = game.teams.get(username)
-
-    return render_template("submissions.html", username=username)
+    team = pc.get_team(username)
+    if not team:
+        return redirect(url_for("progcomp.menu"))
 
     # List out team submission info
+    return render_template("submissions.html", team=team)
 
-@bp.route("/problems/<string:name>", methods=["GET", "POST"])
-def problem(name):
+    
+
+@bp.route("/problems/<string:p_name>", methods=["GET", "POST"])
+def problem(p_name):
     """
     Retrieve the page for a problem
     """
@@ -74,13 +76,37 @@ def problem(name):
     
     pc.update_problems()
 
-    problem = pc.get_problem(name)
+    problem = pc.get_problem(p_name)
     if not problem:
         return redirect(url_for("progcomp.submit"))
-
+    
+    if request.method == 'POST':
+        print("Uploading file")
+        # TODO: Multiple files (script + output data at the same time)
+        # check if the post request has the file part
+        print(request.files)
+        if 'file' not in request.files:
+            print("no file part")
+            return redirect(request.url)
+        file = request.files['file']
+        # If user doesn't select a file, browser submits empty file.
+        print(file)
+        if not file or file.filename == '':
+            return redirect(request.url)
+        filename = secure_filename(file.filename)
+        print("Uploaded file")
+        
+        # need to add folder w/ timestamp on path!
+        path = os.path.join(os.getcwd(), "submissions", username, "00_00_00", p_name)
+        # intermediate directories need to be made
+        os.makedirs(path, exist_ok=True)
+        file.save(os.path.join(path, filename))
+        return redirect(url_for('progcomp.submit'))
+    
     return render_template("problem.html", username=username, problem=problem)
 
-@bp.route("/download/pdf", methods=["GET", "POST"])
+
+@bp.route("/download/pdf", methods=["GET"])
 def dl_pdf(filename):
     """
     Download the main pdf
@@ -90,7 +116,7 @@ def dl_pdf(filename):
     return send_from_directory(path, "problems.txt", as_attachment=True)
 
 
-@bp.route("/download/<string:p_name>/<string:filename>", methods=["GET", "POST"])
+@bp.route("/download/<string:p_name>/<string:filename>", methods=["GET"])
 def download(p_name, filename):
     """
     Download a specified problem input
@@ -100,96 +126,3 @@ def download(p_name, filename):
     if not os.path.exists(os.path.join(path, filename)):
         return redirect(url_for("progcomp.submit"))
     return send_from_directory(path, filename, as_attachment=True)
-
-#     # Attempt to get game information
-#     game = game_service.get_game(game_id)
-#     if game is None:
-#         return "Game not found", 404
-
-#     # Attempt to get player information
-#     player_name = session.get(USERNAME_SESSION_KEY)
-#     player = game.players.get(player_name)
-    
-#     if player is None:
-#         return redirect(url_for("game.join", game_id=game_id))
-
-#     if player.state is PlayerState.FINISHED:
-#         return redirect(url_for("game.end", game_id=game_id))
-
-#     if player.state is PlayerState.WAITING:
-#         player.start_question_attempt(game.time_per_question)
-
-#     # Did not submit an answer
-#     if player.current_attempt.has_timed_out:
-#         player.end_question_attempt(AnswerType.TIMEOUT)
-#         return redirect(url_for("game.answer_outcome", game_id=game_id))
-
-#     # Has submitted an answer
-#     if request.method == "POST":
-#         choice = GameUIAdapter.get_question_choice_selected(request.form)
-#         correct_choice = GameUIAdapter.get_correct_answer_index(request.form)
-
-#         if choice is None or correct_choice is None:
-#             return "Something went wrong, no choice selected!", 500
-
-#         game.on_question_answer(player, choice, correct_choice)
-
-#         return redirect(url_for("game.answer_outcome", game_id=game_id))
-
-#     choices, correct_index = game.questions[player.current_question].get_options()  
-
-#     game_service.save_game(game_id)
-
-#     return render_template(
-#         "in_game.html",
-#         game=game,
-#         player=player,
-#         current_question=game.questions[player.current_question],
-#         choices=choices,
-#         correct_index=correct_index
-#     )
-
-# @bp.route("/outcome/<string:game_id>", methods=["GET"])
-# def answer_outcome(game_id):
-#     """
-#     For displaying the result of a question
-#     """
-#     game = game_service.get_game(game_id)
-
-#     if game is None:
-#         return "Game not found", 404
-
-#     player_name = session.get(USERNAME_SESSION_KEY)
-#     player = game.players.get(player_name)
-
-#     if player is None:
-#         return redirect(url_for("game.join", game_id=game_id))
-
-#     if player.state is PlayerState.ANSWERING and player.current_attempt.has_timed_out:
-#         player.end_question_attempt(AnswerType.TIMEOUT)
-
-#     is_last_question = player.state == PlayerState.FINISHED
-
-#     game_service.save_game(game_id)
-
-#     return render_template(
-#         "answer_outcome.html",
-#         game=game,
-#         player=player,
-#         is_last_question=is_last_question
-#     )
-
-# @bp.route("/end/<string:game_id>", methods=["GET"])
-# def end(game_id):
-#     """
-#     For displaying the game's end leaderboard
-#     """
-#     game = game_service.get_game(game_id)
-
-#     if game is None:
-#         return "Game not found", 404
-    
-#     return render_template(
-#         "end.html",
-#         game=game
-#     )
