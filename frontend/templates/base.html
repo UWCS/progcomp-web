@@ -20,21 +20,11 @@
                   <li class="nav-item">
                     <a class="nav-link" href="/submit">Submissions</a>
                   </li>
+                  {% for i in range(6) %}
                   <li class="nav-item">
-                    <a class="nav-link" href="/1">1</a>
+                    <a class="nav-link" href="/problems/{{ i }}">{{ i }}</a>
                   </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/2">2</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/3">3</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/4">4</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/5">5</a>
-                  </li>
+                  {% endfor %}
                 </ul>
               </div>
                 <div class="container-fluid">

@@ -4,12 +4,17 @@
 
 {% block content %}
 
+<ul>
+    {% for name in problem.test_names %}
+    <li><a href="{{ url_for('progcomp.download', p_name=problem.name, filename=name) }}">{{ name }}</a></li>
+    {% endfor %}
+</ul>
 <!-- <div class="row pt-5 pb-3" id="quizz-header">
     <div class="col">
-        <h3>Question <span class="text-muted">{{ player.current_question + 1 }}</span> of <span class="text-muted">{{ game.questions | length }}</span></h3>
+        <h3>Question <span class="text-muted"></span> of <span class="text-muted"></span></h3>
     </div>
     <div class="col text-end">
-        <h3>Score <span class="text-muted">{{ player.score }} point</span> Time left: <span class="text-muted" id="time_left">2m3s</span></h3>
+        <h3>Score <span class="text-muted"> point</span> Time left: <span class="text-muted" id="time_left">2m3s</span></h3>
     </div>
 </div>
 
@@ -19,21 +24,21 @@
 
 <hr>
 
-<h3 class="pb-5"><span class="text-muted">Q: </span>{{ current_question.text }}</h3>
+<h3 class="pb-5"><span class="text-muted">Q: </span></h3>
 
-<form action="{{ url_for('game.play', game_id=game.game_id) }}" method="POST">
+<form action="" method="POST">
     <div class="row gap-2 text-center pt-4">
         {% set button_cols = ["danger", "primary", "warning", "success"] %}
         {% for choice in choices %}
             <div class="col">
-                <input class="btn btn-lg btn-{{ button_cols[loop.index0 % 4] }} w-100" type="submit" name="choice_{{ loop.index0 }}" value="{{ choice }}"/>
+                <input class="btn btn-lg btn-primary w-100" type="submit" value=""/>
             </div>
 
             {% if loop.index % 2 == 0 %}
                 <div class="w-100"></div>
             {% endif %}
         {% endfor %}
-        <input type="hidden" name="correct_{{correct_index}}"/>
+        <input type="hidden" name="correct_0"/>
     </div>
 </form>
 <hr> -->

@@ -21,17 +21,17 @@
             </tr>
             </thead>
             <tbody>
-                {% for game in games %}
+                <!-- {% for game in games %}
                 <tr>
                     <th scope="row" class="text-center">{{ game.game_id }}</th>
                     <td class="text-center">{{ game.num_questions }}</td>
                     <td class="text-center">{{ game.num_players }}</td>
                     <td class="text-center">
-                        <a href="{{ url_for('game.play', game_id=game.game_id) }}" class="btn btn-success btn-sm">Play</a>
-                        <a href="{{ url_for('game.end', game_id=game.game_id) }}" class="btn btn-info btn-sm">Leaderboard</a>
+                        <a href="{{ url_for('progcomp.play', game_id=game.game_id) }}" class="btn btn-success btn-sm">Play</a>
+                        <a href="{{ url_for('progcomp.end', game_id=game.game_id) }}" class="btn btn-info btn-sm">Leaderboard</a>
                     </td>
                 </tr>
-                {% endfor %}
+                {% endfor %} -->
             </tbody>
         </table>
     </div>
