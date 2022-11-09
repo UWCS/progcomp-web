@@ -9,3 +9,6 @@ class Problem:
     def update(self):
         path = os.path.join(os.getcwd(), "problems", self.name, "input")
         self.test_names = os.listdir(path)
+
+    def get_test(self):
+        pass

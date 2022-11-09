@@ -4,49 +4,33 @@
 
 {% block content %}
 
+<div class="row pt-5" id="header">
+    <h3>Problem <b>{{ problem.name }}</b></span></h3>
+</div>
+
 <ul>
-    {% for name in problem.test_names %}
-    <li><a href="{{ url_for('progcomp.download', p_name=problem.name, filename=name) }}">{{ name }}</a></li>
+    {% for test_name in problem.test_names %}
+    <li><a href="{{ url_for('progcomp.download', p_name=problem.name, filename=test_name) }}">{{ test_name }}</a></li>
     {% endfor %}
 </ul>
 
-<form method=post enctype=multipart/form-data>
-    <input type=file name=file>
-    <input type=submit value=Upload>
-</form>
-<!-- <div class="row pt-5 pb-3" id="quizz-header">
-    <div class="col">
-        <h3>Question <span class="text-muted"></span> of <span class="text-muted"></span></h3>
-    </div>
-    <div class="col text-end">
-        <h3>Score <span class="text-muted"> point</span> Time left: <span class="text-muted" id="time_left">2m3s</span></h3>
-    </div>
-</div>
-
-<div class="progress">
-    <div id="time_left_bar" class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: 75%;"></div>
-</div>
-
 <hr>
 
-<h3 class="pb-5"><span class="text-muted">Q: </span></h3>
-
-<form action="" method="POST">
-    <div class="row gap-2 text-center pt-4">
-        {% set button_cols = ["danger", "primary", "warning", "success"] %}
-        {% for choice in choices %}
-            <div class="col">
-                <input class="btn btn-lg btn-primary w-100" type="submit" value=""/>
-            </div>
-
-            {% if loop.index % 2 == 0 %}
-                <div class="w-100"></div>
-            {% endif %}
+<form method=post enctype=multipart/form-data>
+    <label for="test_select" class="form-label mt-4">Select Input Data</label>
+    <select class="form-select" id="test_select" name="test_select">
+        {% for test_name in problem.test_names %}
+        <option value="{{ test_name }}">{{ test_name[:-4]}}</option>
         {% endfor %}
-        <input type="hidden" name="correct_0"/>
-    </div>
+    </select>
+    <label for="output" class="form-label mt-4">Upload Output</label>
+    <input class="form-control" type=file name=output accept=".txt,.out">
+    <label for="script" class="form-label mt-4">Upload Script</label>
+    <input class="form-control" type=file name=script>
+    <br>
+    <button type="submit" class="btn btn-primary btn-lg">Submit</button>
 </form>
-<hr> -->
-<p id="footer" class="text-muted">Team Name - <code>{{ username }}</code></p>
+<hr>
+<p id="footer" class="text-muted">Submitting for <code>{{ username }}</code></p>
 
 {% endblock %}

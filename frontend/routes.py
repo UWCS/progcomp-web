@@ -3,6 +3,7 @@ from werkzeug.utils import secure_filename
 import os
 
 from backend.progcomp import Progcomp
+from backend.submission import Submission
 
 # from .adapters import GameUIAdapter
 from .session import USERNAME_SESSION_KEY
@@ -85,35 +86,51 @@ def problem(p_name):
         # TODO: Multiple files (script + output data at the same time)
         # check if the post request has the file part
         print(request.files)
-        if 'file' not in request.files:
+
+        if 'output' not in request.files or 'script' not in request.files:
             print("no file part")
             return redirect(request.url)
-        file = request.files['file']
+
         # If user doesn't select a file, browser submits empty file.
-        print(file)
-        if not file or file.filename == '':
+        output = request.files.get("output")
+        if not output or output.filename == "":
             return redirect(request.url)
-        filename = secure_filename(file.filename)
-        print("Uploaded file")
+
+        script = request.files.get("script")
+        if not script or script.filename == "":
+            return redirect(request.url)
+        script_name = secure_filename(script.filename)
+
+        test = request.form.get("test_select")
+        if not test:
+            return redirect(request.url)
         
-        # need to add folder w/ timestamp on path!
-        path = os.path.join(os.getcwd(), "submissions", username, "00_00_00", p_name)
-        # intermediate directories need to be made
+        timestamp = pc.get_timestamp()
+
+        # need to folder w/ timestamp on path
+        path = os.path.join(os.getcwd(), "submissions", username, p_name, test[:-4], timestamp)
+
         os.makedirs(path, exist_ok=True)
-        file.save(os.path.join(path, filename))
+
+        # Upload files
+        output.save(os.path.join(path, "output.txt"))
+        script.save(os.path.join(path, script_name))
+        print("Uploaded file")
+
+        pc.make_submission(timestamp, username, p_name, test[:-4])
+        
         return redirect(url_for('progcomp.submit'))
     
     return render_template("problem.html", username=username, problem=problem)
 
 
 @bp.route("/download/pdf", methods=["GET"])
-def dl_pdf(filename):
+def dl_pdf():
     """
     Download the main pdf
     """
 
-    path = os.path.join(os.getcwd(), "pdf")
-    return send_from_directory(path, "problems.txt", as_attachment=True)
+    return send_from_directory(os.getcwd(), "problems.txt", as_attachment=True)
 
 
 @bp.route("/download/<string:p_name>/<string:filename>", methods=["GET"])

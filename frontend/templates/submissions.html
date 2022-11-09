@@ -9,24 +9,49 @@
 </div>
 
 <hr>
+
+
+<a href="{{ url_for('progcomp.dl_pdf') }}">
+    <button type="button" class="btn btn-primary">Download Problem Descriptions</button>
+</a>
+
+<hr>
+
 <div class="row justify-content-center">
     <div class="col-auto">
         <table class="table table-hover">
             <thead>
             <tr class="table-light">
                 <th scope="col">Timestamp</th>
-                <th scope="col">Problem #</th>
+                <th scope="col">Problem</th>
                 <th scope="col">Dataset</th>
+                <th scope="col">Status</th>
                 <th scope="col">Score</th>
             </tr>
             </thead>
             <tbody>
                 {% for submission in team.submissions %}
-                <tr>
-                    <th scope="row" class="text-center">{{ submission.timestamp }}</th>
-                    <td class="text-center">{{ submission.p_num }}</td>
-                    <td class="text-center">{{ submission.dataset }}</td>
-                    <td class="text-center">{{ submission.result }}</td>
+                {% if submission.status == "CORRECT" %}
+                    {% set row_color = 'table-success' %}
+                {% elif submission.status == "SCORED" %}
+                    {% set row_color = 'table-primary' %}
+                {% elif submission.status == "WRONG" %}
+                    {% set row_color = 'table-danger' %}
+                {% elif submission.status == "PARTIAL" %}
+                    {% set row_color = 'table-warning' %}
+                {% else %}
+                    {% set row_color = '' %}
+                {% endif %}
+                <tr class="{{row_color}}">
+                    <th scope="row" class="text-center">{{ submission.timestamp.replace("-", ":") }}</th>
+                    <td class="text-center">{{ submission.problem.name }}</td>
+                    <td class="text-center">{{ submission.test_name }}</td>
+                    <td class="text-center">{{ submission.status }}</td>
+                    {% if submission.max_score == -1 %}
+                    <td class="text-center">{{ submission.score }}</td>
+                    {% else %}
+                    <td class="text-center">{{ submission.score }}/{{ submission.max_score }}</td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </tbody>
