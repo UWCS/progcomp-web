@@ -34,7 +34,7 @@ class Submission:
 
         # Needs to be in a subprocess so we can add and remove on the fly
         ps = subprocess.run(
-            ["python", mark_file, problem_dir, self.test_name + ".txt", submission_file], 
+            ["python3", mark_file, problem_dir, self.test_name + ".txt", submission_file], 
             capture_output=True, 
             text=True
         )
