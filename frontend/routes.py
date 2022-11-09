@@ -2,6 +2,7 @@ from flask import Blueprint, redirect, render_template, request, url_for, sessio
 from werkzeug.utils import secure_filename
 import os
 import re
+import glob
 
 from backend.progcomp import Progcomp
 from backend.submission import Submission
@@ -64,7 +65,31 @@ def submit():
 
     # List out team submission info
     return render_template("submissions.html", team=team)
+
+
+@bp.route("/leaderboard", methods=["GET"])
+def leaderboard_main():
+    problems = []
+    for dir in glob.glob(os.path.join(os.getcwd(),"results/*")):
+        if not os.path.isdir(dir): continue
+        p = Problem(dir.split("/")[-1], False)
+        problems.append(p)
+        for filen in glob.glob(dir + "/*.txt"):
+            p.test_names.append(filen.split("/")[-1][:-4])
+        print(p.test_names)
+    problems.sort(key=lambda p: p.name)
     
+    with open(os.path.join(os.getcwd(), f"results/winners.txt")) as f:
+        lines = f.readlines()
+    winners = []
+    for line in lines:
+        parts = [x.strip() for x in re.split(r" +", line.strip())]
+        winners.append(parts)
+    print(winners)
+
+    return render_template("leaderboard_hub.html", problems=problems, winners=winners)
+        
+
 
 @bp.route("/leaderboard/<string:p_name>/<string:p_set>", methods=["GET"])
 def leaderboard(p_name, p_set):
@@ -77,8 +102,12 @@ def leaderboard(p_name, p_set):
         
     if not p_name.isalnum() or not p_set.isalnum():
         return
-    with open(os.path.join(os.getcwd(), f"results/{p_name}/{p_set}.txt")) as f:
-        lines = f.readlines()
+    try:
+        with open(os.path.join(os.getcwd(), f"results/{p_name}/{p_set}.txt")) as f:
+            lines = f.readlines()
+    except FileNotFoundError:
+        return redirect(url_for("progcomp.leaderboard_main"))
+
     this_round = set()
     results = []
     for line in lines:
