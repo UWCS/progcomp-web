@@ -1,9 +1,12 @@
 from flask import Blueprint, redirect, render_template, request, url_for, session, send_from_directory, flash
 from werkzeug.utils import secure_filename
 import os
+import re
 
 from backend.progcomp import Progcomp
 from backend.submission import Submission
+from backend.team import Team
+from backend.problem import Problem
 
 # from .adapters import GameUIAdapter
 from .session import USERNAME_SESSION_KEY
@@ -61,6 +64,36 @@ def submit():
 
     # List out team submission info
     return render_template("submissions.html", team=team)
+    
+
+@bp.route("/leaderboard/<string:p_name>/<string:p_set>", methods=["GET"])
+def leaderboard(p_name, p_set):
+
+    # pc.update_problems()
+    # problem = pc.get_problem(p_name)
+    # print(problem, repr(p_set), repr(problem.test_names))
+    # if not problem or (p_set + ".txt") not in problem.test_names:
+        # return redirect(url_for("progcomp.submit"))
+        
+    if not p_name.isalnum() or not p_set.isalnum():
+        return
+    with open(os.path.join(os.getcwd(), f"results/{p_name}/{p_set}.txt")) as f:
+        lines = f.readlines()
+    this_round = set()
+    results = []
+    for line in lines:
+        parts = [x.strip() for x in re.split(r" +", line.strip())]
+
+        if parts[3] not in this_round:
+            print(parts)
+            if parts[2] == "[CORRECT]" or parts[2] == "[PARTIAL]":
+                sub = Submission(Team(parts[3], ""), p_name, parts[1].split(".")[0], p_set, parts[0])
+                sub.status = parts[2][1:-1]
+                results.append(sub)
+                # print(results[-1])
+                this_round.add(parts[3])
+
+    return render_template("leaderboard.html", p_name=p_name, p_set=p_set, submissions=results)
 
     
 
