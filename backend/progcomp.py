@@ -1,6 +1,8 @@
 import os
 from typing import Optional
 from datetime import datetime
+import atexit
+import pickle
 
 from .problem import Problem
 from .team import Team
@@ -43,3 +45,7 @@ class Progcomp:
             return False
         team.add_submission(Submission(team, problem, timestamp, test_name))
         return True
+
+    @atexit.register
+    def pickle(self):
+        pickle.dump(self)
