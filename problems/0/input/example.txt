@@ -1,1 +1,4 @@
-hello world
+3
+hello
+goodbye
+helloagain
