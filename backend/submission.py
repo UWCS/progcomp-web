@@ -17,7 +17,7 @@ class Submission:
         self.mark()
     
     def __repr__(self) -> str:
-        return f"{self.team} for {self.problem} ({self.test_name}) [{self.status}] {self.score} ({self.max_score})"
+        return f"{self.team.name} for {self.problem.name} ({self.test_name}) [{self.status}] {self.score} ({self.max_score})"
     
     def mark(self):
         # Relative directories of the locations needed
