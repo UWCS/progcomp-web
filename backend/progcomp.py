@@ -32,10 +32,6 @@ class Progcomp:
     def get_problem(self, name):
         return self._problems.get(name)
     
-    def get_pdf_loc(self):
-        path = os.path.join(os.getcwd(), "pdf")
-        return path
-    
     def get_timestamp(self):
         td = datetime.now() - self._start_time
         return str(td)[:-4].replace(":","-")

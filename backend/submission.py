@@ -36,7 +36,7 @@ class Submission:
             text=True
         )
 
-        print(f"Err:\n{ps.stderr}")
+        print(f"Err: {ps.stderr}")
 
         line = ps.stdout.strip("\n")
         print(line)
@@ -54,4 +54,4 @@ class Submission:
             self.score = nums
             self.status = "SCORED"
         else:
-            raise ValueError
+            self.status = "INVALID"
