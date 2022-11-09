@@ -76,7 +76,6 @@ def leaderboard_main():
         problems.append(p)
         for filen in glob.glob(dir + "/*.txt"):
             p.test_names.append(filen.split("/")[-1][:-4])
-        print(p.test_names)
     problems.sort(key=lambda p: p.name)
     
     with open(os.path.join(os.getcwd(), f"results/winners.txt")) as f:
@@ -85,9 +84,9 @@ def leaderboard_main():
     for line in lines:
         parts = [x.strip() for x in re.split(r" +", line.strip())]
         winners.append(parts)
-    print(winners)
 
-    return render_template("leaderboard_hub.html", problems=problems, winners=winners)
+    top3 = f"{winners[0][0]}, {winners[1][0]}, and {winners[2][0]}"
+    return render_template("leaderboard_hub.html", problems=problems, winners=winners, top3=top3)
         
 
 
