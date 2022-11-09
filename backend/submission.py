@@ -4,17 +4,18 @@ from .problem import Problem
 from .team import Team
 
 class Submission:
-    def __init__(self, team: Team, problem: Problem, timestamp: str, test_name: str) -> None:
+    def __init__(self, team: Team, problem: Problem, timestamp: str, test_name: str, score: int = None) -> None:
         self.team: Team = team
         self.problem: Problem = problem
         self.timestamp: str = timestamp
         self.test_name : str = test_name
         self.status : str = "UNKNOWN"
-        self.score : int = 0
+        self.score : int = score
         self.max_score : int = -1  # -1 means no max score
 
         # Run in separate thread?
-        self.mark()
+        if self.score is None:
+            self.mark()
     
     def __repr__(self) -> str:
         return f"{self.team.name} for {self.problem.name} ({self.test_name}) [{self.status}] {self.score} ({self.max_score})"

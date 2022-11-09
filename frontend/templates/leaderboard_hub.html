@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Leaderboard{% endblock %}
+
+{% block content %}
+
+
+<div class="row pt-5" id="header">
+    <h2>Congratulations to {{ top3 }}!</h2>
+</div>
+
+<div class="row pt-5" id="header">
+    <h2>Per-Problem Leaderboards</b></h2>
+    <p>Note: these aren't live, they are as of 19:15, when the competition ended.</p>
+</div>
+
+<hr>
+
+<div class="row justify-content-center">
+    <div class="col-auto">
+        {% for prob in problems %}
+            <h3>Problem {{ prob.name }}</h3>
+            <ul>
+                {% for test in prob.test_names %}
+                    <li><a href="leaderboard/{{ prob.name }}/{{ test }}">{{ test }}</a></li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    </div>
+</div>
+<hr>
+
+<div class="row pt-5" id="header">
+    <h2>Overall Winners</b></h2>
+</div>
+<div class="row justify-content-center">
+    <div class="col-auto">
+        <table class="table table-hover">
+            <thead>
+            <tr class="table-light">
+                <th scope="col">Position</th>
+                <th scope="col" class="text-center">Team</th>
+                <th scope="col">Correct</th>
+                <th scope="col">Partial</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for winner in winners %}
+                <tr class="{{row_color}}">
+                    <td class="text-center">{{ loop.index }}</td>
+                    <td class="text-center">{{ winner[0] }}</td>
+                    <td class="text-center">{{ winner[1] }}</td>
+                    <td class="text-center">{{ winner[2] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<hr>
+{% endblock %}
