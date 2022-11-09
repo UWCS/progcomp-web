@@ -26,11 +26,10 @@ def start():
 
     # Check username and password are in a valid format
     username = request.form.get("username")
-    if username in [None, ""] or username.isspace() or len(username) > 100 or not username.isascii():
+    if username in [None, ""] or username.isspace() or len(username) > 100 or not username.isalnum():
         return redirect(url_for("progcomp.menu"))
     
     password = request.form.get("password")
-    print(password)
     if password in [None, ""] or password.isspace() or len(password) > 30 or not password.isascii():
         return redirect(url_for("progcomp.menu"))
     
@@ -82,13 +81,10 @@ def problem(p_name):
         return redirect(url_for("progcomp.submit"))
     
     if request.method == 'POST':
-        print("Uploading file")
         # TODO: Multiple files (script + output data at the same time)
         # check if the post request has the file part
-        print(request.files)
 
         if 'output' not in request.files or 'script' not in request.files:
-            print("no file part")
             return redirect(request.url)
 
         # If user doesn't select a file, browser submits empty file.
@@ -115,7 +111,6 @@ def problem(p_name):
         # Upload files
         output.save(os.path.join(path, "output.txt"))
         script.save(os.path.join(path, script_name))
-        print("Uploaded file")
 
         pc.make_submission(timestamp, username, p_name, test[:-4])
         
@@ -130,7 +125,7 @@ def dl_pdf():
     Download the main pdf
     """
 
-    return send_from_directory(os.getcwd(), "problems.txt", as_attachment=True)
+    return send_from_directory(os.getcwd(), "problems.pdf", as_attachment=True)
 
 
 @bp.route("/download/<string:p_name>/<string:filename>", methods=["GET"])

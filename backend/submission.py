@@ -16,6 +16,9 @@ class Submission:
         # Run in separate thread?
         self.mark()
     
+    def __repr__(self) -> str:
+        return f"{self.team} for {self.problem} ({self.test_name}) [{self.status}] {self.score} ({self.max_score})"
+    
     def mark(self):
         # Relative directories of the locations needed
         problem_dir = os.path.join("problems", self.problem.name)
@@ -36,10 +39,10 @@ class Submission:
             text=True
         )
 
-        print(f"Err: {ps.stderr}")
+        print(f"Errors in marking {self.problem.name}: {ps.stderr}")
 
         line = ps.stdout.strip("\n")
-        print(line)
+
         nums = [int(n) for n in line.split()]
 
         if len(nums) == 2:

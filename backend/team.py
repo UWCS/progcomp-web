@@ -7,4 +7,5 @@ class Team:
     
     def add_submission(self, submission):
         self.submissions.append(submission)
+        print(submission)
         sorted(self.submissions, key=lambda x: x.timestamp, reverse=True)
