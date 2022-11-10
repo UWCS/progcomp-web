@@ -8,27 +8,44 @@
     <h3>Problem <b>{{ problem.name }}</b></span></h3>
 </div>
 
-<ul>
+<h4>Download Input Test Data</h4><br>
+<div class="row gap-2">
     {% for test_name in problem.test_names %}
-    <li><a href="{{ url_for('progcomp.download', p_name=problem.name, filename=test_name) }}">{{ test_name }}</a></li>
+    <a href="{{ url_for('progcomp.download', p_name=problem.name, filename=test_name) }}" class="col-md col-auto btn btn-primary" style="min-width: max-content;"><i class="fa fa-fw fa-download"></i>&nbsp;{{ test_name }}</a>
     {% endfor %}
-</ul>
+</div>
 
 <hr>
-
+<br>
 <form method=post enctype=multipart/form-data>
-    <label for="test_select" class="form-label mt-4">Select Input Data</label>
-    <select class="form-select" id="test_select" name="test_select">
-        {% for test_name in problem.test_names %}
-        <option value="{{ test_name }}">{{ test_name[:-4]}}</option>
-        {% endfor %}
-    </select>
-    <label for="output" class="form-label mt-4">Upload Output</label>
-    <input class="form-control" type=file name=output accept=".txt,.out">
-    <label for="script" class="form-label mt-4">Upload Script</label>
-    <input class="form-control" type=file name=script>
+    <h4>Submit Results</h4>
+    <div class="d-flex align-items-center gap-4">
+        <div>
+            <label for="test_select" class="form-label m-0 fw-bold" style="min-width: max-content">Select Input Data:</label>
+        </div>
+        <div class="flex-grow-1">
+            <select class="form-select" id="test_select" name="test_select">
+                    {% for test_name in problem.test_names %}
+                    <option value="{{ test_name }}">{{ test_name[:-4]}}</option>
+                    {% endfor %}
+                </select>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary btn-lg align-bottom">Submit</button>
+        </div>
+    </div>
     <br>
-    <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+    <div class="d-flex gap-2">
+        <div class="p-2 flex-grow-1">
+            <label for="output" class="form-label fw-bold">Upload Solution Results</label>
+            <input class="form-control" type=file name=output accept=".txt,.out">
+        </div>
+        <div class="p-2 flex-grow-1">
+            <label for="script" class="form-label"><b>Upload Script</b> (for verification)</label>
+            <input class="form-control" type=file name=script>
+        </div>
+    </div>
+    <br>
 </form>
 <hr>
 <p id="footer" class="text-muted">Submitting for <code>{{ username }}</code></p>
