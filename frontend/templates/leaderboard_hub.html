@@ -14,28 +14,26 @@
     <p>Note: these aren't live, they are as of 19:15, when the competition ended.</p>
 </div>
 
-<hr>
 
-<div class="row justify-content-center">
-    <div class="col-auto">
-        {% for prob in problems %}
-            <h3>Problem {{ prob.name }}</h3>
-            <ul>
-                {% for test in prob.test_names %}
-                    <li><a href="leaderboard/{{ prob.name }}/{{ test }}">{{ test }}</a></li>
-                {% endfor %}
-            </ul>
+<div class="row gap-4 justify-content-center">
+    {% for prob in problems %}
+        <div class="flex-grow-1 col-md col-auto row d-md-block text-center">
+        <h3>Problem {{ prob.name }}</h3>
+        {% for test in prob.test_names %}
+            <a class="btn btn-outline-primary p-2 m-1" style="width: 100%" href="leaderboard/{{ prob.name }}/{{ test }}">{{ test }}</a>
         {% endfor %}
-    </div>
+        </div>
+    {% endfor %}
 </div>
+
 <hr>
 
-<div class="row pt-5" id="header">
-    <h2>Overall Winners</b></h2>
+<div class="row p-2  text-center" id="header">
+    <h2>Overall Winners</h2>
 </div>
 <div class="row justify-content-center">
     <div class="col-auto">
-        <table class="table table-hover">
+        <table class="table table-hover table-sm">
             <thead>
             <tr class="table-light">
                 <th scope="col">Position</th>
