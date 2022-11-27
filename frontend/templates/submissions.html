@@ -33,13 +33,13 @@
             <tbody>
                 {% for submission in team.submissions %}
                 {% if submission.status == "CORRECT" %}
-                    {% set row_color = '#d1e7dd' %}
+                    {% set row_color = 'table-success' %}
                 {% elif submission.status == "SCORED" %}
                     {% set row_color = 'table-primary' %}
                 {% elif submission.status == "WRONG" %}
-                    {% set row_color = 'f8d7da' %}
+                    {% set row_color = 'table-danger' %}
                 {% elif submission.status == "PARTIAL" %}
-                    {% set row_color = '#fff3cd' %}
+                    {% set row_color = 'table-warning' %}
                 {% else %}
                     {% set row_color = '' %}
                 {% endif %}
