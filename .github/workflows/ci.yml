@@ -1,0 +1,26 @@
+name: Run CI Checks
+on: [push]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2 
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10' 
+        
+    - name: Install pipenv
+      run: pip install --user pipenv
+    
+    - name: Install dependencies, check that lockfile is synced
+      run: pipenv install --dev --deploy
+      
+    - name: Check that formatting is correct
+      run: pipenv run black --check progcomp
+      
+    - name: Check that no type errors are detected
+      run: pipenv run mypy progcomp
+        
+
+    

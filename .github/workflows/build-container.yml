@@ -1,0 +1,20 @@
+name: Build and publish a Docker image to ghcr.io
+on:
+  workflow_run:
+    workflows: [Run CI Checks]
+    types:
+      - completed
+    branches: [main]
+
+jobs:
+  docker_publish:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v2
+
+      # https://github.com/marketplace/actions/push-to-ghcr
+      - name: Build and publish a Docker image for dcspkg server
+        uses: macbre/push-to-ghcr@v12
+        with:
+          image_name: uwcs/progcomp-web
+          github_token: ${{ secrets.GITHUB_TOKEN }}
