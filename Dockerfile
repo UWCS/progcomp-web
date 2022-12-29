@@ -18,9 +18,7 @@ RUN mkdir -pv /app/.venv
 COPY --from=builder /app/.venv/ /app/.venv/
 
 # copy in python sources
-COPY frontend /app/frontend
-COPY backend /app/backend
+COPY progcomp /app/progcomp
 
 WORKDIR /app
-RUN ls -al
-CMD ["./.venv/bin/gunicorn", "--chdir", "/app", "frontend:app",  "-w", "4", "-b", "0.0.0.0:8080"]
+CMD ["./.venv/bin/gunicorn", "--chdir", "/app", "progcomp:app",  "-w", "4", "-b", "0.0.0.0:8080"]
