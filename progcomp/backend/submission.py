@@ -1,5 +1,6 @@
 import os
 import subprocess
+from typing import Optional
 from .problem import Problem
 from .team import Team
 
@@ -11,14 +12,14 @@ class Submission:
         problem: Problem,
         timestamp: str,
         test_name: str,
-        score: int = None,
+        score: Optional[int] = None,
     ) -> None:
         self.team: Team = team
         self.problem: Problem = problem
         self.timestamp: str = timestamp
         self.test_name: str = test_name
         self.status: str = "UNKNOWN"
-        self.score: int = score
+        self.score: Optional[int] = score
         self.max_score: int = -1  # -1 means no max score
 
         # Run in separate thread?
