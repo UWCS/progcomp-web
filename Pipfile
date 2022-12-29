@@ -5,10 +5,10 @@ name = "pypi"
 
 [packages]
 flask = "*"
-pytest = "*"
-black = "*"
+gunicorn = "*"
 
 [dev-packages]
+black = "*"
 
 [requires]
 python_version = "3.10"
