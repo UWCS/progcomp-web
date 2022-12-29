@@ -12,10 +12,10 @@ import os
 import re
 import glob
 
-from backend.progcomp import Progcomp
-from backend.submission import Submission
-from backend.team import Team
-from backend.problem import Problem
+from .backend.progcomp import Progcomp
+from .backend.submission import Submission
+from .backend.team import Team
+from .backend.problem import Problem
 
 # from .adapters import GameUIAdapter
 from .session import USERNAME_SESSION_KEY
