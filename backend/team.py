@@ -3,8 +3,8 @@ class Team:
         self.name = name
         self.password = password
         self.score = 0
-        self.submissions : list = []
-    
+        self.submissions: list = []
+
     def add_submission(self, submission):
         self.submissions.append(submission)
         print(submission)

@@ -24,5 +24,7 @@ for results in glob.glob("results/*/*.txt"):
             this_round.add(parts[3])
     # print(results, len(this_round))
 
-for k, v in sorted(team_correct.items(), key=lambda p: (-team_correct[p[0]], -team_partial[p[0]])):
+for k, v in sorted(
+    team_correct.items(), key=lambda p: (-team_correct[p[0]], -team_partial[p[0]])
+):
     print(f"{k}\t{v}\t{team_partial[k]}")

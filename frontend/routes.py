@@ -1,4 +1,12 @@
-from flask import Blueprint, redirect, render_template, request, url_for, session, send_from_directory
+from flask import (
+    Blueprint,
+    redirect,
+    render_template,
+    request,
+    url_for,
+    session,
+    send_from_directory,
+)
 from werkzeug.utils import secure_filename
 import os
 import re
@@ -17,10 +25,12 @@ pc = Progcomp()
 
 bp = Blueprint("progcomp", __name__)
 
+
 @bp.route("/")
 def menu():
     # session[USERNAME_SESSION_KEY] = ""
     return render_template("menu.html")
+
 
 @bp.route("/start", methods=["POST"])
 def start():
@@ -30,13 +40,23 @@ def start():
 
     # Check username and password are in a valid format
     username = request.form.get("username")
-    if username in [None, ""] or username.isspace() or len(username) > 100 or not username.isalnum():
+    if (
+        username in [None, ""]
+        or username.isspace()
+        or len(username) > 100
+        or not username.isalnum()
+    ):
         return redirect(url_for("progcomp.menu"))
-    
+
     password = request.form.get("password")
-    if password in [None, ""] or password.isspace() or len(password) > 30 or not password.isascii():
+    if (
+        password in [None, ""]
+        or password.isspace()
+        or len(password) > 30
+        or not password.isascii()
+    ):
         return redirect(url_for("progcomp.menu"))
-    
+
     # Check password against potentially existing team
     team = pc.get_team(username)
     if team:
@@ -44,11 +64,12 @@ def start():
             return redirect(url_for("progcomp.menu"))
     else:
         pc.add_team(username, password)
-    
+
     # Save their username
     session[USERNAME_SESSION_KEY] = username
 
     return redirect(url_for("progcomp.submit"))
+
 
 @bp.route("/submit", methods=["GET"])
 def submit():
@@ -70,14 +91,15 @@ def submit():
 @bp.route("/leaderboard", methods=["GET"])
 def leaderboard_main():
     problems = []
-    for dir in glob.glob(os.path.join(os.getcwd(),"results/*")):
-        if not os.path.isdir(dir): continue
+    for dir in glob.glob(os.path.join(os.getcwd(), "results/*")):
+        if not os.path.isdir(dir):
+            continue
         p = Problem(dir.split("/")[-1], False)
         problems.append(p)
         for filen in glob.glob(dir + "/*.txt"):
             p.test_names.append(filen.split("/")[-1][:-4])
     problems.sort(key=lambda p: p.name)
-    
+
     with open(os.path.join(os.getcwd(), f"results/winners.txt")) as f:
         lines = f.readlines()
     winners = []
@@ -86,8 +108,9 @@ def leaderboard_main():
         winners.append(parts)
 
     top3 = f"{winners[0][0]}, {winners[1][0]}, and {winners[2][0]}"
-    return render_template("leaderboard_hub.html", problems=problems, winners=winners, top3=top3)
-        
+    return render_template(
+        "leaderboard_hub.html", problems=problems, winners=winners, top3=top3
+    )
 
 
 @bp.route("/leaderboard/<string:p_name>/<string:p_set>", methods=["GET"])
@@ -97,8 +120,8 @@ def leaderboard(p_name, p_set):
     # problem = pc.get_problem(p_name)
     # print(problem, repr(p_set), repr(problem.test_names))
     # if not problem or (p_set + ".txt") not in problem.test_names:
-        # return redirect(url_for("progcomp.submit"))
-        
+    # return redirect(url_for("progcomp.submit"))
+
     if not p_name.isalnum() or not p_set.isalnum():
         return
     try:
@@ -115,15 +138,18 @@ def leaderboard(p_name, p_set):
         if parts[3] not in this_round:
             print(parts)
             if parts[2] == "[CORRECT]" or parts[2] == "[PARTIAL]":
-                sub = Submission(Team(parts[3], ""), p_name, parts[1].split(".")[0], p_set, parts[0])
+                sub = Submission(
+                    Team(parts[3], ""), p_name, parts[1].split(".")[0], p_set, parts[0]
+                )
                 sub.status = parts[2][1:-1]
                 results.append(sub)
                 # print(results[-1])
                 this_round.add(parts[3])
 
-    return render_template("leaderboard.html", p_name=p_name, p_set=p_set, submissions=results)
+    return render_template(
+        "leaderboard.html", p_name=p_name, p_set=p_set, submissions=results
+    )
 
-    
 
 @bp.route("/problems/<string:p_name>", methods=["GET", "POST"])
 def problem(p_name):
@@ -134,18 +160,18 @@ def problem(p_name):
     username = session.get(USERNAME_SESSION_KEY)
     if not username:
         return redirect(url_for("progcomp.menu"))
-    
+
     pc.update_problems()
 
     problem = pc.get_problem(p_name)
     if not problem:
         return redirect(url_for("progcomp.submit"))
-    
-    if request.method == 'POST':
+
+    if request.method == "POST":
         # TODO: Multiple files (script + output data at the same time)
         # check if the post request has the file part
 
-        if 'output' not in request.files or 'script' not in request.files:
+        if "output" not in request.files or "script" not in request.files:
             return redirect(request.url)
 
         # If user doesn't select a file, browser submits empty file.
@@ -161,11 +187,13 @@ def problem(p_name):
         test = request.form.get("test_select")
         if not test:
             return redirect(request.url)
-        
+
         timestamp = pc.get_timestamp()
 
         # need to folder w/ timestamp on path
-        path = os.path.join(os.getcwd(), "submissions", username, p_name, test[:-4], timestamp)
+        path = os.path.join(
+            os.getcwd(), "submissions", username, p_name, test[:-4], timestamp
+        )
 
         os.makedirs(path, exist_ok=True)
 
@@ -174,9 +202,9 @@ def problem(p_name):
         script.save(os.path.join(path, script_name))
 
         pc.make_submission(timestamp, username, p_name, test[:-4])
-        
-        return redirect(url_for('progcomp.submit'))
-    
+
+        return redirect(url_for("progcomp.submit"))
+
     return render_template("problem.html", username=username, problem=problem)
 
 
