@@ -13,7 +13,6 @@ jobs:
         cache: pipenv
     - name: Install pipenv
       run: pip install pipenv
-    - run: pipenv install
     - name: Install dependencies, check that lockfile is synced
       run: pipenv install --dev --deploy
   
