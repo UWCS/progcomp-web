@@ -1,5 +1,6 @@
-from sqlalchemy import ForeignKey, ForeignKeyConstraint, func
+from sqlalchemy import ForeignKey, ForeignKeyConstraint, desc
 from sqlalchemy.orm import relationship
+from progcomp.models.submission import Submission
 
 from progcomp.models.utils import auto_str
 
@@ -16,6 +17,6 @@ class Team(db.Model):
     password = db.Column(db.String, nullable=False)
     score = db.Column(db.Integer, default=0)
 
-    submissions = relationship("Submission", back_populates="team")
+    submissions = relationship("Submission", back_populates="team", order_by=Submission.timestamp.desc())
     # , order_by="submissions.timestamp"
     progcomp = relationship("Progcomp", back_populates="teams")
