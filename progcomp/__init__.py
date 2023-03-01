@@ -24,6 +24,8 @@ app.config.from_mapping(
 from .database import db
 
 db.init_app(app)
+with app.app_context():
+    db.create_all()
 
 from . import routes
 
