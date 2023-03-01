@@ -2,6 +2,7 @@ import os
 
 from sqlalchemy import ForeignKey, ForeignKeyConstraint, func
 from sqlalchemy.orm import relationship
+from progcomp.models.submission import Status
 
 from progcomp.models.utils import auto_str
 
@@ -70,8 +71,9 @@ class Test(db.Model):
         team_scores = {}
 
         for sub in submissions:
+            if sub.status not in [Status.CORRECT, Status.PARTIAL]:
+                continue
             current = team_scores.get(sub.team.name)
-            print("SUB COMP", current, sub)
             if not current or (sub.score > current.score) or (sub.score == current.score and sub.timestamp > current.timestamp):
                 team_scores[sub.team.name] = sub
 

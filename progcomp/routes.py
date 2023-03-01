@@ -25,7 +25,6 @@ from .session import USERNAME_SESSION_KEY
 
 
 def load_pc():
-    global pc
     # with app.app_context():
     pc = db.session.query(Progcomp).first()
     if not pc:

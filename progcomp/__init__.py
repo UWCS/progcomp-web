@@ -29,7 +29,6 @@ def create_app(test_config=None):
     from . import routes
 
     app.register_blueprint(routes.bp)
-
     app.before_first_request(routes.load_pc)
     return app
 
