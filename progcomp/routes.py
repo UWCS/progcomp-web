@@ -203,7 +203,7 @@ def leaderboard_main():
 def leaderboard(p_name, p_set):
     print("LEADERBOARD FOR", p_name, p_set)
     if not get_pc().show_leaderboard or not p_name.isalnum() or not p_set.isalnum():
-        return
+        return redirect(url_for("progcomp.menu"))
     
     problem: Problem = get_pc().get_problem(p_name)
     if not problem:
@@ -221,3 +221,5 @@ def leaderboard(p_name, p_set):
         submissions=subs,
         progcomp=get_pc(),
     )
+
+
