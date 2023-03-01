@@ -1,41 +1,45 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>{% block title %}{% endblock %} - UWCS Challenge</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <script src="{{ url_for('static', filename='js/countdown.min.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/challenge.js') }}"></script>
-    </head>
-    <body>
-        <div class="container">
-            <nav class="navbar navbar-expand-lg navbar-light bg-light">
-              <a class="navbar-brand" href="/">
-                <img src="{{ url_for('static', filename='challenge_logo.svg') }}" alt="Logo" style="max-width:100px;"></img>
-              </a>
-              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-              </button>
-              <div class="collapse navbar-collapse" id="navbarColor03">
-                <ul class="navbar-nav me-auto">
-                  <li class="nav-item">
-                    <a class="nav-link" href="/submit">Submissions</a>
-                  </li>
-                  {% for i in range(6) %}
-                  <li class="nav-item">
-                    <a class="nav-link" href="/problems/{{ i }}">Problem&nbsp;{{ i }}</a>
-                  </li>
-                  {% endfor %}
-                  <li class="nav-item">
+
+<head>
+  <title>{% block title %}{% endblock %} - UWCS Challenge</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="{{ url_for('static', filename='js/countdown.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/challenge.js') }}"></script>
+</head>
+
+<body>
+  <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="/">
+        <img src="{{ url_for('static', filename='challenge_logo.svg') }}" alt="Logo" style="max-width:100px;"></img>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor03"
+        aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarColor03">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/submit">Submissions</a>
+          </li>
+          {% for i in range(6) %}
+          <li class="nav-item">
+            <a class="nav-link" href="/problems/{{ i }}">Problem&nbsp;{{ i }}</a>
+          </li>
+          {% endfor %}
+          <!-- <li class="nav-item">
                     <a class="nav-link" href="/leaderboard">Winners</a>
-                  </li>
-                </ul>
-              </div>
-                <div class="container-fluid">
-                  
-                </div>
-            </nav>
-            {% block content %}{% endblock %}
-        </div>
-    </body>
+                  </li> -->
+        </ul>
+      </div>
+      <div class="container-fluid">
+
+      </div>
+    </nav>
+    {% block content %}{% endblock %}
+  </div>
+</body>
+
 </html>
