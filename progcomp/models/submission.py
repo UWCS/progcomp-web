@@ -39,6 +39,9 @@ class Submission(db.Model):
     problem = relationship(Problem, back_populates="submissions")
     test = relationship(Test, back_populates="submissions")
 
+    def time_str(self):
+        return self.problem.progcomp.get_timestamp_str(self.timestamp)
+
     def mark(self):
         # Relative directories of the locations needed
         problem_dir = os.path.join("problems", self.problem.name)
@@ -54,7 +57,7 @@ class Submission(db.Model):
                 "python",
                 mark_file,
                 problem_dir,
-                self.test_name + ".txt",
+                self.test.name + ".txt",
                 submission_file,
             ],
             capture_output=True,
@@ -68,10 +71,12 @@ class Submission(db.Model):
         nums = [int(n) for n in line.split()]
 
         if len(nums) == 2:
-            self.score, self.max_score = nums
+            self.score, max_score = nums
+            if self.test.max_score is None:
+                self.test.max_score = max_score
             if self.score == 0:
                 self.status = Status.WRONG
-            elif self.score == self.max_score:
+            elif self.score == self.test.max_score:
                 self.status = Status.CORRECT
             else:
                 self.status = Status.PARTIAL

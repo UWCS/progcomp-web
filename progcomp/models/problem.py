@@ -49,7 +49,8 @@ class Test(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     problem_id = db.Column(db.Integer, ForeignKey(Problem.id))
-    name = db.Column(db.String, unique=True)
+    name = db.Column(db.String, nullable=False)
+    max_score = db.Column(db.Integer, nullable=True)
 
     problem = relationship(Problem, back_populates="tests")
     submissions = relationship("Submission", back_populates="test")

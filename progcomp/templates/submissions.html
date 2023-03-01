@@ -12,7 +12,8 @@
 
 
 <a href="{{ url_for('progcomp.dl_pdf') }}">
-    <button type="button" class="btn btn-primary" style="width: 100%"><i class="fa fa-fw fa-download"></i>&nbsp;Download Problem Descriptions (PDF)</button>
+    <button type="button" class="btn btn-primary" style="width: 100%"><i class="fa fa-fw fa-download"></i>&nbsp;Download
+        Problem Descriptions (PDF)</button>
 </a>
 
 <hr>
@@ -22,33 +23,33 @@
         <h4 class="text-center">Your Submissions</h4>
         <table class="table table-hover">
             <thead>
-            <tr class="table-light">
-                <th scope="col">Timestamp</th>
-                <th scope="col">Problem</th>
-                <th scope="col">Dataset</th>
-                <th scope="col">Status</th>
-                <th scope="col">Score</th>
-            </tr>
+                <tr class="table-light">
+                    <th scope="col">Timestamp</th>
+                    <th scope="col">Problem</th>
+                    <th scope="col">Dataset</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Score</th>
+                </tr>
             </thead>
             <tbody>
                 {% for submission in team.submissions %}
                 {% if submission.status == "CORRECT" %}
-                    {% set row_color = 'table-success' %}
+                {% set row_color = 'table-success' %}
                 {% elif submission.status == "SCORED" %}
-                    {% set row_color = 'table-primary' %}
+                {% set row_color = 'table-primary' %}
                 {% elif submission.status == "WRONG" %}
-                    {% set row_color = 'table-danger' %}
+                {% set row_color = 'table-danger' %}
                 {% elif submission.status == "PARTIAL" %}
-                    {% set row_color = 'table-warning' %}
+                {% set row_color = 'table-warning' %}
                 {% else %}
-                    {% set row_color = '' %}
+                {% set row_color = '' %}
                 {% endif %}
                 <tr class="{{row_color}}">
-                    <th scope="row" class="text-center">{{ submission.timestamp.replace("-", ":") }}</th>
+                    <th scope="row" class="text-center">{{ submission.time_str() }}</th>
                     <td class="text-center">{{ submission.problem.name }}</td>
-                    <td class="text-center">{{ submission.test_name }}</td>
+                    <td class="text-center">{{ submission.test.name }}</td>
                     <td class="text-center">{{ submission.status }}</td>
-                    {% if submission.max_score == -1 %}
+                    {% if submission.max_score is none %}
                     <td class="text-center">{{ submission.score }}</td>
                     {% else %}
                     <td class="text-center">{{ submission.score }}/{{ submission.max_score }}</td>
