@@ -115,12 +115,12 @@ class Progcomp(db.Model):
         total = len(problem.tests)
         for test in problem.tests:
             test_scores = test.ranked_submissions
+            print("\tTest Score", test.name, [(t.name, t.score) for t in test_scores])
             for sub in test_scores:
                 if sub.status == Status.CORRECT:
                     score[sub.team.name] += 1. / total
                 if sub.status == Status.PARTIAL:
                     score[sub.team.name] += (1. / 1.25) * sub.score / test.max_score / total
-            print("\tTest Score", test.name, [(t.name, s) for (t, s) in test_scores.items()])
         print("Score", problem.name, score)
         return score
     
@@ -129,7 +129,7 @@ class Progcomp(db.Model):
         total = len(problem.tests)
         for test in problem.tests:
             test_scores = test.ranked_submissions
-            print("\tTest Score", test.name, [(t.name, s) for (t, s) in test_scores.items()])
+            print("\tTest Rank", test.name, [(t.name, t.score) for t in test_scores])
             for i, sub in enumerate(test_scores):
                 score[sub.team.name] += (0.85 ** i) / total
         print("Score", problem.name, score)
