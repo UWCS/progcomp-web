@@ -23,7 +23,7 @@ class Progcomp(db.Model):
     start_time = db.Column(db.DateTime, default=func.current_timestamp())
 
     teams = relationship(Team, back_populates="progcomp")
-    problems = relationship(Problem, back_populates="progcomp")
+    problems = relationship(Problem, back_populates="progcomp", order_by=Problem.name)
 
     def get_team(self, name: str) -> Optional[Team]:
         return db.session.query(Team).filter(Team.name == name).first()
@@ -47,10 +47,10 @@ class Progcomp(db.Model):
     def get_problem(self, name):
         return (
             db.session.query(Problem)
-            .where(Problem.name == name, Problem.enabled == False)
+            .where(Problem.name == name, Problem.enabled == True)
             .first()
         )
-    
+
     @property
     def enabled_problems(self):
         return [p for p in self.problems if p.enabled]

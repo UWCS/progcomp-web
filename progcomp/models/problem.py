@@ -17,7 +17,7 @@ class Problem(db.Model):
     progcomp_id = db.Column(db.Integer, ForeignKey("progcomps.id"))
     enabled = db.Column(db.Boolean, nullable=False, default=True)
 
-    tests = relationship("Test", back_populates="problem")
+    tests = relationship("Test", back_populates="problem", order_by="Test.name")
     submissions = relationship("Submission", back_populates="problem")
     progcomp = relationship("Progcomp", back_populates="problems")
 
