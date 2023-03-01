@@ -19,6 +19,7 @@
 
 <hr>
 <br>
+{% if not progcomp.freeze %}
 <form method=post enctype=multipart/form-data>
     <h4>Submit Results</h4>
     <div class="d-flex align-items-center gap-4">
@@ -52,5 +53,9 @@
 </form>
 <hr>
 <p id="footer" class="text-muted">Submitting for <code>{{ username }}</code></p>
+
+{% else %}
+<h4>Submissions Closed!</h4>
+{% endif %}
 
 {% endblock %}
