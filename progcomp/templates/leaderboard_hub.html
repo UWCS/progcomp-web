@@ -32,17 +32,21 @@
             <tr class="table-light">
                 <th scope="col">Position</th>
                 <th scope="col" class="text-center">Team</th>
-                <th scope="col">Correct</th>
-                <th scope="col">Partial</th>
+                <th scope="col">Total</th>
+                {% for prob in problems %}
+                <th scope="col">{{ prob.name }}</th>
+                {% endfor %}
             </tr>
             </thead>
             <tbody>
-                {% for winner in winners %}
-                <tr class="{{row_color}}">
+                {% for score in scores %}
+                <tr class="">
                     <td class="text-center">{{ loop.index }}</td>
-                    <td class="text-center">{{ winner[0] }}</td>
-                    <td class="text-center">{{ winner[1] }}</td>
-                    <td class="text-center">{{ winner[2] }}</td>
+                    <td class="text-center">{{ score.team.name }}</td>
+                    <td class="text-center">{{ score.total }}</td>
+                    {% for prob in problems %}
+                    <td class="text-center">{{ score.per_round[loop.index-1] }}</td>
+                    {% endfor %}
                 </tr>
                 {% endfor %}
             </tbody>

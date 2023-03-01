@@ -87,15 +87,19 @@ class Progcomp(db.Model):
                 directory=directory,
             )
         )
-        print("New sub", sub)
         sub.mark()
+        print("New sub", sub)
         db.session.commit()
         return True
 
     def score_teams(self):
         total = Counter()
         per_prob = []
-        for problem in self.problems:
+
+        conv = lambda x: round(x * 100)
+        for problem in self.enabled_problems:
+            if problem.name == "0":
+                continue
             if problem.tests[0].max_score:  # Has a max
                 score = self.score_max(problem)
             else:   # Is optimisation
@@ -104,9 +108,12 @@ class Progcomp(db.Model):
             for t, s in score.items():
                 total[t] += s
         
-        actual = {}
+        actual = []
         for team in self.teams:
-            actual[team] = total[team.name]
+            sc = OverallScore(team, conv(total[team.name]), [conv(per_prob[i][team.name]) for i in range(len(per_prob))])
+            actual.append(sc)
+        actual.sort(key=lambda x: x.total)
+        actual.reverse()
         return actual
 
     def score_max(self, problem):
@@ -118,9 +125,9 @@ class Progcomp(db.Model):
             print("\tTest Score", test.name, [(t.team.name, t.score) for t in test_scores])
             for sub in test_scores:
                 if sub.status == Status.CORRECT:
-                    score[sub.team.name] += 1. / total
+                    score[sub.team.name] += 1.25 / total
                 if sub.status == Status.PARTIAL:
-                    score[sub.team.name] += (1. / 1.25) * sub.score / test.max_score / total
+                    score[sub.team.name] += float(sub.score) / test.max_score / total
         print("Score", problem.name, score)
         return score
     
@@ -131,6 +138,13 @@ class Progcomp(db.Model):
             test_scores = test.ranked_submissions
             print("\tTest Rank", test.name, [(t.team.name, t.score) for t in test_scores])
             for i, sub in enumerate(test_scores):
-                score[sub.team.name] += (0.85 ** i) / total
+                score[sub.team.name] += 1.25 * (0.85 ** i) / total
         print("Score", problem.name, score)
         return score
+
+@auto_str
+class OverallScore:
+    def __init__(self, team, total, per_round) -> None:
+        self.team = team
+        self.total = total
+        self.per_round = per_round

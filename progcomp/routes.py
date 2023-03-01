@@ -30,7 +30,7 @@ def load_pc():
     if not pc:
         db.session.add(pc := Progcomp(name="main"))
         db.session.commit()
-    pc.update_problems()
+    # pc.update_problems()
     db.session.flush()
 
 def get_pc():
@@ -185,31 +185,16 @@ def download(p_name, filename):
 
 @bp.route("/leaderboard", methods=["GET"])
 def leaderboard_main():
+    print("SHOW LEADEDBOARD", get_pc().show_leaderboard)
     if not get_pc().show_leaderboard:
         return redirect(url_for("progcomp.menu"))
-    # problems = []
-    # for dir in glob.glob(os.path.join(os.getcwd(), "results/*")):
-    #     if not os.path.isdir(dir):
-    #         continue
-    #     p = Problem(dir.split("/")[-1], False)
-    #     problems.append(p)
-    #     for filen in glob.glob(dir + "/*.txt"):
-    #         p.test_names.append(filen.split("/")[-1][:-4])
-    # problems.sort(key=lambda p: p.name)
-
-    # with open(os.path.join(os.getcwd(), f"results/winners.txt")) as f:
-    #     lines = f.readlines()
-    # winners = []
-    # for line in lines:
-    #     parts = [x.strip() for x in re.split(r" +", line.strip())]
-    #     winners.append(parts)
-
-    # top3 = f"{winners[0][0]}, {winners[1][0]}, and {winners[2][0]}"
-    overall = []
+    
+    pc = get_pc()
+    scores = pc.score_teams()
     return render_template(
         "leaderboard_hub.html",
-        problems=get_pc().enabled_problems,
-        overall=overall,
+        problems=[p for p in get_pc().enabled_problems if p.name != "0"],
+        scores=scores,
         progcomp=get_pc(),
     )
 
