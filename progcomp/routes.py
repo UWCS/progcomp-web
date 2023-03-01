@@ -202,8 +202,7 @@ def leaderboard_main():
 
 @bp.route("/leaderboard/<string:p_name>/<string:p_set>", methods=["GET"])
 def leaderboard(p_name, p_set):
-    print("LEADERBOARD FOR", p_name, p_set)
-    if not get_pc().show_leaderboard or not p_name.isalnum() or not p_set.isalnum():
+    if not get_pc().show_leaderboard or not re.match(r'^[A-Za-z0-9_]+$', p_name) or not re.match(r'^[A-Za-z0-9_]+$', p_name):
         return redirect(url_for("progcomp.menu"))
     
     problem: Problem = get_pc().get_problem(p_name)
