@@ -1,4 +1,5 @@
 import glob
+import logging
 import os
 import re
 
@@ -25,6 +26,7 @@ with app.app_context():
     if not pc:
         db.session.add(pc := Progcomp(name="main"))
         db.session.commit()
+    pc.update_problems()
 
 bp = Blueprint("progcomp", __name__)
 
@@ -62,6 +64,7 @@ def start():
 
     # Check password against potentially existing team
     team = pc.get_team(username)
+    print("Team", team)
     if team:
         if team.password != password:
             return redirect(url_for("progcomp.menu"))

@@ -1,8 +1,18 @@
+import logging
 import os
 
 from flask import Flask
 
 from progcomp.models.progcomp import Progcomp
+
+logging.basicConfig(
+    level=logging.getLevelName("INFO"),
+    format="[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("progcomp.log"),
+        logging.StreamHandler(),
+    ],
+)
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_mapping(

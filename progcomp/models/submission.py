@@ -1,4 +1,5 @@
 import enum
+import logging
 import os
 import subprocess
 
@@ -66,7 +67,7 @@ class Submission(db.Model):
             text=True,
         )
 
-        print(f"Errors in marking {self.problem.name}: {ps.stderr}")
+        logging.warning(f"Errors in marking {self.problem.name}: {ps.stderr}")
 
         line = ps.stdout.strip("\n")
 

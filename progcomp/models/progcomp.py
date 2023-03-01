@@ -1,3 +1,4 @@
+import logging
 import os
 from datetime import datetime
 from typing import Optional
@@ -29,17 +30,19 @@ class Progcomp(db.Model):
 
     def add_team(self, name: str, password: str):
         db.session.add(Team(progcomp_id=self.id, name=name, password=password))
+        db.session.commit()
 
     def update_problems(self):
         # Add any new problems, update existing ones
         path = os.path.join(os.getcwd(), "problems")
         p_names = os.listdir(path)
         for p_name in p_names:
-            prob = self.problems.get(p_name)
+            prob = self.get_problem(p_name)
             if not prob:
-                db.session.add(Problem(name=p_name, progcomp_id=self.id))
-            else:
-                prob.update()
+                db.session.add(prob := Problem(name=p_name, progcomp_id=self.id))
+            prob.update()
+        db.session.commit()
+        print("Problems", repr(self.problems))
 
     def get_problem(self, name):
         return db.session.query(Problem).where(Problem.name == name).first()

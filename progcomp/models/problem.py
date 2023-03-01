@@ -20,19 +20,20 @@ class Problem(db.Model):
     submissions = relationship("Submission", back_populates="problem")
     progcomp = relationship("Progcomp", back_populates="problems")
 
-    def __init__(self):
-        self.update()
-
     def update(self):
         path = os.path.join(os.getcwd(), "problems", self.name, "input")
         old = set(t.name for t in self.tests)
         new = set(os.listdir(path))
 
+        print("Old new", old, new)
         for test_name in old - new:
-            db.session.add(Test(problem_id=self.id, name=test_name))
+            test = db.session.query(Test).where(Test.name == test_name).first()
+            if test:
+                test.remove()
         for test_name in new - old:
-            test = db.query(Test).where(Test.name == test_name).first()
-            db.session.remove(test)
+            db.session.add(test := Test(problem_id=self.id, name=test_name))
+            print("Test", test)
+        db.session.commit()
 
     def get_test(self, name):
         return (
