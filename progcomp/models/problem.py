@@ -31,10 +31,12 @@ class Problem(db.Model):
             test = db.session.query(Test).where(Test.name == test_name).first()
             if test:
                 db.session.delete(test)
+                print("Removing Test", test)
         for test_name in new - old:
             db.session.add(test := Test(problem_id=self.id, name=test_name))
-            print("Test", test)
+            print("Adding Test", test)
         db.session.commit()
+        db.session.flush()
 
     def get_test(self, name):
         return (
