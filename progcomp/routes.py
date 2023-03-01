@@ -4,21 +4,13 @@ import os
 import re
 from datetime import datetime
 
-from flask import (
-    Blueprint,
-    redirect,
-    render_template,
-    request,
-    send_from_directory,
-    session,
-    url_for,
-)
+from flask import (Blueprint, redirect, render_template, request,
+                   send_from_directory, session, url_for)
 from werkzeug.utils import secure_filename
 
 from . import app
 from .database import db
 from .models import *
-
 # from .adapters import GameUIAdapter
 from .session import USERNAME_SESSION_KEY
 
@@ -28,14 +20,14 @@ with app.app_context():
         db.session.add(pc := Progcomp(name="main"))
         db.session.commit()
     pc.update_problems()
+    db.session.flush()
 
 bp = Blueprint("progcomp", __name__)
 
 
 @bp.route("/")
 def menu():
-    # session[USERNAME_SESSION_KEY] = ""
-    return render_template("menu.html")
+    return render_template("menu.html", progcomp=pc)
 
 
 @bp.route("/start", methods=["POST"])
@@ -92,7 +84,7 @@ def submit():
         return redirect(url_for("progcomp.menu"))
 
     # List out team submission info
-    return render_template("submissions.html", team=team)
+    return render_template("submissions.html", team=team, progcomp=pc)
 
 
 @bp.route("/leaderboard", methods=["GET"])
@@ -116,7 +108,11 @@ def leaderboard_main():
 
     top3 = f"{winners[0][0]}, {winners[1][0]}, and {winners[2][0]}"
     return render_template(
-        "leaderboard_hub.html", problems=problems, winners=winners, top3=top3
+        "leaderboard_hub.html",
+        problems=problems,
+        winners=winners,
+        top3=top3,
+        progcomp=pc,
     )
 
 
@@ -154,7 +150,11 @@ def leaderboard(p_name, p_set):
                 this_round.add(parts[3])
 
     return render_template(
-        "leaderboard.html", p_name=p_name, p_set=p_set, submissions=results
+        "leaderboard.html",
+        p_name=p_name,
+        p_set=p_set,
+        submissions=results,
+        progcomp=pc,
     )
 
 
@@ -213,7 +213,9 @@ def problem(p_name):
 
         return redirect(url_for("progcomp.submit"))
 
-    return render_template("problem.html", username=username, problem=problem)
+    return render_template(
+        "problem.html", username=username, problem=problem, progcomp=pc
+    )
 
 
 @bp.route("/download/pdf", methods=["GET"])
