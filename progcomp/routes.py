@@ -94,8 +94,9 @@ def submit():
     username = session.get(USERNAME_SESSION_KEY)
     if not username:
         return redirect(url_for("progcomp.menu"))
-    team = get_pc().get_team(username)
-    if not team:
+    pc = get_pc()
+    team = pc.get_team(username)
+    if not team or pc.freeze:
         return redirect(url_for("progcomp.menu"))
 
     # List out team submission info

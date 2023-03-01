@@ -22,7 +22,8 @@ class Progcomp(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True)
     start_time = db.Column(db.DateTime, default=func.current_timestamp())
-    show_leaderboard = db.Column(db.Boolean, nullable=False, default=False)
+    show_leaderboard = db.Column(db.Boolean, nullable=False, default=False, server_default="f")
+    freeze = db.Column(db.Boolean, nullable=False, default=False, server_default="f")
 
     teams = relationship(Team, back_populates="progcomp")
     problems = relationship(Problem, back_populates="progcomp", order_by=Problem.name)
