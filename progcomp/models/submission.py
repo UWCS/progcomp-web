@@ -7,7 +7,7 @@ from sqlalchemy import ForeignKey, ForeignKeyConstraint, func
 from sqlalchemy.orm import relationship
 
 from progcomp.models.problem import Problem, Test
-from progcomp.models.team import Team
+# from progcomp.models.team import Team
 from progcomp.models.utils import auto_str
 
 from ..database import db
@@ -27,7 +27,7 @@ class Submission(db.Model):
     __tablename__ = "submissions"
 
     id = db.Column(db.Integer, primary_key=True)
-    team_id = db.Column(db.Integer, ForeignKey(Team.id))
+    team_id = db.Column(db.Integer, ForeignKey("teams.id"))
     problem_id = db.Column(db.Integer, ForeignKey(Problem.id))
     test_id = db.Column(db.Integer, ForeignKey(Test.id), nullable=False)
     timestamp = db.Column(db.DateTime, default=func.current_timestamp())
@@ -35,13 +35,15 @@ class Submission(db.Model):
     directory = db.Column(db.String, nullable=False)
     score = db.Column(db.Integer)
 
-    team = relationship(Team, back_populates="submissions")
+    team = relationship("Team", back_populates="submissions")
     problem = relationship(Problem, back_populates="submissions")
     test = relationship(Test, back_populates="submissions")
 
+    @property
     def time_str(self):
         return self.problem.progcomp.get_timestamp_str(self.timestamp)
 
+    @property
     def status_str(self):
         return str(self.status)[len("Status") + 1 :]
 

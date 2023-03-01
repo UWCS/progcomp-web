@@ -4,14 +4,8 @@
 
 {% block content %}
 
-
-<div class="row pt-5" id="header">
-    <h2>Congratulations to {{ top3 }}!</h2>
-</div>
-
 <div class="row pt-5" id="header">
     <h2><b>Per-Problem Leaderboards</b></h2>
-    <p>Scores are as of when the contest ended.</p>
 </div>
 
 
@@ -19,8 +13,8 @@
     {% for prob in problems %}
         <div class="flex-grow-1 col-md col-auto row d-md-block text-center">
         <h3>Problem {{ prob.name }}</h3>
-        {% for test in prob.test_names %}
-            <a class="btn btn-outline-primary p-2 m-1" style="width: 100%" href="leaderboard/{{ prob.name }}/{{ test }}">{{ test }}</a>
+        {% for test in prob.tests %}
+            <a class="btn btn-outline-primary p-2 m-1" style="width: 100%" href="leaderboard/{{ prob.name }}/{{ test.name }}">{{ test.name }}</a>
         {% endfor %}
         </div>
     {% endfor %}
@@ -29,7 +23,7 @@
 <hr>
 
 <div class="row p-2  text-center" id="header">
-    <h2>Overall Winners</h2>
+    <h2>Overall Leaderboard</h2>
 </div>
 <div class="row justify-content-center">
     <div class="col-auto">

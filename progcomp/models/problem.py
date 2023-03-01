@@ -31,10 +31,12 @@ class Problem(db.Model):
             test = db.session.query(Test).where(Test.name == test_name).first()
             if test:
                 db.session.delete(test)
+                print("Removing Test", test)
         for test_name in new - old:
             db.session.add(test := Test(problem_id=self.id, name=test_name))
-            print("Test", test)
+            print("Adding Test", test)
         db.session.commit()
+        db.session.flush()
 
     def get_test(self, name):
         return (
@@ -55,3 +57,26 @@ class Test(db.Model):
 
     problem = relationship(Problem, back_populates="tests")
     submissions = relationship("Submission", back_populates="test")
+
+    @property
+    def ranked_submissions(self):
+        from progcomp.models import Submission
+        submissions = (
+            db.session.query(Submission)
+            .where(Submission.test_id == self.id, Submission.problem_id == self.problem_id)
+            .all()
+        )
+
+        team_scores = {}
+
+        for sub in submissions:
+            current = team_scores.get(sub.team.name)
+            print("SUB COMP", current, sub)
+            if not current or (sub.score > current.score) or (sub.score == current.score and sub.timestamp > current.timestamp):
+                team_scores[sub.team.name] = sub
+
+        team_scores = list(team_scores.values())
+        team_scores.sort(key=lambda s: (-s.score, s.timestamp))
+        print(team_scores)
+        return team_scores
+

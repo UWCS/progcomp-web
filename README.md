@@ -16,7 +16,13 @@ pipenv install
 
 (Make sure the terminal is opened within the correct folder!)
 
-> 3. From here on out, you only need to type this command in the terminal to run the frontend:
+> 3. Initialize the database:
+
+```sh
+pipenv run python progcomp/scripts/initialize.py
+```
+
+> 4. From here on out, you only need to type this command in the terminal to run the frontend:
 
 ```sh
 pipenv run flask --app progcomp --debug run
