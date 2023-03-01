@@ -11,7 +11,7 @@
 <h4>Download Input Test Data</h4><br>
 <div class="row gap-2">
     {% for test in problem.tests %}
-    <a href="{{ url_for('progcomp.download', p_name=problem.name, filename='{{ test.name }}.txt') }}"
+    <a href="{{ url_for('progcomp.download', p_name=problem.name, filename=test.name+'.txt') }}"
         class="col-md col-auto btn btn-primary" style="min-width: max-content;"><i
             class="fa fa-fw fa-download"></i>&nbsp;{{ test.name }}</a>
     {% endfor %}
