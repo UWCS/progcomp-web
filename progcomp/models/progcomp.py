@@ -40,7 +40,7 @@ class Progcomp(db.Model):
         for p_name in p_names:
             prob = self.get_problem(p_name)
             if not prob:
-                db.session.add(prob := Problem(name=p_name, progcomp_id=self.id))
+                db.session.add(prob := Problem(name=p_name, progcomp_id=self.id, enabled=False))
             prob.update()
         db.session.commit()
         print("Problems", repr(self.problems))
