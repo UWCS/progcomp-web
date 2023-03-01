@@ -42,6 +42,9 @@ class Submission(db.Model):
     def time_str(self):
         return self.problem.progcomp.get_timestamp_str(self.timestamp)
 
+    def status_str(self):
+        return str(self.status)[len("Status") + 1 :]
+
     def mark(self):
         # Relative directories of the locations needed
         problem_dir = os.path.join("problems", self.problem.name)
