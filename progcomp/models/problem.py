@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 
 from progcomp.models.utils import auto_str
 
-from .. import db
+from ..database import db
 
 
 @auto_str
@@ -29,14 +29,16 @@ class Problem(db.Model):
         new = set(os.listdir(path))
 
         for test_name in old - new:
-            db.add(Test(problem_id=self.id, name=test_name))
+            db.session.add(Test(problem_id=self.id, name=test_name))
         for test_name in new - old:
             test = db.query(Test).where(Test.name == test_name).first()
-            db.remove(test)
+            db.session.remove(test)
 
     def get_test(self, name):
         return (
-            db.query(Test).where(Test.problem_id == self.id, Test.name == name).first()
+            db.session.query(Test)
+            .where(Test.problem_id == self.id, Test.name == name)
+            .first()
         )
 
 

@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 
 from progcomp.models.utils import auto_str
 
-from .. import db
+from ..database import db
 
 
 @auto_str

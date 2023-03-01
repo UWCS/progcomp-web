@@ -9,7 +9,7 @@ from progcomp.models.problem import Problem, Test
 from progcomp.models.team import Team
 from progcomp.models.utils import auto_str
 
-from .. import db
+from ..database import db
 
 
 class Status(enum.Enum):

@@ -10,7 +10,7 @@ from progcomp.models.submission import Submission
 from progcomp.models.team import Team
 from progcomp.models.utils import auto_str
 
-from .. import db
+from ..database import db
 
 
 @auto_str
@@ -25,10 +25,10 @@ class Progcomp(db.Model):
     problems = relationship(Problem, back_populates="progcomp")
 
     def get_team(self, name: str) -> Optional[Team]:
-        return db.query(Team).where(Team.name == name).first()
+        return db.session.query(Team).filter(Team.name == name).one_or_none()
 
     def add_team(self, name: str, password: str):
-        db.add(Team(progcomp_id=self.id, name=name, password=password))
+        db.session.add(Team(progcomp_id=self.id, name=name, password=password))
 
     def update_problems(self):
         # Add any new problems, update existing ones
@@ -37,12 +37,12 @@ class Progcomp(db.Model):
         for p_name in p_names:
             prob = self.problems.get(p_name)
             if not prob:
-                db.add(Problem(name=p_name, progcomp_id=self.id))
+                db.session.add(Problem(name=p_name, progcomp_id=self.id))
             else:
                 prob.update()
 
     def get_problem(self, name):
-        return db.query(Problem).where(Problem.name == name).first()
+        return db.session.query(Problem).where(Problem.name == name).first()
 
     def get_timestamp(self):
         return datetime.now()
@@ -60,4 +60,5 @@ class Progcomp(db.Model):
         team.add_submission(
             Submission(team=team, problem=problem, test=test, timestamp=timestamp)
         )
+        db.session.commit()
         return True

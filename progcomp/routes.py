@@ -2,17 +2,27 @@ import glob
 import os
 import re
 
-from flask import (Blueprint, redirect, render_template, request,
-                   send_from_directory, session, url_for)
+from flask import (
+    Blueprint,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+    session,
+    url_for,
+)
 from werkzeug.utils import secure_filename
 
-from . import db
+from . import app
+from .database import db
 from .models import *
+
 # from .adapters import GameUIAdapter
 from .session import USERNAME_SESSION_KEY
 
-# Initialise
-pc = Progcomp(name="main")
+with app.app_context():
+    pc = Progcomp(name="main")
+    db.session.commit()
 
 bp = Blueprint("progcomp", __name__)
 
