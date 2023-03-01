@@ -54,7 +54,11 @@ class Progcomp(db.Model):
 
     @property
     def enabled_problems(self):
-        return [p for p in self.problems if p.enabled]
+        return (
+            db.session.query(Problem)
+            .where(Problem.enabled == True)
+            .all()
+        )
 
     def get_timestamp_str(self, time):
         return time.strftime("%Y-%m-%d_%H-%M-%S")
