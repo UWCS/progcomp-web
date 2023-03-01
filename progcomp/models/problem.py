@@ -70,7 +70,7 @@ class Test(db.Model):
         team_scores = {}
 
         for sub in submissions:
-            if sub.status not in [Status.CORRECT, Status.PARTIAL]:
+            if sub.status not in [Status.CORRECT, Status.PARTIAL, Status.SCORED]:
                 continue
             current = team_scores.get(sub.team.name)
             if not current or (sub.score > current.score) or (sub.score == current.score and sub.timestamp > current.timestamp):
