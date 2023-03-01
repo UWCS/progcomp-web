@@ -10,6 +10,7 @@ sqlalchemy = "2.0"
 flask-sqlalchemy = "3.0"
 flask-alembic = "*"
 click = "*"
+python-dotenv = "*"
 
 [dev-packages]
 black = "23.1"

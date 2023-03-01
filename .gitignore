@@ -1,2 +1,8 @@
 submissions/**
-.vscode
+/.vscode
+/problems
+/progcomp.log
+/.env
+
+__pycache__
+/instance
