@@ -1,6 +1,6 @@
 import os
 
-from sqlalchemy import ForeignKey, ForeignKeyConstraint
+from sqlalchemy import ForeignKey, ForeignKeyConstraint, func
 from sqlalchemy.orm import relationship
 
 from progcomp.models.utils import auto_str
@@ -16,8 +16,9 @@ class Problem(db.Model):
     name = db.Column(db.String, unique=True)
     progcomp_id = db.Column(db.Integer, ForeignKey("progcomps.id"))
 
-    tests = relationship("tests", back_populates="problem")
-    progcomp = relationship("progcomps", back_populates="problems")
+    tests = relationship("Test", back_populates="problem")
+    submissions = relationship("Submission", back_populates="problem")
+    progcomp = relationship("Progcomp", back_populates="problems")
 
     def __init__(self):
         self.update()
@@ -44,7 +45,8 @@ class Test(db.Model):
     __tablename__ = "tests"
 
     id = db.Column(db.Integer, primary_key=True)
-    problem_id = db.Column(db.Integer, ForeignKey("problems.id"))
+    problem_id = db.Column(db.Integer, ForeignKey(Problem.id))
     name = db.Column(db.String, unique=True)
 
-    problem = relationship("problem", back_populates="tests")
+    problem = relationship(Problem, back_populates="tests")
+    submissions = relationship("Submission", back_populates="test")

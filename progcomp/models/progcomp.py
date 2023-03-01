@@ -2,8 +2,8 @@ import os
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import ForeignKey, ForeignKeyConstraint
-from sqlalchemy.orm import func, relationship
+from sqlalchemy import ForeignKey, ForeignKeyConstraint, func
+from sqlalchemy.orm import relationship
 
 from progcomp.models.problem import Problem
 from progcomp.models.submission import Submission
@@ -21,15 +21,14 @@ class Progcomp(db.Model):
     name = db.Column(db.String, unique=True)
     start_time = db.Column(db.DateTime, default=func.current_timestamp())
 
-    teams = relationship("teams", back_populates="progcomp")
-    problems = relationship("problems", back_populates="progcomp")
+    teams = relationship(Team, back_populates="progcomp")
+    problems = relationship(Problem, back_populates="progcomp")
 
     def get_team(self, name: str) -> Optional[Team]:
         return db.query(Team).where(Team.name == name).first()
 
     def add_team(self, name: str, password: str):
         db.add(Team(progcomp_id=self.id, name=name, password=password))
-        db.commit()
 
     def update_problems(self):
         # Add any new problems, update existing ones
@@ -46,8 +45,7 @@ class Progcomp(db.Model):
         return db.query(Problem).where(Problem.name == name).first()
 
     def get_timestamp(self):
-        td = datetime.now() - self.start_time
-        return str(td)[:-4].replace(":", "-")
+        return datetime.now()
 
     def make_submission(
         self, timestamp: str, team_name: str, p_name: str, test_name: str

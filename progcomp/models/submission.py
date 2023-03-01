@@ -2,15 +2,17 @@ import enum
 import os
 import subprocess
 
-from sqlalchemy import ForeignKey, ForeignKeyConstraint
-from sqlalchemy.orm import func, relationship
+from sqlalchemy import ForeignKey, ForeignKeyConstraint, func
+from sqlalchemy.orm import relationship
 
+from progcomp.models.problem import Problem, Test
+from progcomp.models.team import Team
 from progcomp.models.utils import auto_str
 
 from .. import db
 
 
-class Status(enum.enum):
+class Status(enum.Enum):
     UNKNOWN = 0
     SCORED = 1
     CORRECT = 2
@@ -24,18 +26,16 @@ class Submission(db.Model):
     __tablename__ = "submissions"
 
     id = db.Column(db.Integer, primary_key=True)
-    team_id = db.Column(db.Integer, ForeignKey("team.id"))
-    problem_id = db.Column(db.Integer, ForeignKey("problem.id"))
-    test_id = db.Column(db.Integer, nullable=False)
+    team_id = db.Column(db.Integer, ForeignKey(Team.id))
+    problem_id = db.Column(db.Integer, ForeignKey(Problem.id))
+    test_id = db.Column(db.Integer, ForeignKey(Test.id), nullable=False)
     timestamp = db.Column(db.DateTime, default=func.current_timestamp())
     status = db.Column(db.Enum(Status), default=Status.UNKNOWN)
     score = db.Column(db.Integer)
 
-    ForeignKeyConstraint((problem_id, test_id), ("tests.problem_id", "tests.id"))
-
-    team = relationship("teams", back_populates="submissions")
-    problem = relationship("problems", back_populates="submissions")
-    test = relationship("test", back_populates="submissions")
+    team = relationship(Team, back_populates="submissions")
+    problem = relationship(Problem, back_populates="submissions")
+    test = relationship(Test, back_populates="submissions")
 
     def __init__(self):
         self.mark()

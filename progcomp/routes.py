@@ -1,27 +1,18 @@
-from flask import (
-    Blueprint,
-    redirect,
-    render_template,
-    request,
-    url_for,
-    session,
-    send_from_directory,
-)
-from werkzeug.utils import secure_filename
+import glob
 import os
 import re
-import glob
 
-from .backend.progcomp import Progcomp
-from .backend.submission import Submission
-from .backend.team import Team
-from .backend.problem import Problem
+from flask import (Blueprint, redirect, render_template, request,
+                   send_from_directory, session, url_for)
+from werkzeug.utils import secure_filename
 
+from . import db
+from .models import *
 # from .adapters import GameUIAdapter
 from .session import USERNAME_SESSION_KEY
 
 # Initialise
-pc = Progcomp()
+pc = Progcomp(name="main")
 
 bp = Blueprint("progcomp", __name__)
 
@@ -192,7 +183,7 @@ def problem(p_name):
 
         # need to folder w/ timestamp on path
         path = os.path.join(
-            os.getcwd(), "submissions", username, p_name, test[:-4], timestamp
+            os.getcwd(), "submissions", username, p_name, test[:-4], str(timestamp)
         )
 
         os.makedirs(path, exist_ok=True)
