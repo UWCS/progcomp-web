@@ -10,8 +10,10 @@
 
 <h4>Download Input Test Data</h4><br>
 <div class="row gap-2">
-    {% for test_name in problem.test_names %}
-    <a href="{{ url_for('progcomp.download', p_name=problem.name, filename=test_name) }}" class="col-md col-auto btn btn-primary" style="min-width: max-content;"><i class="fa fa-fw fa-download"></i>&nbsp;{{ test_name }}</a>
+    {% for test in problem.tests %}
+    <a href="{{ url_for('progcomp.download', p_name=problem.name, filename=test.name+'.txt') }}"
+        class="col-md col-auto btn btn-primary" style="min-width: max-content;"><i
+            class="fa fa-fw fa-download"></i>&nbsp;{{ test.name }}</a>
     {% endfor %}
 </div>
 
@@ -21,14 +23,15 @@
     <h4>Submit Results</h4>
     <div class="d-flex align-items-center gap-4">
         <div>
-            <label for="test_select" class="form-label m-0 fw-bold" style="min-width: max-content">Select Input Data:</label>
+            <label for="test_select" class="form-label m-0 fw-bold" style="min-width: max-content">Select Input
+                Data:</label>
         </div>
         <div class="flex-grow-1">
             <select class="form-select" id="test_select" name="test_select">
-                    {% for test_name in problem.test_names %}
-                    <option value="{{ test_name }}">{{ test_name[:-4]}}</option>
-                    {% endfor %}
-                </select>
+                {% for test in problem.tests %}
+                <option value="{{ test.name }}">{{ test.name}}</option>
+                {% endfor %}
+            </select>
         </div>
         <div>
             <button type="submit" class="btn btn-primary btn-lg align-bottom">Submit</button>

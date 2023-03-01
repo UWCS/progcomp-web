@@ -19,7 +19,7 @@ pipenv install
 > 3. From here on out, you only need to type this command in the terminal to run the frontend:
 
 ```sh
-pipenv run flask --app frontend --debug run
+pipenv run flask --app progcomp --debug run
 ```
 
 The site will then be running locally at `localhost:5000`, and you can access it as a url in your preferred web browser.
