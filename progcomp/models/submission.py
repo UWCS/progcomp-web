@@ -84,7 +84,7 @@ class Submission(db.Model):
             else:
                 self.status = Status.PARTIAL
         elif len(nums) == 1:
-            self.score = nums
+            (self.score,) = nums
             self.status = Status.SCORED
         else:
             self.status = Status.INVALID

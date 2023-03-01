@@ -49,7 +49,7 @@
                     <td class="text-center">{{ submission.problem.name }}</td>
                     <td class="text-center">{{ submission.test.name }}</td>
                     <td class="text-center">{{ submission.status_str() }}</td>
-                    {% if submission.max_score is none %}
+                    {% if submission.test.max_score is none %}
                     <td class="text-center">{{ submission.score }}</td>
                     {% else %}
                     <td class="text-center">{{ submission.score }}/{{ submission.test.max_score }}</td>

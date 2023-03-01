@@ -30,10 +30,8 @@ from flask_alembic import Alembic
 alembic = Alembic()
 alembic.init_app(app)
 
-# with app.app_context():
-#     db.create_all()
-
-
+# COMMENT OUT FOLLOWING WHEN ALEMBIC-ING
+print("NAME", __name__)
 from . import routes
 
 app.register_blueprint(routes.bp)
