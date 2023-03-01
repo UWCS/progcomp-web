@@ -32,25 +32,19 @@ class Submission(db.Model):
     test_id = db.Column(db.Integer, ForeignKey(Test.id), nullable=False)
     timestamp = db.Column(db.DateTime, default=func.current_timestamp())
     status = db.Column(db.Enum(Status), default=Status.UNKNOWN)
+    directory = db.Column(db.String, nullable=False)
     score = db.Column(db.Integer)
 
     team = relationship(Team, back_populates="submissions")
     problem = relationship(Problem, back_populates="submissions")
     test = relationship(Test, back_populates="submissions")
 
-    def __init__(self):
-        self.mark()
-
     def mark(self):
         # Relative directories of the locations needed
         problem_dir = os.path.join("problems", self.problem.name)
         mark_file = os.path.join(problem_dir, "mark.py")
         submission_file = os.path.join(
-            "submissions",
-            self.team.name,
-            self.problem.name,
-            self.test.name,
-            self.timestamp,
+            self.directory,
             "output.txt",
         )
 

@@ -2,6 +2,7 @@ import glob
 import logging
 import os
 import re
+from datetime import datetime
 
 from flask import (
     Blueprint,
@@ -194,11 +195,12 @@ def problem(p_name):
         if not test:
             return redirect(request.url)
 
-        timestamp = pc.get_timestamp()
+        time = datetime.now()
+        time_str = pc.get_timestamp_str(time)
 
         # need to folder w/ timestamp on path
         path = os.path.join(
-            os.getcwd(), "submissions", username, p_name, test[:-4], str(timestamp)
+            os.getcwd(), "submissions", username, p_name, test, time_str
         )
 
         os.makedirs(path, exist_ok=True)
@@ -207,7 +209,7 @@ def problem(p_name):
         output.save(os.path.join(path, "output.txt"))
         script.save(os.path.join(path, script_name))
 
-        pc.make_submission(timestamp, username, p_name, test[:-4])
+        pc.make_submission(path, username, p_name, test, timestamp=time)
 
         return redirect(url_for("progcomp.submit"))
 

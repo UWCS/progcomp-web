@@ -47,11 +47,16 @@ class Progcomp(db.Model):
     def get_problem(self, name):
         return db.session.query(Problem).where(Problem.name == name).first()
 
-    def get_timestamp(self):
-        return datetime.now()
+    def get_timestamp_str(self, time):
+        return time.strftime("%Y-%m-%d_%H-%M-%S")
 
     def make_submission(
-        self, timestamp: str, team_name: str, p_name: str, test_name: str
+        self,
+        directory: str,
+        team_name: str,
+        p_name: str,
+        test_name: str,
+        timestamp: datetime,
     ):
         team = self.get_team(team_name)
         problem = self.get_problem(p_name)
@@ -60,8 +65,16 @@ class Progcomp(db.Model):
         test = problem.get_test(test_name)
         if not test:
             return False
-        team.add_submission(
-            Submission(team=team, problem=problem, test=test, timestamp=timestamp)
+        db.session.add(
+            sub := Submission(
+                team=team,
+                problem=problem,
+                test=test,
+                timestamp=timestamp,
+                directory=directory,
+            )
         )
+        print("New sub", sub)
+        sub.mark()
         db.session.commit()
         return True

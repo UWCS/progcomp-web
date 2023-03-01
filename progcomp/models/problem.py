@@ -23,13 +23,13 @@ class Problem(db.Model):
     def update(self):
         path = os.path.join(os.getcwd(), "problems", self.name, "input")
         old = set(t.name for t in self.tests)
-        new = set(os.listdir(path))
+        new = set([x[:-4] for x in os.listdir(path)])
 
         print("Old new", old, new)
         for test_name in old - new:
             test = db.session.query(Test).where(Test.name == test_name).first()
             if test:
-                test.remove()
+                db.session.delete(test)
         for test_name in new - old:
             db.session.add(test := Test(problem_id=self.id, name=test_name))
             print("Test", test)
