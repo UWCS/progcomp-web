@@ -8,18 +8,9 @@ from sqlalchemy.orm import relationship
 
 from progcomp.models.problem import Problem, Test
 # from progcomp.models.team import Team
-from progcomp.models.utils import auto_str
+from progcomp.models.utils import auto_str, Status
 
 from ..database import db
-
-
-class Status(enum.Enum):
-    UNKNOWN = 0
-    SCORED = 1
-    CORRECT = 2
-    PARTIAL = 3
-    WRONG = 4
-    INVALID = 5
 
 
 @auto_str

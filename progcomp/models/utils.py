@@ -1,3 +1,6 @@
+import enum
+
+
 def auto_str(cls):
     def __repr__(self):
         value = ", ".join(
@@ -9,3 +12,12 @@ def auto_str(cls):
 
     cls.__repr__ = __repr__
     return cls
+
+
+class Status(enum.Enum):
+    UNKNOWN = 0
+    SCORED = 1
+    CORRECT = 2
+    PARTIAL = 3
+    WRONG = 4
+    INVALID = 5

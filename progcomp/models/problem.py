@@ -2,9 +2,8 @@ import os
 
 from sqlalchemy import ForeignKey, ForeignKeyConstraint, func
 from sqlalchemy.orm import relationship
-from progcomp.models.submission import Status
 
-from progcomp.models.utils import auto_str
+from progcomp.models.utils import auto_str, Status
 
 from ..database import db
 
