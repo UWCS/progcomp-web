@@ -21,7 +21,7 @@ from .models import *
 # from .adapters import GameUIAdapter
 from .session import USERNAME_SESSION_KEY
 
-pc: Progcomp = None
+# pc: Progcomp = None
 
 
 def load_pc():
@@ -34,13 +34,16 @@ def load_pc():
     pc.update_problems()
     db.session.flush()
 
+def get_pc():
+    return db.session.query(Progcomp).first()
+
 
 bp = Blueprint("progcomp", __name__)
 
 
 @bp.route("/")
 def menu():
-    return render_template("menu.html", progcomp=pc)
+    return render_template("menu.html", progcomp=get_pc())
 
 
 @bp.route("/start", methods=["POST"])
@@ -69,13 +72,13 @@ def start():
         return redirect(url_for("progcomp.menu"))
 
     # Check password against potentially existing team
-    team = pc.get_team(username)
+    team = get_pc().get_team(username)
     print("Team", team)
     if team:
         if team.password != password:
             return redirect(url_for("progcomp.menu"))
     else:
-        pc.add_team(username, password)
+        get_pc().add_team(username, password)
 
     # Save their username
     session[USERNAME_SESSION_KEY] = username
@@ -92,12 +95,12 @@ def submit():
     username = session.get(USERNAME_SESSION_KEY)
     if not username:
         return redirect(url_for("progcomp.menu"))
-    team = pc.get_team(username)
+    team = get_pc().get_team(username)
     if not team:
         return redirect(url_for("progcomp.menu"))
 
     # List out team submission info
-    return render_template("submissions.html", team=team, progcomp=pc)
+    return render_template("submissions.html", team=team, progcomp=get_pc())
 
 
 @bp.route("/problems/<string:p_name>", methods=["GET", "POST"])
@@ -110,9 +113,9 @@ def problem(p_name):
     if not username:
         return redirect(url_for("progcomp.menu"))
 
-    # pc.update_problems()
+    # get_pc().update_problems()
 
-    problem = pc.get_problem(p_name)
+    problem = get_pc().get_problem(p_name)
     if not problem:
         return redirect(url_for("progcomp.submit"))
 
@@ -138,7 +141,7 @@ def problem(p_name):
             return redirect(request.url)
 
         time = datetime.now()
-        time_str = pc.get_timestamp_str(time)
+        time_str = get_pc().get_timestamp_str(time)
 
         # need to folder w/ timestamp on path
         path = os.path.join(
@@ -151,12 +154,12 @@ def problem(p_name):
         output.save(os.path.join(path, "output.txt"))
         script.save(os.path.join(path, script_name))
 
-        pc.make_submission(path, username, p_name, test, timestamp=time)
+        get_pc().make_submission(path, username, p_name, test, timestamp=time)
 
         return redirect(url_for("progcomp.submit"))
 
     return render_template(
-        "problem.html", username=username, problem=problem, progcomp=pc
+        "problem.html", username=username, problem=problem, progcomp=get_pc()
     )
 
 
@@ -183,7 +186,7 @@ def download(p_name, filename):
 
 @bp.route("/leaderboard", methods=["GET"])
 def leaderboard_main():
-    if not pc.show_leaderboard:
+    if not get_pc().show_leaderboard:
         return redirect(url_for("progcomp.menu"))
     # problems = []
     # for dir in glob.glob(os.path.join(os.getcwd(), "results/*")):
@@ -206,51 +209,31 @@ def leaderboard_main():
     overall = []
     return render_template(
         "leaderboard_hub.html",
-        problems=pc.enabled_problems,
+        problems=get_pc().enabled_problems,
         overall=overall,
-        progcomp=pc,
+        progcomp=get_pc(),
     )
 
 
 @bp.route("/leaderboard/<string:p_name>/<string:p_set>", methods=["GET"])
 def leaderboard(p_name, p_set):
-    if not pc.show_leaderboard:
-        return redirect(url_for("progcomp.menu"))
-
-    # pc.update_problems()
-    # problem = pc.get_problem(p_name)
-    # print(problem, repr(p_set), repr(problem.test_names))
-    # if not problem or (p_set + ".txt") not in problem.test_names:
-    # return redirect(url_for("progcomp.submit"))
-
-    if not p_name.isalnum() or not p_set.isalnum():
+    print("LEADERBOARD FOR", p_name, p_set)
+    if not get_pc().show_leaderboard or not p_name.isalnum() or not p_set.isalnum():
         return
-    try:
-        with open(os.path.join(os.getcwd(), f"results/{p_name}/{p_set}.txt")) as f:
-            lines = f.readlines()
-    except FileNotFoundError:
-        return redirect(url_for("progcomp.leaderboard_main"))
+    
+    problem: Problem = get_pc().get_problem(p_name)
+    if not problem:
+        return
+    test: Test = problem.get_test(p_set)
+    if not test:
+        return
 
-    this_round = set()
-    results = []
-    for line in lines:
-        parts = [x.strip() for x in re.split(r" +", line.strip())]
-
-        if parts[3] not in this_round:
-            print(parts)
-            if parts[2] == "[CORRECT]" or parts[2] == "[PARTIAL]":
-                sub = Submission(
-                    Team(parts[3], ""), p_name, parts[1].split(".")[0], p_set, parts[0]
-                )
-                sub.status = parts[2][1:-1]
-                results.append(sub)
-                # print(results[-1])
-                this_round.add(parts[3])
+    subs = test.ranked_submissions
 
     return render_template(
         "leaderboard.html",
         p_name=p_name,
         p_set=p_set,
-        submissions=results,
-        progcomp=pc,
+        submissions=subs,
+        progcomp=get_pc(),
     )
