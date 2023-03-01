@@ -40,10 +40,9 @@
                     {% if submission.max_score == -1 %}
                     <td class="text-center">{{ submission.score }}</td>
                     {% else %}
-                    <td class="text-center">{{ submission.score }}/{{ submission.max_score }}</td>
-                    <th scope="row" class="text-center">{{ submission.timestamp.replace("-", ":") }}</th>
+                    <td class="text-center">{{ submission.score }}/{{ submission.test.max_score }}</td>
                     {% endif %}
-                    <td class="text-center">{{ submission.timestamp }}</td>
+                    <td class="text-center">{{ submission.time_str }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

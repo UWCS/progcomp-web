@@ -39,9 +39,11 @@ class Submission(db.Model):
     problem = relationship(Problem, back_populates="submissions")
     test = relationship(Test, back_populates="submissions")
 
+    @property
     def time_str(self):
         return self.problem.progcomp.get_timestamp_str(self.timestamp)
 
+    @property
     def status_str(self):
         return str(self.status)[len("Status") + 1 :]
 

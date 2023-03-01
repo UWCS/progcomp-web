@@ -33,22 +33,22 @@
             </thead>
             <tbody>
                 {% for submission in team.submissions %}
-                {% if submission.status_str() == "CORRECT" %}
+                {% if submission.status_str == "CORRECT" %}
                 {% set row_color = 'table-success' %}
-                {% elif submission.status_str() == "SCORED" %}
+                {% elif submission.status_str == "SCORED" %}
                 {% set row_color = 'table-primary' %}
-                {% elif submission.status_str() == "WRONG" %}
+                {% elif submission.status_str == "WRONG" %}
                 {% set row_color = 'table-danger' %}
-                {% elif submission.status_str() == "PARTIAL" %}
+                {% elif submission.status_str == "PARTIAL" %}
                 {% set row_color = 'table-warning' %}
                 {% else %}
                 {% set row_color = '' %}
                 {% endif %}
                 <tr class="{{row_color}}">
-                    <th scope="row" class="text-center">{{ submission.time_str() }}</th>
+                    <th scope="row" class="text-center">{{ submission.time_str }}</th>
                     <td class="text-center">{{ submission.problem.name }}</td>
                     <td class="text-center">{{ submission.test.name }}</td>
-                    <td class="text-center">{{ submission.status_str() }}</td>
+                    <td class="text-center">{{ submission.status_str }}</td>
                     {% if submission.test.max_score is none %}
                     <td class="text-center">{{ submission.score }}</td>
                     {% else %}
