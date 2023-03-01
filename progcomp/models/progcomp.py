@@ -139,7 +139,8 @@ class Progcomp(db.Model):
             test_scores = test.ranked_submissions
             print("\tTest Rank", test.name, [(t.team.name, t.score) for t in test_scores])
             for i, sub in enumerate(test_scores):
-                score[sub.team.name] += 1.25 * (0.85 ** i) / total
+                if sub.score > 0:
+                    score[sub.team.name] += 1.25 * (0.85 ** i) / total
         print("Score", problem.name, score)
         return score
 
