@@ -100,77 +100,6 @@ def submit():
     return render_template("submissions.html", team=team, progcomp=pc)
 
 
-@bp.route("/leaderboard", methods=["GET"])
-def leaderboard_main():
-    problems = []
-    for dir in glob.glob(os.path.join(os.getcwd(), "results/*")):
-        if not os.path.isdir(dir):
-            continue
-        p = Problem(dir.split("/")[-1], False)
-        problems.append(p)
-        for filen in glob.glob(dir + "/*.txt"):
-            p.test_names.append(filen.split("/")[-1][:-4])
-    problems.sort(key=lambda p: p.name)
-
-    with open(os.path.join(os.getcwd(), f"results/winners.txt")) as f:
-        lines = f.readlines()
-    winners = []
-    for line in lines:
-        parts = [x.strip() for x in re.split(r" +", line.strip())]
-        winners.append(parts)
-
-    top3 = f"{winners[0][0]}, {winners[1][0]}, and {winners[2][0]}"
-    return render_template(
-        "leaderboard_hub.html",
-        problems=problems,
-        winners=winners,
-        top3=top3,
-        progcomp=pc,
-    )
-
-
-@bp.route("/leaderboard/<string:p_name>/<string:p_set>", methods=["GET"])
-def leaderboard(p_name, p_set):
-
-    # pc.update_problems()
-    # problem = pc.get_problem(p_name)
-    # print(problem, repr(p_set), repr(problem.test_names))
-    # if not problem or (p_set + ".txt") not in problem.test_names:
-    # return redirect(url_for("progcomp.submit"))
-
-    if not p_name.isalnum() or not p_set.isalnum():
-        return
-    try:
-        with open(os.path.join(os.getcwd(), f"results/{p_name}/{p_set}.txt")) as f:
-            lines = f.readlines()
-    except FileNotFoundError:
-        return redirect(url_for("progcomp.leaderboard_main"))
-
-    this_round = set()
-    results = []
-    for line in lines:
-        parts = [x.strip() for x in re.split(r" +", line.strip())]
-
-        if parts[3] not in this_round:
-            print(parts)
-            if parts[2] == "[CORRECT]" or parts[2] == "[PARTIAL]":
-                sub = Submission(
-                    Team(parts[3], ""), p_name, parts[1].split(".")[0], p_set, parts[0]
-                )
-                sub.status = parts[2][1:-1]
-                results.append(sub)
-                # print(results[-1])
-                this_round.add(parts[3])
-
-    return render_template(
-        "leaderboard.html",
-        p_name=p_name,
-        p_set=p_set,
-        submissions=results,
-        progcomp=pc,
-    )
-
-
 @bp.route("/problems/<string:p_name>", methods=["GET", "POST"])
 def problem(p_name):
     """
@@ -250,3 +179,78 @@ def download(p_name, filename):
     if not os.path.exists(os.path.join(path, filename)):
         return redirect(url_for("progcomp.submit"))
     return send_from_directory(path, filename, as_attachment=True)
+
+
+@bp.route("/leaderboard", methods=["GET"])
+def leaderboard_main():
+    if not pc.show_leaderboard:
+        return redirect(url_for("progcomp.menu"))
+    problems = []
+    for dir in glob.glob(os.path.join(os.getcwd(), "results/*")):
+        if not os.path.isdir(dir):
+            continue
+        p = Problem(dir.split("/")[-1], False)
+        problems.append(p)
+        for filen in glob.glob(dir + "/*.txt"):
+            p.test_names.append(filen.split("/")[-1][:-4])
+    problems.sort(key=lambda p: p.name)
+
+    with open(os.path.join(os.getcwd(), f"results/winners.txt")) as f:
+        lines = f.readlines()
+    winners = []
+    for line in lines:
+        parts = [x.strip() for x in re.split(r" +", line.strip())]
+        winners.append(parts)
+
+    top3 = f"{winners[0][0]}, {winners[1][0]}, and {winners[2][0]}"
+    return render_template(
+        "leaderboard_hub.html",
+        problems=problems,
+        winners=winners,
+        top3=top3,
+        progcomp=pc,
+    )
+
+
+@bp.route("/leaderboard/<string:p_name>/<string:p_set>", methods=["GET"])
+def leaderboard(p_name, p_set):
+    if not pc.show_leaderboard:
+        return redirect(url_for("progcomp.menu"))
+
+    # pc.update_problems()
+    # problem = pc.get_problem(p_name)
+    # print(problem, repr(p_set), repr(problem.test_names))
+    # if not problem or (p_set + ".txt") not in problem.test_names:
+    # return redirect(url_for("progcomp.submit"))
+
+    if not p_name.isalnum() or not p_set.isalnum():
+        return
+    try:
+        with open(os.path.join(os.getcwd(), f"results/{p_name}/{p_set}.txt")) as f:
+            lines = f.readlines()
+    except FileNotFoundError:
+        return redirect(url_for("progcomp.leaderboard_main"))
+
+    this_round = set()
+    results = []
+    for line in lines:
+        parts = [x.strip() for x in re.split(r" +", line.strip())]
+
+        if parts[3] not in this_round:
+            print(parts)
+            if parts[2] == "[CORRECT]" or parts[2] == "[PARTIAL]":
+                sub = Submission(
+                    Team(parts[3], ""), p_name, parts[1].split(".")[0], p_set, parts[0]
+                )
+                sub.status = parts[2][1:-1]
+                results.append(sub)
+                # print(results[-1])
+                this_round.add(parts[3])
+
+    return render_template(
+        "leaderboard.html",
+        p_name=p_name,
+        p_set=p_set,
+        submissions=results,
+        progcomp=pc,
+    )
