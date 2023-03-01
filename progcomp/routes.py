@@ -21,8 +21,10 @@ from .models import *
 from .session import USERNAME_SESSION_KEY
 
 with app.app_context():
-    pc = Progcomp(name="main")
-    db.session.commit()
+    pc = db.session.query(Progcomp).first()
+    if not pc:
+        db.session.add(pc := Progcomp(name="main"))
+        db.session.commit()
 
 bp = Blueprint("progcomp", __name__)
 

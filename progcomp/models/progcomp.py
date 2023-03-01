@@ -25,7 +25,7 @@ class Progcomp(db.Model):
     problems = relationship(Problem, back_populates="progcomp")
 
     def get_team(self, name: str) -> Optional[Team]:
-        return db.session.query(Team).filter(Team.name == name).one_or_none()
+        return db.session.query(Team).filter(Team.name == name).first()
 
     def add_team(self, name: str, password: str):
         db.session.add(Team(progcomp_id=self.id, name=name, password=password))
