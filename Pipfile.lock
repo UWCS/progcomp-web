@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ad6659241db9e54f87f2a699a112d10dcfd8beef39b46892222a28d13d69695a"
+            "sha256": "4324f1f83e44c6c26991bde66ba1d858301058ec62f663282dc2a1fc9a8f0944"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,12 +16,20 @@
         ]
     },
     "default": {
+        "alembic": {
+            "hashes": [
+                "sha256:4d3bd32ecdbb7bbfb48a9fe9e6d6fd6a831a1b59d03e26e292210237373e7db5",
+                "sha256:6f1c2207369bf4f49f952057a33bb017fbe5c148c2a773b46906b806ea6e825f"
+            ],
+            "markers": "python_version >= '3.7'",
+            "version": "==1.9.4"
+        },
         "click": {
             "hashes": [
                 "sha256:7682dc8afb30297001674575ea00d1814d808d6a36af415a82bd481d37ba7b8e",
                 "sha256:bb4d8133cb15a609f44e8213d9b391b0809795062913b383c62be0ee95b1db48"
             ],
-            "markers": "python_version >= '3.7'",
+            "index": "pypi",
             "version": "==8.1.3"
         },
         "colorama": {
@@ -39,6 +47,14 @@
             ],
             "index": "pypi",
             "version": "==2.2.3"
+        },
+        "flask-alembic": {
+            "hashes": [
+                "sha256:05a1e6f4148dbfcc9280a393373bfbd250af6f9f4f0ca9f744ef8f7376a3deec",
+                "sha256:7e67740b0b08d58dcae0c701d56b56e60f5fa4af907bb82b4cb0469229ba94ff"
+            ],
+            "index": "pypi",
+            "version": "==2.0.1"
         },
         "flask-sqlalchemy": {
             "hashes": [
@@ -137,6 +153,14 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==3.1.2"
+        },
+        "mako": {
+            "hashes": [
+                "sha256:c97c79c018b9165ac9922ae4f32da095ffd3c4e6872b45eded42926deea46818",
+                "sha256:d60a3903dc3bb01a18ad6a89cdbe2e4eadc69c0bc8ef1e3773ba53d44c3f7a34"
+            ],
+            "markers": "python_version >= '3.7'",
+            "version": "==1.2.4"
         },
         "markupsafe": {
             "hashes": [
@@ -303,7 +327,7 @@
                 "sha256:7682dc8afb30297001674575ea00d1814d808d6a36af415a82bd481d37ba7b8e",
                 "sha256:bb4d8133cb15a609f44e8213d9b391b0809795062913b383c62be0ee95b1db48"
             ],
-            "markers": "python_version >= '3.7'",
+            "index": "pypi",
             "version": "==8.1.3"
         },
         "colorama": {
