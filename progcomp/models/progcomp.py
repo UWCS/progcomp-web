@@ -45,7 +45,15 @@ class Progcomp(db.Model):
         print("Problems", repr(self.problems))
 
     def get_problem(self, name):
-        return db.session.query(Problem).where(Problem.name == name).first()
+        return (
+            db.session.query(Problem)
+            .where(Problem.name == name, Problem.enabled == False)
+            .first()
+        )
+    
+    @property
+    def enabled_problems(self):
+        return [p for p in self.problems if p.enabled]
 
     def get_timestamp_str(self, time):
         return time.strftime("%Y-%m-%d_%H-%M-%S")

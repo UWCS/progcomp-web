@@ -24,7 +24,7 @@
           <li class="nav-item">
             <a class="nav-link" href="/submit">Submissions</a>
           </li>
-          {% for p in progcomp.problems %}
+          {% for p in progcomp.enabled_problems %}
           <li class="nav-item">
             <a class="nav-link" href="/problems/{{ p.name }}">Problem&nbsp;{{ p.name }}</a>
           </li>
