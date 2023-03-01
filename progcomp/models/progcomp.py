@@ -36,7 +36,7 @@ class Progcomp(db.Model):
     def update_problems(self):
         # Add any new problems, update existing ones
         path = os.path.join(os.getcwd(), "problems")
-        p_names = os.listdir(path)
+        p_names = sorted(os.listdir(path))
         for p_name in p_names:
             prob = self.get_problem(p_name)
             if not prob:
@@ -57,6 +57,7 @@ class Progcomp(db.Model):
         return (
             db.session.query(Problem)
             .where(Problem.enabled == True)
+            .order_by(Problem.name)
             .all()
         )
 
