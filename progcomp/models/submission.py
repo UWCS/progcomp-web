@@ -82,4 +82,4 @@ class Submission(db.Model):
         else:
             self.status = Status.INVALID
 
-        logging.info(f"New Submission for {self.problem.name}: {self.test.name} by {self.team.name} [{self.status}] {self.score}/{self.max_score or ''}")
+        logging.info(f"New Submission for {self.problem.name}: {self.test.name} by {self.team.name} [{self.status}] {self.score}/{self.test.max_score or ''}")
