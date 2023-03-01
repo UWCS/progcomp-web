@@ -4,23 +4,36 @@ import os
 import re
 from datetime import datetime
 
-from flask import (Blueprint, redirect, render_template, request,
-                   send_from_directory, session, url_for)
+from flask import (
+    Blueprint,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+    session,
+    url_for,
+)
 from werkzeug.utils import secure_filename
 
-from . import app
 from .database import db
 from .models import *
+
 # from .adapters import GameUIAdapter
 from .session import USERNAME_SESSION_KEY
 
-with app.app_context():
+pc: Progcomp = None
+
+
+def load_pc():
+    global pc
+    # with app.app_context():
     pc = db.session.query(Progcomp).first()
     if not pc:
         db.session.add(pc := Progcomp(name="main"))
         db.session.commit()
     pc.update_problems()
     db.session.flush()
+
 
 bp = Blueprint("progcomp", __name__)
 
@@ -168,7 +181,7 @@ def problem(p_name):
     if not username:
         return redirect(url_for("progcomp.menu"))
 
-    pc.update_problems()
+    # pc.update_problems()
 
     problem = pc.get_problem(p_name)
     if not problem:
