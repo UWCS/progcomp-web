@@ -14,8 +14,10 @@ class Problem(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True)
+    progcomp_id = db.Column(db.Integer, ForeignKey("progcomps.id"))
 
     tests = relationship("tests", back_populates="problem")
+    progcomp = relationship("progcomps", back_populates="problems")
 
     def __init__(self):
         self.update()
@@ -30,6 +32,11 @@ class Problem(db.Model):
         for test_name in new - old:
             test = db.query(Test).where(Test.name == test_name).first()
             db.remove(test)
+
+    def get_test(self, name):
+        return (
+            db.query(Test).where(Test.problem_id == self.id, Test.name == name).first()
+        )
 
 
 @auto_str
