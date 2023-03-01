@@ -192,11 +192,12 @@ def leaderboard_main():
     
     pc = get_pc()
     scores = pc.score_teams()
+    if not pc.freeze:
+        scores = []
     return render_template(
         "leaderboard_hub.html",
         problems=[p for p in get_pc().enabled_problems if p.name != "0"],
-        # scores=scores,
-        scores=[],
+        scores=scores,
         progcomp=get_pc(),
     )
 
