@@ -120,6 +120,7 @@ class Progcomp(db.Model):
                     score[sub.team.name] += 1. / total
                 if sub.status == Status.PARTIAL:
                     score[sub.team.name] += (1. / 1.25) * sub.score / test.max_score / total
+            print("\tTest Score", test.name, [(t.name, s) for (t, s) in test_scores.items()])
         print("Score", problem.name, score)
         return score
     
@@ -128,6 +129,8 @@ class Progcomp(db.Model):
         total = len(problem.tests)
         for test in problem.tests:
             test_scores = test.ranked_submissions
+            print("\tTest Score", test.name, [(t.name, s) for (t, s) in test_scores.items()])
             for i, sub in enumerate(test_scores):
                 score[sub.team.name] += (0.85 ** i) / total
+        print("Score", problem.name, score)
         return score
