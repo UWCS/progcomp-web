@@ -38,19 +38,17 @@ class Progcomp(db.Model):
         path = os.path.join(os.getcwd(), "problems")
         p_names = sorted(os.listdir(path))
         for p_name in p_names:
-            prob = self.get_problem(p_name)
+            prob = self.get_problem(p_name, False)
             if not prob:
                 db.session.add(prob := Problem(name=p_name, progcomp_id=self.id, enabled=False))
             prob.update()
         db.session.commit()
         print("Problems", repr(self.problems))
 
-    def get_problem(self, name):
-        return (
-            db.session.query(Problem)
-            .where(Problem.name == name, Problem.enabled == True)
-            .first()
-        )
+    def get_problem(self, name, enabled_filter=True):
+        q = db.session.query(Problem).where(Problem.name == name)
+        if enabled_filter: q.where(Problem.enabled == True)
+        return q.first()
 
     @property
     def enabled_problems(self):
