@@ -185,29 +185,29 @@ def download(p_name, filename):
 def leaderboard_main():
     if not pc.show_leaderboard:
         return redirect(url_for("progcomp.menu"))
-    problems = []
-    for dir in glob.glob(os.path.join(os.getcwd(), "results/*")):
-        if not os.path.isdir(dir):
-            continue
-        p = Problem(dir.split("/")[-1], False)
-        problems.append(p)
-        for filen in glob.glob(dir + "/*.txt"):
-            p.test_names.append(filen.split("/")[-1][:-4])
-    problems.sort(key=lambda p: p.name)
+    # problems = []
+    # for dir in glob.glob(os.path.join(os.getcwd(), "results/*")):
+    #     if not os.path.isdir(dir):
+    #         continue
+    #     p = Problem(dir.split("/")[-1], False)
+    #     problems.append(p)
+    #     for filen in glob.glob(dir + "/*.txt"):
+    #         p.test_names.append(filen.split("/")[-1][:-4])
+    # problems.sort(key=lambda p: p.name)
 
-    with open(os.path.join(os.getcwd(), f"results/winners.txt")) as f:
-        lines = f.readlines()
-    winners = []
-    for line in lines:
-        parts = [x.strip() for x in re.split(r" +", line.strip())]
-        winners.append(parts)
+    # with open(os.path.join(os.getcwd(), f"results/winners.txt")) as f:
+    #     lines = f.readlines()
+    # winners = []
+    # for line in lines:
+    #     parts = [x.strip() for x in re.split(r" +", line.strip())]
+    #     winners.append(parts)
 
-    top3 = f"{winners[0][0]}, {winners[1][0]}, and {winners[2][0]}"
+    # top3 = f"{winners[0][0]}, {winners[1][0]}, and {winners[2][0]}"
+    overall = []
     return render_template(
         "leaderboard_hub.html",
-        problems=problems,
-        winners=winners,
-        top3=top3,
+        problems=pc.enabled_problems,
+        overall=overall,
         progcomp=pc,
     )
 
