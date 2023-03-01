@@ -2,9 +2,8 @@ import logging
 import os
 
 from flask import Flask
-from flask_alembic import Alembic
 
-from .database import db
+from .database import alembic, db
 
 logging.basicConfig(
     level=logging.getLevelName("INFO"),
@@ -25,8 +24,6 @@ def create_app(test_config=None):
     )
 
     db.init_app(app)
-
-    alembic = Alembic()
     alembic.init_app(app)
 
     from . import routes
