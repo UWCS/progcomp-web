@@ -76,7 +76,7 @@ class Test(db.Model):
                 team_scores[sub.team.name] = sub
 
         team_scores = list(team_scores.values())
-        team_scores.sort(key=lambda s: (s.score, s.timestamp))
+        team_scores.sort(key=lambda s: (-s.score, s.timestamp))
         print(team_scores)
         return team_scores
 
