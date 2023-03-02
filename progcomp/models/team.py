@@ -17,6 +17,8 @@ class Team(db.Model):
     password = db.Column(db.String, nullable=False)
     score = db.Column(db.Integer, default=0)
 
-    submissions = relationship("Submission", back_populates="team", order_by=Submission.timestamp.desc())
+    submissions = relationship(
+        "Submission", back_populates="team", order_by=Submission.timestamp.desc()
+    )
     # , order_by="submissions.timestamp"
     progcomp = relationship("Progcomp", back_populates="teams")

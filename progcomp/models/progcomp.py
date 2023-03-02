@@ -1,6 +1,6 @@
-from collections import Counter
 import logging
 import os
+from collections import Counter
 from datetime import datetime
 from typing import Optional
 
@@ -22,7 +22,9 @@ class Progcomp(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True)
     start_time = db.Column(db.DateTime, default=func.current_timestamp())
-    show_leaderboard = db.Column(db.Boolean, nullable=False, default=False, server_default="f")
+    show_leaderboard = db.Column(
+        db.Boolean, nullable=False, default=False, server_default="f"
+    )
     freeze = db.Column(db.Boolean, nullable=False, default=False, server_default="f")
 
     teams = relationship(Team, back_populates="progcomp")
@@ -42,14 +44,16 @@ class Progcomp(db.Model):
         for p_name in p_names:
             prob = self.get_problem(p_name, False)
             if not prob:
-                db.session.add(prob := Problem(name=p_name, progcomp_id=self.id, enabled=False))
+                prob = Problem(name=p_name, progcomp_id=self.id, enabled=False)
+                db.session.add(prob)
             prob.update()
         db.session.commit()
         print("Problems", repr(self.problems))
 
     def get_problem(self, name, enabled_filter=True):
         q = db.session.query(Problem).where(Problem.name == name)
-        if enabled_filter: q.where(Problem.enabled == True)
+        if enabled_filter:
+            q.where(Problem.enabled == True)
         return q.first()
 
     @property
@@ -103,15 +107,19 @@ class Progcomp(db.Model):
                 continue
             if problem.tests[0].max_score:  # Has a max
                 score = self.score_max(problem)
-            else:   # Is optimisation
+            else:  # Is optimisation
                 score = self.score_optimisation(problem)
             per_prob.append(score)
             for t, s in score.items():
                 total[t] += s
-        
+
         actual = []
         for team in self.teams:
-            sc = OverallScore(team, conv(total[team.name]), [conv(per_prob[i][team.name]) for i in range(len(per_prob))])
+            sc = OverallScore(
+                team,
+                conv(total[team.name]),
+                [conv(per_prob[i][team.name]) for i in range(len(per_prob))],
+            )
             actual.append(sc)
         actual.sort(key=lambda x: x.total)
         actual.reverse()
@@ -123,7 +131,9 @@ class Progcomp(db.Model):
         total = len(problem.tests)
         for test in problem.tests:
             test_scores = test.ranked_submissions
-            print("\tTest Score", test.name, [(t.team.name, t.score) for t in test_scores])
+            print(
+                "\tTest Score", test.name, [(t.team.name, t.score) for t in test_scores]
+            )
             for sub in test_scores:
                 if sub.status == Status.CORRECT:
                     score[sub.team.name] += 1.25 / total
@@ -131,18 +141,21 @@ class Progcomp(db.Model):
                     score[sub.team.name] += float(sub.score) / test.max_score / total
         print("Score", problem.name, score)
         return score
-    
+
     def score_optimisation(self, problem):
         score = Counter()
         total = len(problem.tests)
         for test in problem.tests:
             test_scores = test.ranked_submissions
-            print("\tTest Rank", test.name, [(t.team.name, t.score) for t in test_scores])
+            print(
+                "\tTest Rank", test.name, [(t.team.name, t.score) for t in test_scores]
+            )
             for i, sub in enumerate(test_scores):
                 if sub.score > 0:
-                    score[sub.team.name] += 1.25 * (0.85 ** i) / total
+                    score[sub.team.name] += 1.25 * (0.85**i) / total
         print("Score", problem.name, score)
         return score
+
 
 @auto_str
 class OverallScore:

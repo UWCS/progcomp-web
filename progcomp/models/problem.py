@@ -3,7 +3,7 @@ import os
 from sqlalchemy import ForeignKey, ForeignKeyConstraint, func
 from sqlalchemy.orm import relationship
 
-from progcomp.models.utils import auto_str, Status
+from progcomp.models.utils import Status, auto_str
 
 from ..database import db
 
@@ -61,9 +61,11 @@ class Test(db.Model):
     @property
     def ranked_submissions(self):
         from progcomp.models import Submission
+
         submissions = (
             db.session.query(Submission)
-            .where(Submission.test_id == self.id, Submission.problem_id == self.problem_id)
+            .where(Submission.test_id == self.id)
+            .where(Submission.problem_id == self.problem_id)
             .all()
         )
 
@@ -73,11 +75,14 @@ class Test(db.Model):
             if sub.status not in [Status.CORRECT, Status.PARTIAL, Status.SCORED]:
                 continue
             current = team_scores.get(sub.team.name)
-            if not current or (sub.score > current.score) or (sub.score == current.score and sub.timestamp > current.timestamp):
+            if (
+                not current
+                or (sub.score > current.score)
+                or (sub.score == current.score and sub.timestamp > current.timestamp)
+            ):
                 team_scores[sub.team.name] = sub
 
         team_scores = list(team_scores.values())
         team_scores.sort(key=lambda s: (-s.score, s.timestamp))
         print(team_scores)
         return team_scores
-
