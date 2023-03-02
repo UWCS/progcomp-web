@@ -4,21 +4,12 @@ import os
 import re
 from datetime import datetime
 
-from flask import (
-    Blueprint,
-    jsonify,
-    redirect,
-    render_template,
-    request,
-    send_from_directory,
-    session,
-    url_for,
-)
+from flask import (Blueprint, jsonify, redirect, render_template, request,
+                   send_from_directory, session, url_for)
 from werkzeug.utils import secure_filename
 
 from .database import db
 from .models import *
-
 # from .adapters import GameUIAdapter
 from .session import USERNAME_SESSION_KEY
 
@@ -246,4 +237,6 @@ def leaderboard(p_name, p_set):
 
 @bp.route("/end_time", methods=["GET"])
 def end_time():
-    return jsonify({"end_time": get_pc().end_time})
+    pc = get_pc()
+    print(pc.end_time.timestamp())
+    return jsonify({"end_time": get_pc().end_time.timestamp()})

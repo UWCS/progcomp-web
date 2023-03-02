@@ -11,6 +11,7 @@ flask-sqlalchemy = "3.0"
 flask-alembic = "*"
 click = "*"
 python-dotenv = "*"
+dateparser = "*"
 
 [dev-packages]
 black = "23.1"
