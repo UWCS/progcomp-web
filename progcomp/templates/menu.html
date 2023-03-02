@@ -6,6 +6,7 @@
 <br>
 <div class="d-flex flex-column justify-content-center align-items-center">
     <img class="mw-100 p-2 mt-3" style="width: 500px" src="static/challenge_logo.svg" alt="Logo"></img>
+    {% if not username %}
     <form class="mw-100 mt-3" style="width: 300px" action="{{ url_for('progcomp.start') }}" method="POST">
         <div class="form-group mt-3">
             <label for="username">Team Name</label>
@@ -22,6 +23,14 @@
             <button type="submit" class="btn btn-success btn-lg">Join this Team</button>
         </div>
     </form>
+    {% else %}
+    <form class="mw-100 mt-3" style="width: 300px" action="{{ url_for('progcomp.logout') }}" method="POST">
+        Team Name: {{ username }}
+        <div class="form-group mt-3">
+            <button type="submit" class="btn btn-danger btn-lg">Log out</button>
+        </div>
+    </form>
+    {% endif %}
     <div class="mt-5">
         <h2>Instructions</h2>
         <ol>

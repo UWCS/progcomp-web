@@ -43,7 +43,8 @@ bp = Blueprint("progcomp", __name__)
 
 @bp.route("/")
 def menu():
-    return render_template("menu.html", progcomp=get_pc())
+    username = session.get(USERNAME_SESSION_KEY)
+    return render_template("menu.html", progcomp=get_pc(), username=username)
 
 
 @bp.route("/start", methods=["POST"])
@@ -84,6 +85,18 @@ def start():
     session[USERNAME_SESSION_KEY] = username
 
     return redirect(url_for("progcomp.submit"))
+
+
+@bp.route("/logout", methods=["POST"])
+def logout():
+    """
+    When someone hits the 'logout' button
+    """
+
+    # Save their username
+    session[USERNAME_SESSION_KEY] = None
+
+    return redirect(url_for("progcomp.menu"))
 
 
 @bp.route("/submit", methods=["GET"])
