@@ -26,6 +26,7 @@ class Progcomp(db.Model):
         db.Boolean, nullable=False, default=False, server_default="f"
     )
     freeze = db.Column(db.Boolean, nullable=False, default=False, server_default="f")
+    end_time = db.Column(db.DateTime)
 
     teams = relationship(Team, back_populates="progcomp")
     problems = relationship(Problem, back_populates="progcomp", order_by=Problem.name)

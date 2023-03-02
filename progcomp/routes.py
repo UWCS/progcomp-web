@@ -6,6 +6,7 @@ from datetime import datetime
 
 from flask import (
     Blueprint,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -241,3 +242,8 @@ def leaderboard(p_name, p_set):
         submissions=subs,
         progcomp=get_pc(),
     )
+
+
+@bp.route("/end_time", methods=["GET"])
+def end_time():
+    return jsonify({"end_time": get_pc().end_time})
