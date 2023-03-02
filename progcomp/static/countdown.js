@@ -25,13 +25,15 @@ const listStrNonEmpty = function (parts, max_numb) {
     return listStr(filtered);
 }
 
+var targetDate = null;
+var quick = true;
 
 // Update the count down every minute
-const countdown = function (target) {
-
+const countdown = function () {
+    if (!targetDate) return
     // Find the distance between now and the count down date
     const now = new Date().getTime();
-    const distance = target - now;
+    const distance = targetDate - now;
 
     // Time calculations for days, hours, minutes and seconds
     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -49,12 +51,13 @@ const countdown = function (target) {
 
     let cd = document.getElementById("countdown");
     if (!cd) return clearInterval(x);
-    cd.innerHTML = `<strong>${time_rem_str}</strong>`;
-    if (days == 0 && typeof countdown.quick == "undefined") {
-        // Once per sec if close
+    console.log(time_rem_str);
+    cd.innerHTML = `${time_rem_str}`;
+    if (days > 0 && quick) {
+        // Less frequent updates if far away
         clearInterval(x);
-        x = setInterval(countdown, 1000);
-        countdown.quick = true;
+        x = setInterval(countdown, 60000);
+        countdown.quick = false;
     }
     // If the count down is finished, clear
     if (distance < 0) {
@@ -62,3 +65,18 @@ const countdown = function (target) {
         cd.innerHTML = "Competition now ended!";
     }
 };
+
+const updateTarget = function () {
+    fetch("http://localhost:5000/end_time")
+        .then((r) => r.json())
+        .then((json) => {
+            targetDate = json["end_time"];
+            console.log("New target", targetDate);
+        });
+}
+
+updateTarget()
+let y = setInterval(updateTarget, 15000);
+
+countdown();
+let x = setInterval(countdown, 5000);
