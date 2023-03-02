@@ -1,4 +1,4 @@
-from import_app import *
+from __script_setup import *
 
 prob = sys.argv[1]
 test = sys.argv[2]

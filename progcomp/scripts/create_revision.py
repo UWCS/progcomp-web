@@ -1,4 +1,4 @@
-from import_app import *
+from __script_setup import *
 
 if len(sys.argv) < 2:
     print("Provide a revision name")

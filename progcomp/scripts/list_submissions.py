@@ -1,4 +1,4 @@
-from import_app import *
+from __script_setup import *
 
 with app.app_context():
     for team in db.session.query(Team).all():

@@ -1,4 +1,4 @@
-from import_app import *
+from __script_setup import *
 
 with app.app_context():
     for problem in db.session.query(Problem).all():

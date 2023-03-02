@@ -1,4 +1,4 @@
-from import_app import *
+from __script_setup import *
 
 with app.app_context():
     pr = db.session.query(Problem).filter(Problem.name == sys.argv[1]).first()
