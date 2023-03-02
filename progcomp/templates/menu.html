@@ -3,48 +3,35 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-
-<div style="margin: auto 0">
-<img src="static/challenge_logo.svg" alt="Logo" style="max-height:200px;margin:10px auto 20px;display:block;"></img>
-</div>
-<div class="row">
-    <div class="col"></div>
-    <div class="col col-lg-3">
-        <form action="{{ url_for('progcomp.start') }}" method="POST">
-            <div class="d-grid gap-2">
-                <div class="form-group">
-                    <label for="username" class="form-label mt-4">Team Name</label>
-                    <input type="text" class="form-control" id="username" name="username" placeholder="Enter your team's name">
-                    <label for="password" class="form-label mt-4">Pass Phrase</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Create/Enter your pass phrase">
-                    <!-- <select class="form-select" id="diff" name="diff">
-                        <option value="-1">Mixed</option>
-                        <option value="0">Easy</option>
-                        <option value="1">Medium</option>
-                        <option value="2">Hard</option>
-                    </select> -->
-                </div>
-                <button type="submit" class="btn btn-success btn-lg">Join this Team</button>
-            </div>
-        </form>
-    </div>
-    <div class="col"></div>
-</div>
-
-<div class="row">
-    <div class="col"></div>
-    <div class="col col-lg-4">
+<br>
+<div class="d-flex flex-column justify-content-center align-items-center">
+    <img class="mw-100 p-2 mt-3" style="width: 500px" src="static/challenge_logo.svg" alt="Logo"></img>
+    <form class="mw-100 mt-3" style="width: 300px" action="{{ url_for('progcomp.start') }}" method="POST">
+        <div class="form-group mt-3">
+            <label for="username">Team Name</label>
+            <input type="text" class="form-control" id="username" name="username" placeholder="Enter your team's name">
+            <small id="username-help" class="form-text text-muted">Must be alphanumeric and not contain
+                spaces.</small>
+        </div>
+        <div class="form-group mt-3">
+            <label for="password">Pass Phrase</label>
+            <input type="password" class="form-control" id="password" name="password"
+                placeholder="Create/Enter your pass phrase">
+        </div>
+        <div class="form-group mt-3">
+            <button type="submit" class="btn btn-success btn-lg">Join this Team</button>
+        </div>
+    </form>
+    <div class="mt-5">
         <h2>Instructions</h2>
         <ol>
-            <li>Pick a team name and passphrase, and share this amongst your team.</li>
-            <li>Download the problems PDF under submissions.</li>
+            <li>Pick a team name and passphrase, and share this among your team.</li>
+            <li>Download the problems PDF under Submissions.</li>
             <li>Each challenge will be listed along the top. Click on each to view the input test data.</li>
-            <li>Once you have some solutions, upload your script's output (and the script for later verification, if
-                needed).</li>
+            <li>Once you have some solutions, upload your script's output (and the script for later verification).</li>
             <li>Your results for each problem should be available under Submissions.</li>
         </ol>
     </div>
-    <div class="col"></div>
 </div>
 
 {% endblock %}
