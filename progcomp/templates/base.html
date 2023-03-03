@@ -65,9 +65,11 @@
     </nav>
     {% block content %}{% endblock %}
 
-    <footer class="mt-auto d-flex flex-wrap justify-content-between py-3 mt-4 border-top">
-      <p class="mb-0 text-muted">Team: {{ username }} | <span id="countdown">Countdown soonTM</span></p>
-
+    <footer class="mt-auto d-flex flex-wrap justify-content-between gap-2 py-3 mt-4 border-top">
+      <p class="flex-grow-1 flex-md-grow-0 mb-0 text-muted text-center">
+        Team: {{ username }} | <span id="countdown">Countdown soonTM</span>
+      </p>
+      <div class="d-md-none" style="flex-basis: 100%; height: 0"></div>
       <a class="d-flex text-decoration-none" href="https://uwcs.co.uk">
         <svg height="32" viewBox="0 0 1635 548" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
