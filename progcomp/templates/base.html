@@ -3,16 +3,20 @@
 
 <head>
   <title>{% block title %}{% endblock %} - UWCS Challenge</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='countdown.js') }}"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+  <script defer src="{{ url_for('static', filename='countdown.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='darkmode.js') }}"></script>
 </head>
 
 <body>
-  <div class="container">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
-      <div class="container-fluid">
+  <div class="container min-vh-100 d-flex flex-column">
+    <nav class="navbar navbar-expand-lg">
+      <div class="container-fluid align-items-center">
         <a class="navbar-brand" href="/">
           <img src="{{ url_for('static', filename='challenge_logo.svg') }}" alt="Logo" style="max-width:100px;"></img>
         </a>
@@ -35,8 +39,9 @@
               <a class="nav-link" href="/leaderboard">Leaderboard</a>
             </li>
             {% endif %}
-            <li class="ms-lg-auto nav-item">
-              <span id=countdown class="nav-link">Countdown coming soon</span>
+            <div class="vr ms-md-auto"></div>
+            <li class="nav-item ms-2">
+              <a id="dark-mode" class="nav-link ml-1" href="#"><i class="bi-moon-fill"></i></a>
             </li>
           </ul>
         </div>
