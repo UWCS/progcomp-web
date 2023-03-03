@@ -11,11 +11,11 @@ from progcomp.models.problem import Problem, Test
 # from progcomp.models.team import Team
 from progcomp.models.utils import Status, auto_str
 
-from ..database import db
+from ..database import Base, db
 
 
 @auto_str
-class Submission(db.Model):
+class Submission(Base):
     __tablename__ = "submissions"
 
     id = db.Column(db.Integer, primary_key=True)

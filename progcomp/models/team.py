@@ -1,14 +1,14 @@
 from sqlalchemy import ForeignKey, ForeignKeyConstraint, desc
 from sqlalchemy.orm import relationship
-from progcomp.models.submission import Submission
 
+from progcomp.models.submission import Submission
 from progcomp.models.utils import auto_str
 
-from ..database import db
+from ..database import Base, db
 
 
 @auto_str
-class Team(db.Model):
+class Team(Base):
     __tablename__ = "teams"
 
     id = db.Column(db.Integer, primary_key=True)

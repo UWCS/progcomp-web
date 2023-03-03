@@ -1,15 +1,20 @@
 import os
+import typing
+from typing import Optional
 
 from sqlalchemy import ForeignKey, ForeignKeyConstraint, func
 from sqlalchemy.orm import relationship
 
 from progcomp.models.utils import Status, auto_str
 
-from ..database import db
+if typing.TYPE_CHECKING:
+    from progcomp.models.submission import *
+
+from ..database import Base, db
 
 
 @auto_str
-class Problem(db.Model):
+class Problem(Base):
     __tablename__ = "problems"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -21,7 +26,7 @@ class Problem(db.Model):
     submissions = relationship("Submission", back_populates="problem")
     progcomp = relationship("Progcomp", back_populates="problems")
 
-    def update(self):
+    def update(self) -> None:
         path = os.path.join(os.getcwd(), "problems", self.name, "input")
         old = set(t.name for t in self.tests)
         new = set([x[:-4] for x in os.listdir(path)])
@@ -38,7 +43,7 @@ class Problem(db.Model):
         db.session.commit()
         db.session.flush()
 
-    def get_test(self, name):
+    def get_test(self, name) -> Optional["Test"]:
         return (
             db.session.query(Test)
             .where(Test.problem_id == self.id, Test.name == name)
@@ -47,7 +52,7 @@ class Problem(db.Model):
 
 
 @auto_str
-class Test(db.Model):
+class Test(Base):
     __tablename__ = "tests"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -59,7 +64,7 @@ class Test(db.Model):
     submissions = relationship("Submission", back_populates="test")
 
     @property
-    def ranked_submissions(self):
+    def ranked_submissions(self) -> list["Submission"]:
         from progcomp.models import Submission
 
         submissions = (
@@ -69,7 +74,7 @@ class Test(db.Model):
             .all()
         )
 
-        team_scores = {}
+        team_scores: dict[str, "Submission"] = {}
 
         for sub in submissions:
             if sub.status not in [Status.CORRECT, Status.PARTIAL, Status.SCORED]:
@@ -82,7 +87,7 @@ class Test(db.Model):
             ):
                 team_scores[sub.team.name] = sub
 
-        team_scores = list(team_scores.values())
-        team_scores.sort(key=lambda s: (-s.score, s.timestamp))
-        print(team_scores)
-        return team_scores
+        sub_list = list(team_scores.values())
+        sub_list.sort(key=lambda s: (-s.score, s.timestamp))
+        print(sub_list)
+        return sub_list

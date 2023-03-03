@@ -1,7 +1,9 @@
 import enum
+import typing
 
 
-def auto_str(cls):
+@typing.no_type_check
+def auto_str(cls: type[object]) -> type[object]:
     def __repr__(self):
         value = ", ".join(
             "{}={}".format(*item)

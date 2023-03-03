@@ -3,7 +3,7 @@ import os
 
 from flask import Flask
 
-from .database import alembic, db
+from .database import db
 
 logging.basicConfig(
     level=logging.getLevelName("INFO"),
@@ -15,7 +15,7 @@ logging.basicConfig(
 )
 
 
-def create_app(test_config=None):
+def create_app() -> Flask:
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY="dev",
@@ -24,7 +24,6 @@ def create_app(test_config=None):
     )
 
     db.init_app(app)
-    alembic.init_app(app)
 
     from . import routes
 
@@ -33,4 +32,4 @@ def create_app(test_config=None):
     return app
 
 
-app = create_app()
+app: Flask = create_app()

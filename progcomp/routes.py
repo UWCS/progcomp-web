@@ -15,6 +15,9 @@ from flask import (
     url_for,
 )
 from werkzeug.utils import secure_filename
+from werkzeug.wrappers.response import Response
+
+FlaskResponse = typing.Union[Response, str]
 
 from .database import db
 from .models import *
@@ -35,42 +38,45 @@ def load_pc():
     db.session.flush()
 
 
-def get_pc():
-    return db.session.query(Progcomp).first()
+def get_pc() -> Progcomp:
+    pc = db.session.query(Progcomp).first()
+    if pc is None:
+        raise Exception("Progcomp object does not exist")
+    return pc
 
 
 bp = Blueprint("progcomp", __name__)
 
 
 @bp.route("/")
-def menu():
+def menu() -> FlaskResponse:
     username = session.get(USERNAME_SESSION_KEY)
     return render_template("menu.html", progcomp=get_pc(), username=username)
 
 
+def verify_input(inp: Optional[str], max_len: int = 100) -> bool:
+    return not (
+        inp is None
+        or inp == ""
+        or inp.isspace()
+        or len(inp) > max_len
+        or not inp.isalnum()
+    )
+
+
 @bp.route("/start", methods=["POST"])
-def start():
+def start() -> FlaskResponse:
     """
     When someone hits the 'start' button
     """
 
     # Check username and password are in a valid format
     username = request.form.get("username")
-    if (
-        username in [None, ""]
-        or username.isspace()
-        or len(username) > 100
-        or not username.isalnum()
-    ):
+    if username is None or verify_input(username, 100):
         return redirect(url_for("progcomp.menu"))
 
     password = request.form.get("password")
-    if (
-        password in [None, ""]
-        or password.isspace()
-        or len(password) > 30
-        or not password.isascii()
-    ):
+    if password is None or verify_input(password, 30):
         return redirect(url_for("progcomp.menu"))
 
     # Check password against potentially existing team
@@ -89,7 +95,7 @@ def start():
 
 
 @bp.route("/logout", methods=["POST"])
-def logout():
+def logout() -> FlaskResponse:
     """
     When someone hits the 'logout' button
     """
@@ -101,7 +107,7 @@ def logout():
 
 
 @bp.route("/submit", methods=["GET"])
-def submit():
+def submit() -> FlaskResponse:
     """
     The submission page / home page for the contest
     """
@@ -121,7 +127,7 @@ def submit():
 
 
 @bp.route("/problems/<string:p_name>", methods=["GET", "POST"])
-def problem(p_name):
+def problem(p_name) -> FlaskResponse:
     """
     Retrieve the page for a problem
     """
@@ -149,7 +155,7 @@ def problem(p_name):
             return redirect(request.url)
 
         script = request.files.get("script")
-        if not script or script.filename == "":
+        if not script or script.filename is None or script.filename == "":
             return redirect(request.url)
         script_name = secure_filename(script.filename)
 
@@ -181,7 +187,7 @@ def problem(p_name):
 
 
 @bp.route("/download/pdf", methods=["GET"])
-def dl_pdf():
+def dl_pdf() -> FlaskResponse:
     """
     Download the main pdf
     """
@@ -190,7 +196,7 @@ def dl_pdf():
 
 
 @bp.route("/download/<string:p_name>/<string:filename>", methods=["GET"])
-def download(p_name, filename):
+def download(p_name, filename) -> FlaskResponse:
     """
     Download a specified problem input
     """
@@ -202,7 +208,7 @@ def download(p_name, filename):
 
 
 @bp.route("/leaderboard", methods=["GET"])
-def leaderboard_main():
+def leaderboard_main() -> FlaskResponse:
     print("SHOW LEADEDBOARD", get_pc().show_leaderboard)
     if not get_pc().show_leaderboard:
         return redirect(url_for("progcomp.menu"))
@@ -222,7 +228,7 @@ def leaderboard_main():
 
 
 @bp.route("/leaderboard/<string:p_name>/<string:p_set>", methods=["GET"])
-def leaderboard(p_name, p_set):
+def leaderboard(p_name, p_set) -> FlaskResponse:
     if (
         not get_pc().show_leaderboard
         or not re.match(r"^[A-Za-z0-9_]+$", p_name)
@@ -232,10 +238,10 @@ def leaderboard(p_name, p_set):
 
     problem: Problem = get_pc().get_problem(p_name)
     if not problem:
-        return
-    test: Test = problem.get_test(p_set)
-    if not test:
-        return
+        return redirect(url_for("progcomp.menu"))
+    test: Optional[Test] = problem.get_test(p_set)
+    if test is None or not test:
+        return redirect(url_for("progcomp.menu"))
 
     subs = test.ranked_submissions
     username = session.get(USERNAME_SESSION_KEY)
@@ -250,7 +256,7 @@ def leaderboard(p_name, p_set):
 
 
 @bp.route("/poll", methods=["GET"])
-def poll():
+def poll() -> FlaskResponse:
     pc = get_pc()
     data = {"end_time": pc.end_time.timestamp() if pc.end_time else 0}
     return jsonify(data)
