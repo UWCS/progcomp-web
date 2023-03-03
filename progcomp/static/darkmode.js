@@ -5,7 +5,7 @@ const dark = function () {
 
 document.getElementById('dark-mode').addEventListener('click', () => {
     const curr_dark = Cookies.get("dark_mode") == "dark";
-    Cookies.set("dark_mode", curr_dark ? "light" : "dark", { SameSite: None });
+    Cookies.set("dark_mode", curr_dark ? "light" : "dark", { SameSite: "None" });
     dark();
 });
 
