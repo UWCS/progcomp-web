@@ -80,7 +80,7 @@ const updateTarget = function () {
             const newDate = new Date(Number(json["end_time"]) * 1000);
             if (newDate != targetDate) {
                 targetDate = newDate;
-                Cookies.set(newDate);
+                Cookies.set("end_time", newDate, { SameSite: None });
                 countdown();
             }
         });
