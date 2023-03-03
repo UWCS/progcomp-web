@@ -25,53 +25,56 @@ const listStrNonEmpty = function (parts, max_numb) {
     return listStr(filtered);
 }
 
+const setIntervals = function (cd_t, ut_t, q) {
+    if (quick == q) return;
+    clearInterval(x);
+    clearInterval(y);
+    x = setInterval(countdown, cd_t * 1000);
+    y = setInterval(updateTarget, ut_t * 1000);
+    quick = q;
+}
+
 var targetDate = new Date(Cookies.get("end_time"));
 var quick = null;
+var x, y, cd;
 
 // Update the count down every minute
 const countdown = function () {
-    if (!targetDate) return
+    if (!targetDate || !cd) return
 
     // Find the distance between now and the count down date
     const now = new Date().getTime();
     const distance = targetDate - now;
-    console.log(targetDate, now, distance);
-    // Time calculations for days, hours, minutes and seconds
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / (1000));
-    // Display the result in the countdown
-    let daysText = formatPlural(days, "day");
-    let hoursText = formatPlural(hours, "hour");
-    let minutesText = formatPlural(minutes, "minute");
-    let secondsText = formatPlural(seconds, "second");
-
-    time_rem_str = listStrNonEmpty([daysText, hoursText, minutesText, secondsText], 2);
-    if (days >= 7) time_rem_str = daysText;
-
-    let cd = document.getElementById("countdown");
-    if (!cd) return;
-    console.log(time_rem_str);
-    cd.innerHTML = `${time_rem_str} remaining`;
-    if (days > 0 && quick == null) {
-        // Less frequent updates if far away
-        clearInterval(x);
-        x = setInterval(countdown, 60000);
-        countdown.quick = false;
-    }
-    if (minutes < 10) {
-        // More frequent updates if close
-        clearInterval(x);
-        x = setInterval(countdown, 1000);
-        clearInterval(y);
-        y = setInterval(countdown, 5000);
-        countdown.quick = true;
-    }
-    // If the count down is finished, clear
     if (distance < 0) {
         cd.innerHTML = "Competition now ended!";
+        setIntervals(60, 300, "ended");
+    } else {
+        // Time calculations for days, hours, minutes and seconds
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / (1000));
+        // Display the result in the countdown
+        let daysText = formatPlural(days, "day");
+        let hoursText = formatPlural(hours, "hour");
+        let minutesText = formatPlural(minutes, "minute");
+        let secondsText = formatPlural(seconds, "second");
+
+        time_rem_str = listStrNonEmpty([daysText, hoursText, minutesText, secondsText], 2);
+        if (days >= 7) time_rem_str = daysText;
+
+        cd.innerHTML = `${time_rem_str} remaining`;
+
+        // Set update time
+        if (days > 0) {
+            setIntervals(60, 300, "days");
+        } else if (days == 0 && hours > 1) {
+            setIntervals(1, 60, "hours");
+        } else if (hours <= 1) {
+            setIntervals(1, 15, "mins");
+        }
     }
+
 };
 
 const updateTarget = function () {
@@ -88,7 +91,8 @@ const updateTarget = function () {
 }
 
 updateTarget();
-let y = setInterval(updateTarget, 15000);
 
-let x = setInterval(countdown, 5000);
-window.addEventListener('load', countdown);
+window.addEventListener('load', () => {
+    cd = document.getElementById("countdown");
+    countdown()
+});
