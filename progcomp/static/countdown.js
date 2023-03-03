@@ -25,16 +25,17 @@ const listStrNonEmpty = function (parts, max_numb) {
     return listStr(filtered);
 }
 
-var targetDate = Cookies.get("end_time");
+var targetDate = new Date(Cookies.get("end_time"));//Number(json["end_time"]) * 1000);
 var quick = null;
 
 // Update the count down every minute
 const countdown = function () {
     if (!targetDate) return
+
     // Find the distance between now and the count down date
     const now = new Date().getTime();
     const distance = targetDate - now;
-
+    console.log(targetDate, now, distance);
     // Time calculations for days, hours, minutes and seconds
     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
     const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -50,7 +51,7 @@ const countdown = function () {
     if (days >= 7) time_rem_str = daysText;
 
     let cd = document.getElementById("countdown");
-    if (!cd) return clearInterval(x);
+    if (!cd) return;
     console.log(time_rem_str);
     cd.innerHTML = `${time_rem_str} remaining`;
     if (days > 0 && quick == null) {
@@ -74,19 +75,20 @@ const countdown = function () {
 };
 
 const updateTarget = function () {
-    fetch("https://progcomp.uwcs.co.uk/poll")
+    fetch("http://localhost:5000/poll")
         .then((r) => r.json())
         .then((json) => {
             const newDate = new Date(Number(json["end_time"]) * 1000);
             if (newDate != targetDate) {
                 targetDate = newDate;
-                Cookies.set("end_time", newDate, { SameSite: "None" });
+                Cookies.set("end_time", newDate.getTime(), { SameSite: "Strict" });
                 countdown();
             }
         });
 }
 
-updateTarget()
+updateTarget();
 let y = setInterval(updateTarget, 15000);
 
 let x = setInterval(countdown, 5000);
+window.addEventListener('load', countdown);
