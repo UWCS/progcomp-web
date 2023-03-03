@@ -236,7 +236,7 @@ def leaderboard(p_name, p_set) -> FlaskResponse:
     ):
         return redirect(url_for("progcomp.menu"))
 
-    problem: Problem = get_pc().get_problem(p_name)
+    problem: Optional[Problem] = get_pc().get_problem(p_name)
     if not problem:
         return redirect(url_for("progcomp.menu"))
     test: Optional[Test] = problem.get_test(p_set)

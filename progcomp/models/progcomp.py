@@ -1,8 +1,8 @@
 import logging
 import os
-from collections import Counter
+from collections import Counter, defaultdict
 from datetime import datetime
-from typing import Optional
+from typing import Callable, Optional, Union
 
 from sqlalchemy import ForeignKey, ForeignKeyConstraint, func
 from sqlalchemy.orm import relationship
@@ -34,11 +34,11 @@ class Progcomp(Base):
     def get_team(self, name: str) -> Optional[Team]:
         return db.session.query(Team).filter(Team.name == name).first()
 
-    def add_team(self, name: str, password: str):
+    def add_team(self, name: str, password: str) -> None:
         db.session.add(Team(progcomp_id=self.id, name=name, password=password))
         db.session.commit()
 
-    def update_problems(self):
+    def update_problems(self) -> None:
         # Add any new problems, update existing ones
         path = os.path.join(os.getcwd(), "problems")
         p_names = sorted(os.listdir(path))
@@ -51,14 +51,14 @@ class Progcomp(Base):
         db.session.commit()
         print("Problems", repr(self.problems))
 
-    def get_problem(self, name, enabled_filter=True):
+    def get_problem(self, name, enabled_filter=True) -> Optional[Problem]:
         q = db.session.query(Problem).where(Problem.name == name)
         if enabled_filter:
             q.where(Problem.enabled == True)
         return q.first()
 
     @property
-    def enabled_problems(self):
+    def enabled_problems(self) -> list[Problem]:
         return (
             db.session.query(Problem)
             .where(Problem.enabled == True)
@@ -66,7 +66,7 @@ class Progcomp(Base):
             .all()
         )
 
-    def get_timestamp_str(self, time):
+    def get_timestamp_str(self, time) -> str:
         return time.strftime("%H:%M:%S")
 
     def make_submission(
@@ -76,7 +76,7 @@ class Progcomp(Base):
         p_name: str,
         test_name: str,
         timestamp: datetime,
-    ):
+    ) -> bool:
         team = self.get_team(team_name)
         problem = self.get_problem(p_name)
         if not team or not problem:
@@ -98,11 +98,11 @@ class Progcomp(Base):
         db.session.commit()
         return True
 
-    def score_teams(self):
-        total = Counter()
+    def score_teams(self) -> list["OverallScore"]:
+        total: dict[str, float] = defaultdict(float)
         per_prob = []
 
-        conv = lambda x: round(x * 100)
+        conv: Callable[[Union[int, float]], int] = lambda x: round(x * 100)
         for problem in self.enabled_problems:
             if problem.name == "0":
                 continue
@@ -114,7 +114,7 @@ class Progcomp(Base):
             for t, s in score.items():
                 total[t] += s
 
-        actual = []
+        actual: list[OverallScore] = []
         for team in self.teams:
             sc = OverallScore(
                 team,
@@ -126,8 +126,8 @@ class Progcomp(Base):
         actual.reverse()
         return actual
 
-    def score_max(self, problem):
-        score = Counter()
+    def score_max(self, problem: Problem) -> dict[str, float]:
+        score: dict[str, float] = defaultdict(float)
         print(problem)
         total = len(problem.tests)
         for test in problem.tests:
@@ -143,8 +143,8 @@ class Progcomp(Base):
         print("Score", problem.name, score)
         return score
 
-    def score_optimisation(self, problem):
-        score = Counter()
+    def score_optimisation(self, problem) -> dict[str, float]:
+        score: dict[str, float] = defaultdict(float)
         total = len(problem.tests)
         for test in problem.tests:
             test_scores = test.ranked_submissions

@@ -32,14 +32,14 @@ class Submission(Base):
     test = relationship(Test, back_populates="submissions")
 
     @property
-    def time_str(self):
+    def time_str(self) -> str:
         return self.problem.progcomp.get_timestamp_str(self.timestamp)
 
     @property
-    def status_str(self):
+    def status_str(self) -> str:
         return str(self.status)[len("Status") + 1 :]
 
-    def mark(self):
+    def mark(self) -> None:
         # Relative directories of the locations needed
         problem_dir = os.path.join("problems", self.problem.name)
         mark_file = os.path.join(problem_dir, "mark.py")

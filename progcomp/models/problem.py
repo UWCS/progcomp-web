@@ -43,7 +43,7 @@ class Problem(Base):
         db.session.commit()
         db.session.flush()
 
-    def get_test(self, name) -> Optional["Test"]:
+    def get_test(self, name: str) -> Optional[Test]:
         return (
             db.session.query(Test)
             .where(Test.problem_id == self.id, Test.name == name)
