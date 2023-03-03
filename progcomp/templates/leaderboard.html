@@ -37,7 +37,7 @@
                 <tr class="{{ row_color }}">
                     <td class="text-center">{{ loop.index }}</td>
                     <td class="text-center">{{ submission.team.name }}</td>
-                    {% if submission.max_score == -1 %}
+                    {% if not submission.max_score %}
                     <td class="text-center">{{ submission.score }}</td>
                     {% else %}
                     <td class="text-center">{{ submission.score }}/{{ submission.test.max_score }}</td>
