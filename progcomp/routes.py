@@ -3,6 +3,7 @@ import logging
 import os
 import re
 from datetime import datetime
+from typing import Union
 
 from flask import (
     Blueprint,
@@ -17,7 +18,7 @@ from flask import (
 from werkzeug.utils import secure_filename
 from werkzeug.wrappers.response import Response
 
-FlaskResponse = typing.Union[Response, str]
+FlaskResponse = Union[Response, str]
 
 from .database import db
 from .models import *
@@ -72,11 +73,11 @@ def start() -> FlaskResponse:
 
     # Check username and password are in a valid format
     username = request.form.get("username")
-    if username is None or verify_input(username, 100):
+    if username is None or not verify_input(username, 100):
         return redirect(url_for("progcomp.menu"))
 
     password = request.form.get("password")
-    if password is None or verify_input(password, 30):
+    if password is None or not verify_input(password, 30):
         return redirect(url_for("progcomp.menu"))
 
     # Check password against potentially existing team
