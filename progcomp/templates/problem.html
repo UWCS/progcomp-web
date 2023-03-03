@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 
-{% block title %}Problem{% endblock %}
+{% block title %}Problem {{ problem.name }}{% endblock %}
+
+{% block head %}
+<script src="{{ url_for('static', filename='keep_selected.js') }}"></script>
+{% endblock %}
 
 {% block content %}
 
@@ -35,7 +39,7 @@
             </select>
         </div>
         <div>
-            <button type="submit" class="btn btn-primary btn-lg align-bottom">Submit</button>
+            <button id="prob_submit" type="submit" class="btn btn-primary btn-lg align-bottom">Submit</button>
         </div>
     </div>
     <br>
