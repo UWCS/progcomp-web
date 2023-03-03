@@ -67,7 +67,7 @@ class Progcomp(db.Model):
         )
 
     def get_timestamp_str(self, time):
-        return time.strftime("%Y-%m-%d_%H-%M-%S")
+        return time.strftime("%H:%M:%S")
 
     def make_submission(
         self,

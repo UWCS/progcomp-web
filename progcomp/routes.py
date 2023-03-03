@@ -4,12 +4,21 @@ import os
 import re
 from datetime import datetime
 
-from flask import (Blueprint, jsonify, redirect, render_template, request,
-                   send_from_directory, session, url_for)
+from flask import (
+    Blueprint,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+    session,
+    url_for,
+)
 from werkzeug.utils import secure_filename
 
 from .database import db
 from .models import *
+
 # from .adapters import GameUIAdapter
 from .session import USERNAME_SESSION_KEY
 
@@ -149,7 +158,7 @@ def problem(p_name):
             return redirect(request.url)
 
         time = datetime.now()
-        time_str = get_pc().get_timestamp_str(time)
+        time_str = time.strftime("%Y-%m-%d_%H-%M-%S")
 
         # need to folder w/ timestamp on path
         path = os.path.join(
