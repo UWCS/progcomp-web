@@ -29,7 +29,7 @@
         </div>
         <table class="table table-hover table-sm">
             <thead>
-                <tr class="table-light">
+                <tr>
                     <th scope="col">Position</th>
                     <th scope="col" class="text-center">Team</th>
                     <th scope="col">Total</th>
@@ -292,7 +292,7 @@
         </div>
         <table class="table table-hover table-sm">
             <thead>
-                <tr class="table-light">
+                <tr>
                     <th scope="col">Position</th>
                     <th scope="col" class="text-center">Team</th>
                     <th scope="col">Total</th>
@@ -303,7 +303,7 @@
             </thead>
             <tbody>
                 {% for score in scores %}
-                <tr class="">
+                <tr>
                     <td class="text-center">{{ loop.index }}</td>
                     <td class="text-center">{{ score.team.name }}</td>
                     <td class="text-center">{{ score.total }}</td>
