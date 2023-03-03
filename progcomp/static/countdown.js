@@ -75,7 +75,7 @@ const countdown = function () {
 };
 
 const updateTarget = function () {
-    fetch("http://localhost:5000/end_time")
+    fetch("http://localhost:5000/poll")
         .then((r) => r.json())
         .then((json) => {
             console.log(json["end_time"]);
