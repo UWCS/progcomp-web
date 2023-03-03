@@ -52,7 +52,7 @@ const countdown = function () {
     let cd = document.getElementById("countdown");
     if (!cd) return clearInterval(x);
     console.log(time_rem_str);
-    cd.innerHTML = `${time_rem_str}`;
+    cd.innerHTML = `${time_rem_str} remaining`;
     if (days > 0 && quick == null) {
         // Less frequent updates if far away
         clearInterval(x);
@@ -69,7 +69,6 @@ const countdown = function () {
     }
     // If the count down is finished, clear
     if (distance < 0) {
-        clearInterval(x);
         cd.innerHTML = "Competition now ended!";
     }
 };
@@ -78,10 +77,11 @@ const updateTarget = function () {
     fetch("http://localhost:5000/poll")
         .then((r) => r.json())
         .then((json) => {
-            console.log(json["end_time"]);
-            targetDate = new Date(Number(json["end_time"]) * 1000);
-            console.log("New target", targetDate);
-            countdown();
+            const newDate = new Date(Number(json["end_time"]) * 1000);
+            if (newDate != targetDate) {
+                targetDate = newDate;
+                countdown();
+            }
         });
 }
 

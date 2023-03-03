@@ -115,7 +115,9 @@ def submit():
         return redirect(url_for("progcomp.menu"))
 
     # List out team submission info
-    return render_template("submissions.html", team=team, progcomp=get_pc())
+    return render_template(
+        "submissions.html", team=team, progcomp=get_pc(), username=username
+    )
 
 
 @bp.route("/problems/<string:p_name>", methods=["GET", "POST"])
@@ -209,11 +211,13 @@ def leaderboard_main():
     scores = pc.score_teams()
     # if not pc.freeze:
     #     scores = []
+    username = session.get(USERNAME_SESSION_KEY)
     return render_template(
         "leaderboard_hub.html",
         problems=[p for p in get_pc().enabled_problems if p.name != "0"],
         scores=scores,
         progcomp=get_pc(),
+        username=username,
     )
 
 
@@ -234,13 +238,14 @@ def leaderboard(p_name, p_set):
         return
 
     subs = test.ranked_submissions
-
+    username = session.get(USERNAME_SESSION_KEY)
     return render_template(
         "leaderboard.html",
         p_name=p_name,
         p_set=p_set,
         submissions=subs,
         progcomp=get_pc(),
+        username=username,
     )
 
 
