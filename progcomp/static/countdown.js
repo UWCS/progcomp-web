@@ -78,7 +78,7 @@ const countdown = function () {
 };
 
 const updateTarget = function () {
-    fetch("http://localhost:5000/poll")
+    fetch("/poll")
         .then((r) => r.json())
         .then((json) => {
             const newDate = new Date(Number(json["end_time"]) * 1000);
