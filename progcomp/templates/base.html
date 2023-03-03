@@ -48,6 +48,27 @@
       </div>
     </nav>
     {% block content %}{% endblock %}
+
+    <footer class="mt-auto d-flex flex-wrap justify-content-between py-3 mt-4 border-top">
+      <p class="mb-0 text-muted">Team: {{ username }} | <span id="countdown">Countdown soonTM</span></p>
+
+      <a class="d-flex text-decoration-none" href="https://uwcs.co.uk">
+        <img src="https://uwcs.co.uk/documents/59/uwcs_h4sIpZd.svg" alt="UWCS" height="32">
+      </a>
+
+      <ul class="nav justify-content-end list-unstyled d-flex">
+        <li class="ms-3">
+          <a class="text-muted" href="https://github.com/UWCS/progcomp-web"><i class="bi-github"
+              aria-hidden="true"></i></a>
+        </li>
+        <li class="ms-3">
+          <a class="text-muted" href="https://discord.uwcs.co.uk"><i class="bi-discord" aria-hidden="true"></i></a>
+        </li>
+        <li class="ms-3">
+          <a class="text-muted" href="https://uwcs.co.uk"><i class="bi-globe" aria-hidden="true"></i></a>
+        </li>
+      </ul>
+    </footer>
   </div>
 </body>
 
