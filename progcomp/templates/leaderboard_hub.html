@@ -11,12 +11,13 @@
 
 <div class="row gap-4 justify-content-center">
     {% for prob in problems %}
-        <div class="flex-grow-1 col-md col-auto row d-md-block text-center">
+    <div class="flex-grow-1 col-md col-auto row d-md-block text-center">
         <h3>Problem {{ prob.name }}</h3>
         {% for test in prob.tests %}
-            <a class="btn btn-outline-primary p-2 m-1" style="width: 100%" href="leaderboard/{{ prob.name }}/{{ test.name }}">{{ test.name }}</a>
+        <a class="btn btn-outline-primary p-2 m-1" style="width: 100%"
+            href="leaderboard/{{ prob.name }}/{{ test.name }}">{{ test.name }}</a>
         {% endfor %}
-        </div>
+    </div>
     {% endfor %}
 </div>
 
@@ -291,14 +292,14 @@
         </div>
         <table class="table table-hover table-sm">
             <thead>
-            <tr class="table-light">
-                <th scope="col">Position</th>
-                <th scope="col" class="text-center">Team</th>
-                <th scope="col">Total</th>
-                {% for prob in problems %}
-                <th scope="col">{{ prob.name }}</th>
-                {% endfor %}
-            </tr>
+                <tr class="table-light">
+                    <th scope="col">Position</th>
+                    <th scope="col" class="text-center">Team</th>
+                    <th scope="col">Total</th>
+                    {% for prob in problems %}
+                    <th scope="col">{{ prob.name }}</th>
+                    {% endfor %}
+                </tr>
             </thead>
             <tbody>
                 {% for score in scores %}
@@ -315,5 +316,4 @@
         </table>
     </div>
 </div>
-<hr>
 {% endblock %}

@@ -14,25 +14,25 @@
     <div class="col-auto">
         <table class="table table-hover">
             <thead>
-            <tr class="table-light">
-                <th scope="col">Position</th>
-                <th scope="col" class="text-center">Team</th>
-                <th scope="col">Score</th>
-                <th scope="col">Timestamp</th>
-            </tr>
+                <tr class="table-light">
+                    <th scope="col">Position</th>
+                    <th scope="col" class="text-center">Team</th>
+                    <th scope="col">Score</th>
+                    <th scope="col">Timestamp</th>
+                </tr>
             </thead>
             <tbody>
                 {% for submission in submissions %}
                 {% if submission.status == "CORRECT" %}
-                    {% set row_color = 'table-success' %}
+                {% set row_color = 'table-success' %}
                 {% elif submission.status == "SCORED" %}
-                    {% set row_color = 'table-primary' %}
+                {% set row_color = 'table-primary' %}
                 {% elif submission.status == "WRONG" %}
-                    {% set row_color = 'table-danger' %}
+                {% set row_color = 'table-danger' %}
                 {% elif submission.status == "PARTIAL" %}
-                    {% set row_color = 'table-warning' %}
+                {% set row_color = 'table-warning' %}
                 {% else %}
-                    {% set row_color = '' %}
+                {% set row_color = '' %}
                 {% endif %}
                 <tr class="{{ row_color }}">
                     <td class="text-center">{{ loop.index }}</td>
@@ -49,5 +49,4 @@
         </table>
     </div>
 </div>
-<hr>
 {% endblock %}
