@@ -48,11 +48,14 @@
                     <td class="text-center">{{ submission.problem.name }}</td>
                     <td class="text-center">{{ submission.test.name }}</td>
                     <td class="text-center">{{ submission.status_str }}</td>
-                    {% if submission.test.max_score is none %}
-                    <th class="text-center">{{ submission.score }}</td>
-                        {% else %}
-                    <th class="text-center">{{ submission.score }}/{{ submission.test.max_score }}</td>
-                        {% endif %}
+                    {% if submission.score is none %}
+                    {% set sc = '-' %}
+                    {% elif submission.test.max_score is none %}
+                    {% set sc = submission.score %}
+                    {% else %}
+                    {% set sc = submission.score ~ "/" ~ submission.test.max_score %}
+                    {% endif %}
+                    <th class="text-center">{{ sc }}</td>
                     <td class="text-center">{{ submission.time_str }}</td>
                 </tr>
                 {% endfor %}
