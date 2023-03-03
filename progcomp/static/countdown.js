@@ -25,7 +25,7 @@ const listStrNonEmpty = function (parts, max_numb) {
     return listStr(filtered);
 }
 
-var targetDate = null;
+var targetDate = Cookies.get("end_time");
 var quick = null;
 
 // Update the count down every minute
@@ -80,6 +80,7 @@ const updateTarget = function () {
             const newDate = new Date(Number(json["end_time"]) * 1000);
             if (newDate != targetDate) {
                 targetDate = newDate;
+                Cookies.set(newDate);
                 countdown();
             }
         });
