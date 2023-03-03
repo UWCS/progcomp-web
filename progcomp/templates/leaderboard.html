@@ -15,29 +15,29 @@
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th scope="col">Position</th>
+                    <th scope="col" class="text-center">Position</th>
                     <th scope="col" class="text-center">Team</th>
-                    <th scope="col">Score</th>
-                    <th scope="col">Timestamp</th>
+                    <th scope="col" class="text-center">Score</th>
+                    <th scope="col" class="text-center">Time</th>
                 </tr>
             </thead>
             <tbody>
                 {% for submission in submissions %}
-                {% if submission.status == "CORRECT" %}
-                {% set row_color = 'table-success' %}
-                {% elif submission.status == "SCORED" %}
-                {% set row_color = 'table-primary' %}
-                {% elif submission.status == "WRONG" %}
-                {% set row_color = 'table-danger' %}
-                {% elif submission.status == "PARTIAL" %}
-                {% set row_color = 'table-warning' %}
+                {% if submission.status_str == "CORRECT" %}
+                {% set row_color = 'bg-success-subtle' %}
+                {% elif submission.status_str == "SCORED" %}
+                {% set row_color = 'bg-primary-subtle' %}
+                {% elif submission.status_str == "WRONG" %}
+                {% set row_color = 'bg-danger-subtle' %}
+                {% elif submission.status_str == "PARTIAL" %}
+                {% set row_color = 'bg-warning-subtle' %}
                 {% else %}
                 {% set row_color = '' %}
                 {% endif %}
-                <tr class="{{ row_color }}">
+                <tr class="{{row_color}}">
                     <td class="text-center">{{ loop.index }}</td>
                     <td class="text-center">{{ submission.team.name }}</td>
-                    {% if not submission.max_score %}
+                    {% if submission.test.max_score is none %}
                     <td class="text-center">{{ submission.score }}</td>
                     {% else %}
                     <td class="text-center">{{ submission.score }}/{{ submission.test.max_score }}</td>

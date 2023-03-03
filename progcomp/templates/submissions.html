@@ -24,11 +24,11 @@
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th scope="col">Timestamp</th>
-                    <th scope="col">Problem</th>
-                    <th scope="col">Dataset</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Score</th>
+                    <th scope="col" class="text-center">Problem</th>
+                    <th scope="col" class="text-center">Dataset</th>
+                    <th scope="col" class="text-center">Status</th>
+                    <th scope="col" class="text-center">Score</th>
+                    <th scope="col" class="text-center">Time</th>
                 </tr>
             </thead>
             <tbody>
@@ -45,15 +45,15 @@
                 {% set row_color = '' %}
                 {% endif %}
                 <tr class="{{row_color}}">
-                    <th scope="row" class="text-center">{{ submission.time_str }}</th>
                     <td class="text-center">{{ submission.problem.name }}</td>
                     <td class="text-center">{{ submission.test.name }}</td>
                     <td class="text-center">{{ submission.status_str }}</td>
                     {% if submission.test.max_score is none %}
-                    <td class="text-center">{{ submission.score }}</td>
-                    {% else %}
-                    <td class="text-center">{{ submission.score }}/{{ submission.test.max_score }}</td>
-                    {% endif %}
+                    <th class="text-center">{{ submission.score }}</td>
+                        {% else %}
+                    <th class="text-center">{{ submission.score }}/{{ submission.test.max_score }}</td>
+                        {% endif %}
+                    <td class="text-center">{{ submission.time_str }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

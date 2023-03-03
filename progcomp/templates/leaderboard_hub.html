@@ -32,12 +32,12 @@
                 <tr>
                     <th scope="col">Position</th>
                     <th scope="col" class="text-center">Team</th>
-                    <th scope="col">Total</th>
-                    <th scope="col">1</th>
-                    <th scope="col">2</th>
-                    <th scope="col">3</th>
-                    <th scope="col">4</th>
-                    <th scope="col">5</th>
+                    <th scope="col" class="text-center">Total</th>
+                    <th scope="col" class="text-center">1</th>
+                    <th scope="col" class="text-center">2</th>
+                    <th scope="col" class="text-center">3</th>
+                    <th scope="col" class="text-center">4</th>
+                    <th scope="col" class="text-center">5</th>
                 </tr>
             </thead>
             <tbody>
@@ -293,11 +293,11 @@
         <table class="table table-hover table-sm">
             <thead>
                 <tr>
-                    <th scope="col">Position</th>
+                    <th scope="col" class="text-center">Position</th>
                     <th scope="col" class="text-center">Team</th>
-                    <th scope="col">Total</th>
+                    <th scope="col" class="text-center">Total</th>
                     {% for prob in problems %}
-                    <th scope="col">{{ prob.name }}</th>
+                    <th scope="col" class="text-center">{{ prob.name }}</th>
                     {% endfor %}
                 </tr>
             </thead>
@@ -306,8 +306,8 @@
                 <tr>
                     <td class="text-center">{{ loop.index }}</td>
                     <td class="text-center">{{ score.team.name }}</td>
-                    <td class="text-center">{{ score.total }}</td>
-                    {% for prob in problems %}
+                    <th class="text-center">{{ score.total }}</td>
+                        {% for prob in problems %}
                     <td class="text-center">{{ score.per_round[loop.index-1] }}</td>
                     {% endfor %}
                 </tr>
