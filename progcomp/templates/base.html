@@ -16,8 +16,8 @@
 </head>
 
 <body>
-  <div class="container min-vh-100 d-flex flex-column">
-    <nav class="navbar navbar-expand-lg rounded-bottom bg-primary-subtle">
+  <div class="container min-vh-100 d-flex flex-column align-items-center">
+    <nav class="w-100 navbar navbar-expand-lg rounded-bottom bg-primary-subtle" style="min-width: fit-content">
       <div class="container-fluid align-items-center">
         <a class="navbar-brand" href="/">
           <!-- Logo inlined to avoid delayed loading -->
@@ -63,9 +63,11 @@
         </div>
       </div>
     </nav>
+    <article id="content" class="w-100">
     {% block content %}{% endblock %}
+    </article>
 
-    <footer class="mt-auto d-flex flex-wrap justify-content-between gap-2 py-3 mt-4 border-top">
+    <footer class="w-100 mt-auto d-flex flex-wrap justify-content-between gap-2 py-3 mt-4 border-top">
       <p class="flex-grow-1 flex-md-grow-0 mb-0 text-muted text-center">
         Team: {{ username }} | <span id="countdown">Countdown soonTM</span>
       </p>
