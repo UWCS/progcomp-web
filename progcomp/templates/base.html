@@ -29,16 +29,25 @@
         <div class="collapse navbar-collapse" id="navbarColor03">
           <ul class="navbar-nav d-flex w-100">
             <li class="nav-item">
-              <a class="nav-link" href="/progcomps">
+              <a class="nav-link text-nowrap" href="/progcomps">
+                {% set visibility = progcomp.visible|string() %}
+                {% if visibility == "Open" %}
+                {% set row_color = 'text-bg-success' %}
+                {% elif visibility == "Closed" %}
+                {% set row_color = 'text-bg-danger' %}
+                {% else %}
+                {% set row_color = "text-bg-warning" %}
+                {% endif %}
                 {% if progcomp %}
                 <span class="d-lg-none ms-lg-0">Progcomp: </span>{{ progcomp.name }}
+                <small class="badge {{ row_color }}" style="height: fit-content">{{ progcomp.visible }}</small>
                 {% else %}
                 Progcomps List
                 {% endif %}
               </a>
             </li>
             {% if progcomp %}
-            <div class="vr d-none d-lg-block "></div>
+            <div class="vr d-none d-lg-block mx-1"></div>
             <li class="nav-item">
               <a class="nav-link" href="/submissions">Submissions</a>
             </li>
