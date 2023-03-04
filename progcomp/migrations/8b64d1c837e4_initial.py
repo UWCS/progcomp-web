@@ -23,7 +23,7 @@ def upgrade() -> None:
         sa.Column("name", sa.String(), nullable=True),
         sa.Column("start_time", sa.DateTime(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("name"),
+        sa.UniqueConstraint("name", name="unq_progcomp_name"),
     )
     op.create_table(
         "problems",
@@ -35,7 +35,7 @@ def upgrade() -> None:
             ["progcomps.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("name"),
+        sa.UniqueConstraint("name", name="unq_problems_name"),
     )
     op.create_table(
         "teams",
@@ -49,7 +49,7 @@ def upgrade() -> None:
             ["progcomps.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("name"),
+        sa.UniqueConstraint("name", name="unq_teams_name"),
     )
     op.create_table(
         "tests",

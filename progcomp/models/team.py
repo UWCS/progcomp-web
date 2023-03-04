@@ -13,9 +13,11 @@ class Team(Base):
 
     id = db.Column(db.Integer, primary_key=True)
     progcomp_id = db.Column(db.Integer, ForeignKey("progcomps.id"))
-    name = db.Column(db.String, unique=True)
+    name = db.Column(db.String)
     password = db.Column(db.String, nullable=False)
     score = db.Column(db.Integer, default=0)
+
+    db.UniqueConstraint("Team.name", "Team.progcomp_id", name="unq_team_name")
 
     submissions = relationship(
         "Submission", back_populates="team", order_by=Submission.timestamp.desc()

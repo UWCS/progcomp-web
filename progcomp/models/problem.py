@@ -18,7 +18,7 @@ class Problem(Base):
     __tablename__ = "problems"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=True)
+    name = db.Column(db.String)
     progcomp_id = db.Column(db.Integer, ForeignKey("progcomps.id"))
     visibility = db.Column(
         db.Enum(Visibility),
@@ -26,6 +26,7 @@ class Problem(Base):
         default=Visibility.OPEN,
         server_default="OPEN",
     )
+    db.UniqueConstraint("Problem.name", "Problem.progcomp_id", name="unq_problem_name")
 
     tests = relationship("Test", back_populates="problem", order_by="Test.name")
     submissions = relationship("Submission", back_populates="problem")
@@ -82,6 +83,8 @@ class Test(Base):
 
     problem = relationship(Problem, back_populates="tests")
     submissions = relationship("Submission", back_populates="test")
+
+    db.UniqueConstraint("Test.name", "Test.problem_id", "unq_test_name")
 
     @property
     def ranked_submissions(self) -> list["Submission"]:
