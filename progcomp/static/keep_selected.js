@@ -8,8 +8,6 @@ const selected = function () {
     }
 }
 
-dark();
-
 // Set toggle button on load
 window.addEventListener('load', function () {
     test_select_elem = document.getElementById("test_select");

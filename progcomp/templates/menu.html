@@ -6,13 +6,22 @@
 
 {% block title %}Home{% endblock %}
 
+{% macro progcomp_badge(progcomp) -%}
+{% set visibility = progcomp.visible|string() %}
+{% if visibility == "Open" %}{% set row_color = 'text-bg-success' %}
+{% elif visibility == "Closed" %}{% set row_color = 'text-bg-danger' %}
+{% else %}{% set row_color = "text-bg-warning" %}
+{% endif %}
+<small class="badge {{ row_color }}">{{ progcomp.visible }}</small>
+{%- endmacro %}
+
 {% block content %}
 
 <div class="d-flex flex-column align-items-center gap-3 my-5">
     <img class="mw-100 p-2" style="width: 500px" src="static/challenge_logo.svg" alt="Logo"></img>
     {% if not username %}
     <form class="mw-100" style="width: 300px" action="{{ url_for('progcomp.start') }}" method="POST">
-        <div class="form-group my-2">
+        <div class="form-group my-3">
             <label for="progcomp">Competition</label>
             <select class="form-select" id="progcomp" name="progcomp" {% if not partitions %}disabled{% endif %}>
                 {% for (title, items) in partitions.items() %}
@@ -25,17 +34,9 @@
             </select>
             {% for (title, items) in partitions.items() %}
             {% for progcomp in items %}
-            {% set visibility = progcomp.visible|string() %}
-            {% if visibility == "Open" %}
-            {% set row_color = 'text-bg-success' %}
-            {% elif visibility == "Closed" %}
-            {% set row_color = 'text-bg-danger' %}
-            {% else %}
-            {% set row_color = "text-bg-warning" %}
-            {% endif %}
             <small id="progcomp-help-{{ progcomp.name }}" class="form-text text-muted" hidden>
                 {{ title }}
-                <small class="badge {{ row_color }}">{{ progcomp.visible }}</small>
+                {{ progcomp_badge(progcomp) }}
                 {{ progcomp.time_str }}
             </small>
             {% endfor %}
@@ -60,13 +61,32 @@
         </div>
     </form>
     {% else %}
-    <form class="mt-3 text-center" action="{{ url_for('progcomp.logout') }}" method="POST">
-        Competition: {{ progcomp.name }}<br>
-        Team Name: {{ username }}
-        <div class="form-group mt-3">
-            <button type="submissions" class="btn btn-danger btn-lg">Log out</button>
+    <form class="mw-100" style="width: 300px" action="{{ url_for('progcomp.logout') }}" method="POST">
+        <div class="form-group my-3">
+            <label for="progcomp">Competition</label>
+            <select class="form-select" id="progcomp" name="progcomp" disabled
+                style="background: var(--bs-form-control-disabled-bg);">
+                <option selected>{{ progcomp.name }}</option>
+            </select>
+
+            <small id="progcomp-help-{{ progcomp.name }}" class="form-text text-muted">
+                {{ progcomp.category }}
+                {{ progcomp_badge(progcomp) }}
+                {{ progcomp.time_str }}
+            </small><br>
+        </div>
+
+        <div class="form-group my-3">
+            <label for="username">Team Name</label>
+            <input type="text" class="form-control" value="{{ username }}" disabled>
+            <small id="username-help" class="form-text text-muted">Must be alphanumeric and not contain
+                spaces.</small>
+        </div>
+        <div class="form-group text-center my-3">
+            <button type="submit" class="btn btn-danger btn-lg">Log out</button>
         </div>
     </form>
+
     {% endif %}
     <div class="mt-3">
         <h2>Instructions</h2>
