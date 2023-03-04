@@ -182,7 +182,11 @@ def problem(p_name) -> FlaskResponse:
     if not problem or not problem.visible:
         return redirect(url_for("progcomp.submissions"))
 
-    if request.method == "POST":
+    if request.method == "GET":
+        return render_template(
+            "problem.html", username=username, problem=problem, progcomp=pc
+        )
+    else:  # POST
         if not problem.open:
             return redirect(request.url)
         # TODO: Multiple files (script + output data at the same time)
@@ -210,7 +214,7 @@ def problem(p_name) -> FlaskResponse:
 
         # need to folder w/ timestamp on path
         path = os.path.join(
-            os.getcwd(), "submissions", username, p_name, test, time_str
+            os.getcwd(), "submissions", pc.name, username, p_name, test, time_str
         )
 
         os.makedirs(path, exist_ok=True)
@@ -222,10 +226,6 @@ def problem(p_name) -> FlaskResponse:
         pc.make_submission(path, username, p_name, test, timestamp=time)
 
         return redirect(url_for("progcomp.submissions"))
-
-    return render_template(
-        "problem.html", username=username, problem=problem, progcomp=pc
-    )
 
 
 @bp.route("/download/pdf", methods=["GET"])
