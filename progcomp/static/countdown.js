@@ -47,6 +47,7 @@ const countdown = function () {
     const distance = targetDate - now;
     if (distance < 0) {
         cd.innerHTML = "Competition now ended!";
+        if (quick != "ended" && quick != null) location.reload()
         setIntervals(60, 300, "ended");
     } else {
         // Time calculations for days, hours, minutes and seconds
