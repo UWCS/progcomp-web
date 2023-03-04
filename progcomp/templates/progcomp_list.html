@@ -1,7 +1,7 @@
 {% if progcomps %}
 <div class="my-3">
     <h2>{{ title }}</h2>
-    <div class="d-flex flex-wrap gap-4">
+    <div class="d-flex flex-wrap gap-4 justify-content-center">
         {% for progcomp in progcomps %}
         <div class="card p-0" style="width: 18rem;">
             <div class="card-body">
@@ -20,7 +20,7 @@
                 <h6 class="card-subtitle mb-2 text-muted">{{ progcomp.time_str }}</h6>
                 <!-- <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
             content.</p> -->
-                <a href="/progcomp/{{ progcomp.name }}" class="card-link">Start</a>
+                <a href="/progcomp/{{ progcomp.name }}" class="btn btn-primary">Start</a>
             </div>
         </div>
         {% endfor %}
