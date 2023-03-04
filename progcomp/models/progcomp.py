@@ -7,6 +7,7 @@ from typing import Callable, Optional, Union
 from sqlalchemy import ForeignKey, ForeignKeyConstraint, func
 from sqlalchemy.orm import relationship
 
+from progcomp.models import utils
 from progcomp.models.problem import Problem
 from progcomp.models.submission import Submission
 from progcomp.models.team import Team
@@ -87,7 +88,11 @@ class Progcomp(Base):
         print("Problems", repr(self.problems))
 
     def get_timestamp_str(self, time) -> str:
-        return time.strftime("%H:%M:%S")
+        return utils.time_str(time, datetime.now())
+
+    @property
+    def time_str(self) -> str:
+        return utils.format_time_range(self.start_time, self.end_time, datetime.now())
 
     def make_submission(
         self,

@@ -7,7 +7,6 @@ from sqlalchemy import ForeignKey, ForeignKeyConstraint, func
 from sqlalchemy.orm import relationship
 
 from progcomp.models.problem import Problem, Test
-
 # from progcomp.models.team import Team
 from progcomp.models.utils import Status, auto_str
 
@@ -33,7 +32,7 @@ class Submission(Base):
 
     @property
     def time_str(self) -> str:
-        return self.problem.progcomp.get_timestamp_str(self.timestamp)
+        return self.timestamp.strftime("%H:%M:%S")
 
     @property
     def status_str(self) -> str:
