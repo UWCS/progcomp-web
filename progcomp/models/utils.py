@@ -84,3 +84,6 @@ class Visibility(enum.Enum):
 
     def __bool__(self):
         return self > Visibility.HIDDEN
+
+    def __str__(self):
+        return self.__repr__().split(".")[-1].split(":")[0].title()

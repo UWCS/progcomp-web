@@ -37,7 +37,7 @@ class Problem(Base):
         return min(self.visibility, self.progcomp.visible)
 
     @property
-    def open(self) -> Visibility:
+    def open(self) -> bool:
         return self.visible == Visibility.OPEN
 
     def update(self) -> None:

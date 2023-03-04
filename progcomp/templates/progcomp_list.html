@@ -1,0 +1,30 @@
+{% if progcomps %}
+<div class="my-3">
+    <h2>{{ title }}</h2>
+    <div class="d-flex flex-wrap gap-4">
+        {% for progcomp in progcomps %}
+        <div class="card p-0" style="width: 18rem;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5>{{ progcomp.name }}</h5>
+                    {% set visibility = progcomp.visible|string() %}
+                    {% if visibility == "Open" %}
+                    {% set row_color = 'text-bg-success' %}
+                    {% elif visibility == "Closed" %}
+                    {% set row_color = 'text-bg-danger' %}
+                    {% else %}
+                    {% set row_color = "text-bg-warning" %}
+                    {% endif %}
+                    <small class="badge {{ row_color }}" style="height: fit-content">{{ progcomp.visible }}</small>
+                </div>
+                <h6 class="card-subtitle mb-2 text-muted">{{ progcomp.time_str }}</h6>
+                <!-- <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
+            content.</p> -->
+                <a href="/progcomp/{{ progcomp.name }}" class="card-link">Start</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endif %}

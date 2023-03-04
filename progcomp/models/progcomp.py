@@ -41,6 +41,30 @@ class Progcomp(Base):
     def visible(self) -> Visibility:
         return self.visibility
 
+    @property
+    def open(self) -> bool:
+        return self.visible == Visibility.OPEN
+
+    def get_timestamp_str(self, time) -> str:
+        return utils.time_str(time, datetime.now())
+
+    @property
+    def time_str(self) -> str:
+        return utils.format_time_range(self.start_time, self.end_time, datetime.now())
+
+    @property
+    def category(self) -> str:
+        now = datetime.now()
+        if self.start_time and now < self.start_time:
+            return "Upcoming"
+        elif self.end_time and self.end_time < now:
+            return "Complete"
+        elif self.start_time and self.end_time:
+            # If both exist, must be betweeen
+            return "Active"
+        else:
+            return "Unknown"
+
     def get_team(self, name: str) -> Optional[Team]:
         return (
             db.session.query(Team)
@@ -86,13 +110,6 @@ class Progcomp(Base):
             prob.update()
         db.session.commit()
         print("Problems", repr(self.problems))
-
-    def get_timestamp_str(self, time) -> str:
-        return utils.time_str(time, datetime.now())
-
-    @property
-    def time_str(self) -> str:
-        return utils.format_time_range(self.start_time, self.end_time, datetime.now())
 
     def make_submission(
         self,

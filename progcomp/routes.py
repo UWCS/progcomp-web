@@ -56,13 +56,29 @@ def menu() -> FlaskResponse:
     return render_template("menu.html", progcomp=pc, username=username)
 
 
+def partition(items: list, func: Callable, order=[]) -> list:
+    results = defaultdict(list)
+    for item in order:
+        results[item] = []
+    for item in items:
+        results[func(item)].append(item)
+    print(results)
+    return results
+
+
 @bp.route("/progcomps")
 def progcomps() -> FlaskResponse:
+    session[PROGCOMP_SESSION_KEY] = None
     username = session.get(USERNAME_SESSION_KEY, "main")
     pcs = db.session.query(Progcomp).all()
+    pcs = [pc for pc in pcs if pc.visible]
+
+    parts = partition(pcs, lambda pc: pc.category, ["Upcoming", "Active", "Complete"])
+    if parts["Unknown"]:
+        logging.warning(f"Progcomps with unknown times: {parts['Unknown']}")
     return render_template(
         "progcomps.html",
-        progcomps=[pc for pc in pcs if pc.visible],
+        partitions=parts,
         progcomp=get_pc(),
         username=username,
     )
