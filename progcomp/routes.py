@@ -193,7 +193,11 @@ def dl_pdf() -> FlaskResponse:
     Download the main pdf
     """
 
-    return send_from_directory(os.getcwd(), "problems.pdf", as_attachment=True)
+    return send_from_directory(
+        os.path.join(os.getcwd(), "problems", get_pc().name),
+        "problems.pdf",
+        as_attachment=True,
+    )
 
 
 @bp.route("/download/<string:p_name>/<string:filename>", methods=["GET"])
@@ -202,7 +206,7 @@ def download(p_name, filename) -> FlaskResponse:
     Download a specified problem input
     """
 
-    path = os.path.join(os.getcwd(), "problems", p_name, "input")
+    path = os.path.join(os.getcwd(), "problems", get_pc().name, p_name, "input")
     if not os.path.exists(os.path.join(path, filename)):
         return redirect(url_for("progcomp.submissions"))
     return send_from_directory(path, filename, as_attachment=True)
