@@ -3,23 +3,23 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<br>
-<div class="d-flex flex-column justify-content-center align-items-center">
-    <img class="mw-100 p-2 mt-3" style="width: 500px" src="static/challenge_logo.svg" alt="Logo"></img>
+
+<div class="d-flex flex-column align-items-center gap-3 my-5">
+    <img class="mw-100 p-2" style="width: 500px" src="static/challenge_logo.svg" alt="Logo"></img>
     {% if not username %}
-    <form class="mw-100 mt-3" style="width: 300px" action="{{ url_for('progcomp.start') }}" method="POST">
-        <div class="form-group mt-3">
+    <form class="mw-100" style="width: 300px" action="{{ url_for('progcomp.start') }}" method="POST">
+        <div class="form-group">
             <label for="username">Team Name</label>
             <input type="text" class="form-control" id="username" name="username" placeholder="Enter your team's name">
             <small id="username-help" class="form-text text-muted">Must be alphanumeric and not contain
                 spaces.</small>
         </div>
-        <div class="form-group mt-3">
+        <div class="form-group my-2">
             <label for="password">Pass Phrase</label>
             <input type="password" class="form-control" id="password" name="password"
                 placeholder="Create/Enter your pass phrase">
         </div>
-        <div class="form-group mt-3">
+        <div class="form-group text-center">
             <button type="submit" class="btn btn-success btn-lg">Join this Team</button>
         </div>
     </form>
