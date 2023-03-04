@@ -24,7 +24,7 @@ from .database import db
 from .models import *
 
 # from .adapters import GameUIAdapter
-from .session import USERNAME_SESSION_KEY
+from .session import PROGCOMP_SESSION_KEY, USERNAME_SESSION_KEY
 
 # pc: Progcomp = None
 
@@ -40,7 +40,8 @@ def load_pc():
 
 
 def get_pc() -> Progcomp:
-    pc = db.session.query(Progcomp).where(Progcomp.name == "main").first()
+    name = session.get(PROGCOMP_SESSION_KEY)
+    pc = db.session.query(Progcomp).where(Progcomp.name == name).first()
     if pc is None:
         raise Exception("Progcomp object does not exist")
     return pc
@@ -52,7 +53,16 @@ bp = Blueprint("progcomp", __name__)
 @bp.route("/")
 def menu() -> FlaskResponse:
     username = session.get(USERNAME_SESSION_KEY)
+    session[PROGCOMP_SESSION_KEY] = "main"
     return render_template("menu.html", progcomp=get_pc(), username=username)
+
+
+@bp.route("/progcomp/<string:pc_name>")
+def set_progcomp(pc_name) -> FlaskResponse:
+    if db.session.query(Progcomp).where(Progcomp.name == pc_name).first():
+        session[PROGCOMP_SESSION_KEY] = pc_name
+
+    return redirect(url_for("progcomp.menu"))
 
 
 def verify_input(inp: Optional[str], max_len: int = 100) -> bool:

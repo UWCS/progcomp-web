@@ -40,6 +40,11 @@
         <div class="collapse navbar-collapse" id="navbarColor03">
           <ul class="navbar-nav d-flex w-100">
             <li class="nav-item">
+              <a class="nav-link" href="#">
+                <span class="d-lg-none ms-lg-0">Progcomp: </span>{{ progcomp.name }}</a>
+            </li>
+            <div class="vr d-none d-lg-block "></div>
+            <li class="nav-item">
               <a class="nav-link" href="/submissions">Submissions</a>
             </li>
             {% for p in progcomp.visible_problems %}
