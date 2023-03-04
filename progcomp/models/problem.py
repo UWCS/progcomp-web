@@ -5,7 +5,7 @@ from typing import Optional
 from sqlalchemy import ForeignKey, ForeignKeyConstraint, func
 from sqlalchemy.orm import relationship
 
-from progcomp.models.utils import Status, auto_str
+from progcomp.models.utils import Status, Visibility, auto_str
 
 if typing.TYPE_CHECKING:
     from progcomp.models.submission import *
@@ -20,11 +20,23 @@ class Problem(Base):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True)
     progcomp_id = db.Column(db.Integer, ForeignKey("progcomps.id"))
-    enabled = db.Column(db.Boolean, nullable=False, default=True)
+    visibility = db.Column(
+        db.Enum(Visibility),
+        nullable=False,
+        default=Visibility.OPEN,
+        server_default="OPEN",
+    )
 
     tests = relationship("Test", back_populates="problem", order_by="Test.name")
     submissions = relationship("Submission", back_populates="problem")
     progcomp = relationship("Progcomp", back_populates="problems")
+
+    @property
+    def visible(self) -> Visibility:
+        # Lowest visibility of self and parent progcomp
+        sv = self.visibility
+        pv = self.progcomp.visible
+        return pv if pv.value <= sv.value else sv
 
     def update(self) -> None:
         path = os.path.join(os.getcwd(), "problems", self.name, "input")

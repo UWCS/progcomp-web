@@ -23,3 +23,9 @@ class Status(enum.Enum):
     PARTIAL = 3
     WRONG = 4
     INVALID = 5
+
+
+class Visibility(enum.Enum):
+    HIDDEN = 0
+    CLOSED = 1  # Visible but no submissions
+    OPEN = 2

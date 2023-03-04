@@ -10,7 +10,7 @@ from sqlalchemy.orm import relationship
 from progcomp.models.problem import Problem
 from progcomp.models.submission import Submission
 from progcomp.models.team import Team
-from progcomp.models.utils import Status, auto_str
+from progcomp.models.utils import Status, Visibility, auto_str
 
 from ..database import Base, db
 
@@ -25,12 +25,21 @@ class Progcomp(Base):
     show_leaderboard = db.Column(
         db.Boolean, nullable=False, default=False, server_default="f"
     )
-    freeze = db.Column(db.Boolean, nullable=False, default=False, server_default="f")
+    visibility = db.Column(
+        db.Enum(Visibility),
+        nullable=False,
+        default=Visibility.OPEN,
+        server_default="OPEN",
+    )
     end_time = db.Column(db.DateTime)
 
     teams = relationship(Team, back_populates="progcomp")
     problems = relationship(Problem, back_populates="progcomp", order_by=Problem.name)
 
+    @property
+    def visible(self) -> Visibility:
+        return self.visibility
+    
     def get_team(self, name: str) -> Optional[Team]:
         return db.session.query(Team).filter(Team.name == name).first()
 
