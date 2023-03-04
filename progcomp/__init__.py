@@ -28,7 +28,6 @@ def create_app() -> Flask:
     from . import routes
 
     app.register_blueprint(routes.bp)
-    app.before_first_request(routes.load_pc)
     return app
 
 

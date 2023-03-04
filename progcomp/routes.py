@@ -26,18 +26,6 @@ from .models import *
 # from .adapters import GameUIAdapter
 from .session import PROGCOMP_SESSION_KEY, USERNAME_SESSION_KEY
 
-# pc: Progcomp = None
-
-
-def load_pc():
-    # with app.app_context():
-    pc = db.session.query(Progcomp).where(Progcomp.name == "main").first()
-    if not pc:
-        db.session.add(pc := Progcomp(name="main"))
-        db.session.commit()
-    # pc.update_problems()
-    db.session.flush()
-
 
 def get_pc() -> Progcomp:
     name = session.get(PROGCOMP_SESSION_KEY)
@@ -78,7 +66,7 @@ def progcomps() -> FlaskResponse:
         logging.warning(f"Progcomps with unknown times: {parts['Unknown']}")
     return render_template(
         "progcomps.html",
-        partitions=parts,
+        partitions=parts if pcs else {},
         progcomp=get_pc(),
         username=username,
     )
