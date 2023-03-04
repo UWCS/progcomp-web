@@ -58,7 +58,7 @@ class Progcomp(Base):
         if self.start_time and now < self.start_time:
             return "Upcoming"
         elif self.end_time and self.end_time < now:
-            return "Complete"
+            return "Archived"
         elif self.start_time and self.end_time:
             # If both exist, must be betweeen
             return "Active"

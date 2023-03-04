@@ -36,57 +36,32 @@ def get_pc() -> Progcomp:
 bp = Blueprint("progcomp", __name__)
 
 
-@bp.route("/")
-def menu() -> FlaskResponse:
-    username = session.get(USERNAME_SESSION_KEY, "main")
-    if (pc := get_pc()) is None:
-        return redirect(url_for("progcomp.progcomps"))
-    return render_template("menu.html", progcomp=pc, username=username)
-
-
 def partition(items: list, func: Callable, order=[]) -> list:
     results = defaultdict(list)
     for item in order:
         results[item] = []
     for item in items:
         results[func(item)].append(item)
-    print(results)
-    return results
+    return {k: v for k, v in results.items() if v}
 
 
-@bp.route("/progcomps")
-def progcomps() -> FlaskResponse:
-    session[PROGCOMP_SESSION_KEY] = None
-    username = session.get(USERNAME_SESSION_KEY, "main")
-    pcs = db.session.query(Progcomp).all()
+def get_progcomp_list():
+    pcs = db.session.query(Progcomp).order_by(Progcomp.start_time).all()
     pcs = [pc for pc in pcs if pc.visible]
 
-    parts = partition(pcs, lambda pc: pc.category, ["Upcoming", "Active", "Complete"])
-    if parts["Unknown"]:
-        logging.warning(f"Progcomps with unknown times: {parts['Unknown']}")
+    parts = partition(pcs, lambda pc: pc.category, ["Active", "Upcoming", "Archived"])
+    for p in parts.items():
+        print(p)
+    return parts
+
+
+@bp.route("/")
+def menu() -> FlaskResponse:
+    username = session.get(USERNAME_SESSION_KEY, "main")
+    partitions = get_progcomp_list()
     return render_template(
-        "progcomps.html",
-        partitions=parts if pcs else {},
-        progcomp=get_pc(),
-        username=username,
+        "menu.html", progcomp=get_pc(), partitions=partitions, username=username
     )
-
-
-@bp.route("/progcomp/clear")
-def clear_progcomp() -> FlaskResponse:
-    session[PROGCOMP_SESSION_KEY] = None
-    session[USERNAME_SESSION_KEY] = None
-
-    return redirect(url_for("progcomp.progcomps"))
-
-
-@bp.route("/progcomp/<string:pc_name>")
-def set_progcomp(pc_name) -> FlaskResponse:
-    if db.session.query(Progcomp).where(Progcomp.name == pc_name).first():
-        session[PROGCOMP_SESSION_KEY] = pc_name
-        session[USERNAME_SESSION_KEY] = None
-
-    return redirect(url_for("progcomp.menu"))
 
 
 def verify_input(inp: Optional[str], max_len: int = 100) -> bool:
@@ -104,10 +79,6 @@ def start() -> FlaskResponse:
     """
     When someone hits the 'start' button
     """
-
-    if (pc := get_pc()) is None:
-        return redirect(url_for("progcomp.progcomps"))
-
     # Check username and password are in a valid format
     username = request.form.get("username")
     if username is None or not verify_input(username, 100):
@@ -117,9 +88,15 @@ def start() -> FlaskResponse:
     if password is None or not verify_input(password, 30):
         return redirect(url_for("progcomp.menu"))
 
+    pc_name = request.form.get("progcomp")
+    if pc_name is None or verify_input(pc_name, 50):
+        return redirect(url_for("progcomp.menu"))
+    pc = db.session.query(Progcomp).where(Progcomp.name == pc_name).first()
+    if pc is None or not pc.visible:
+        return redirect(url_for("progcomp.menu"))
+
     # Check password against potentially existing team
     team = pc.get_team(username)
-    print("Team", team)
     if team:
         if team.password != password:
             return redirect(url_for("progcomp.menu"))
@@ -128,6 +105,7 @@ def start() -> FlaskResponse:
 
     # Save their username
     session[USERNAME_SESSION_KEY] = username
+    session[PROGCOMP_SESSION_KEY] = pc_name
 
     return redirect(url_for("progcomp.submissions"))
 
@@ -140,6 +118,7 @@ def logout() -> FlaskResponse:
 
     # Save their username
     session[USERNAME_SESSION_KEY] = None
+    session[PROGCOMP_SESSION_KEY] = None
 
     return redirect(url_for("progcomp.menu"))
 

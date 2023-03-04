@@ -8,7 +8,20 @@
     <img class="mw-100 p-2" style="width: 500px" src="static/challenge_logo.svg" alt="Logo"></img>
     {% if not username %}
     <form class="mw-100" style="width: 300px" action="{{ url_for('progcomp.start') }}" method="POST">
-        <div class="form-group">
+        <div class="form-group my-2">
+            <label for="progcomp">Competition</label>
+            <select class="form-select" id="progcomp" name="progcomp" {% if not partitions %}disabled{% endif %}>
+                {% for (title, items) in partitions.items() %}
+                <optgroup label="{{ title }}">
+                    {% for progcomp in items %}
+                    <option value="{{ progcomp.name }}">{{ progcomp.name }}</option>
+                    {% endfor %}
+                </optgroup>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group my-2">
             <label for="username">Team Name</label>
             <input type="text" class="form-control" id="username" name="username" placeholder="Enter your team's name">
             <small id="username-help" class="form-text text-muted">Must be alphanumeric and not contain
@@ -19,12 +32,13 @@
             <input type="password" class="form-control" id="password" name="password"
                 placeholder="Create/Enter your pass phrase">
         </div>
-        <div class="form-group text-center">
+        <div class="form-group text-center my-2">
             <button type="submit" class="btn btn-success btn-lg">Join this Team</button>
         </div>
     </form>
     {% else %}
     <form class="mt-3 text-center" action="{{ url_for('progcomp.logout') }}" method="POST">
+        Competition: {{ progcomp.name }}
         Team Name: {{ username }}
         <div class="form-group mt-3">
             <button type="submissions" class="btn btn-danger btn-lg">Log out</button>
