@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block head %}
+<script src="{{ url_for('static', filename='progcomp-info.js') }}"></script>
+{% endblock %}
+
 {% block title %}Home{% endblock %}
 
 {% block content %}
@@ -19,6 +23,23 @@
                 </optgroup>
                 {% endfor %}
             </select>
+            {% for (title, items) in partitions.items() %}
+            {% for progcomp in items %}
+            {% set visibility = progcomp.visible|string() %}
+            {% if visibility == "Open" %}
+            {% set row_color = 'text-bg-success' %}
+            {% elif visibility == "Closed" %}
+            {% set row_color = 'text-bg-danger' %}
+            {% else %}
+            {% set row_color = "text-bg-warning" %}
+            {% endif %}
+            <small id="progcomp-help-{{ progcomp.name }}" class="form-text text-muted" hidden>
+                {{ title }}
+                <small class="badge {{ row_color }}">{{ progcomp.visible }}</small>
+                {{ progcomp.time_str }}
+            </small>
+            {% endfor %}
+            {% endfor %}
         </div>
 
         <div class="form-group my-3">
