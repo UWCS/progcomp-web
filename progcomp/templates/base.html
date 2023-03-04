@@ -42,7 +42,7 @@
             <li class="nav-item">
               <a class="nav-link" href="/submit">Submissions</a>
             </li>
-            {% for p in progcomp.enabled_problems %}
+            {% for p in progcomp.visible_problems %}
             <li class="nav-item">
               <a class="nav-link" href="/problems/{{ p.name }}">Problem&nbsp;{{ p.name }}</a>
             </li>
@@ -64,7 +64,7 @@
       </div>
     </nav>
     <article id="content" class="w-100">
-    {% block content %}{% endblock %}
+      {% block content %}{% endblock %}
     </article>
 
     <footer class="w-100 mt-auto d-flex flex-wrap justify-content-between gap-2 py-3 mt-4 border-top">

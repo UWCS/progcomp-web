@@ -29,3 +29,12 @@ class Visibility(enum.Enum):
     HIDDEN = 0
     CLOSED = 1  # Visible but no submissions
     OPEN = 2
+
+    def __lt__(self, other):
+        return self.value < other.value
+
+    def __le__(self, other):
+        return self.value <= other.value
+
+    def __bool__(self):
+        return self > Visibility.HIDDEN

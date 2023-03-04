@@ -33,10 +33,11 @@ class Problem(Base):
 
     @property
     def visible(self) -> Visibility:
-        # Lowest visibility of self and parent progcomp
-        sv = self.visibility
-        pv = self.progcomp.visible
-        return pv if pv.value <= sv.value else sv
+        return min(self.visibility, self.progcomp.visible)
+    
+    @property
+    def open(self) -> Visibility:
+        return self.visible == Visibility.OPEN
 
     def update(self) -> None:
         path = os.path.join(os.getcwd(), "problems", self.name, "input")

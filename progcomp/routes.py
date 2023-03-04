@@ -118,7 +118,7 @@ def submit() -> FlaskResponse:
         return redirect(url_for("progcomp.menu"))
     pc = get_pc()
     team = pc.get_team(username)
-    if not team or pc.freeze:
+    if not team:
         return redirect(url_for("progcomp.menu"))
 
     # List out team submission info
@@ -137,13 +137,13 @@ def problem(p_name) -> FlaskResponse:
     if not username:
         return redirect(url_for("progcomp.menu"))
 
-    # get_pc().update_problems()
-
     problem = get_pc().get_problem(p_name)
-    if not problem:
+    if not problem or not problem.visible:
         return redirect(url_for("progcomp.submit"))
 
     if request.method == "POST":
+        if not problem.open:
+            return redirect(request.url)
         # TODO: Multiple files (script + output data at the same time)
         # check if the post request has the file part
 
@@ -216,12 +216,10 @@ def leaderboard_main() -> FlaskResponse:
 
     pc = get_pc()
     scores = pc.score_teams()
-    # if not pc.freeze:
-    #     scores = []
     username = session.get(USERNAME_SESSION_KEY)
     return render_template(
         "leaderboard_hub.html",
-        problems=[p for p in get_pc().enabled_problems if p.name != "0"],
+        problems=[p for p in get_pc().visible_problems if p.name != "0"],
         scores=scores,
         progcomp=get_pc(),
         username=username,

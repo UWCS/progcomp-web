@@ -39,13 +39,22 @@ class Progcomp(Base):
     @property
     def visible(self) -> Visibility:
         return self.visibility
-    
+
     def get_team(self, name: str) -> Optional[Team]:
         return db.session.query(Team).filter(Team.name == name).first()
 
     def add_team(self, name: str, password: str) -> None:
         db.session.add(Team(progcomp_id=self.id, name=name, password=password))
         db.session.commit()
+
+    def get_problem(self, name, visibility=Visibility.CLOSED) -> Optional[Problem]:
+        problems = db.session.query(Problem).where(Problem.name == name).all()
+        return next((p for p in problems if p.visible), None)
+
+    @property
+    def visible_problems(self) -> list[Problem]:
+        problems = db.session.query(Problem).order_by(Problem.name).all()
+        return [p for p in problems if p.visible]
 
     def update_problems(self) -> None:
         # Add any new problems, update existing ones
@@ -54,26 +63,13 @@ class Progcomp(Base):
         for p_name in p_names:
             prob = self.get_problem(p_name, False)
             if not prob:
-                prob = Problem(name=p_name, progcomp_id=self.id, enabled=False)
+                prob = Problem(
+                    name=p_name, progcomp_id=self.id, visibility=Visibility.HIDDEN
+                )
                 db.session.add(prob)
             prob.update()
         db.session.commit()
         print("Problems", repr(self.problems))
-
-    def get_problem(self, name, enabled_filter=True) -> Optional[Problem]:
-        q = db.session.query(Problem).where(Problem.name == name)
-        if enabled_filter:
-            q.where(Problem.enabled == True)
-        return q.first()
-
-    @property
-    def enabled_problems(self) -> list[Problem]:
-        return (
-            db.session.query(Problem)
-            .where(Problem.enabled == True)
-            .order_by(Problem.name)
-            .all()
-        )
 
     def get_timestamp_str(self, time) -> str:
         return time.strftime("%H:%M:%S")
@@ -90,8 +86,7 @@ class Progcomp(Base):
         problem = self.get_problem(p_name)
         if not team or not problem:
             return False
-        test = problem.get_test(test_name)
-        if not test:
+        if not (test := problem.get_test(test_name)):
             return False
         db.session.add(
             sub := Submission(
@@ -112,7 +107,7 @@ class Progcomp(Base):
         per_prob = []
 
         conv: Callable[[Union[int, float]], int] = lambda x: round(x * 100)
-        for problem in self.enabled_problems:
+        for problem in self.visible_problems:
             if problem.name == "0":
                 continue
             if problem.tests[0].max_score:  # Has a max
