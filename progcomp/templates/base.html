@@ -29,9 +29,15 @@
         <div class="collapse navbar-collapse" id="navbarColor03">
           <ul class="navbar-nav d-flex w-100">
             <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span class="d-lg-none ms-lg-0">Progcomp: </span>{{ progcomp.name }}</a>
+              <a class="nav-link" href="/progcomps">
+                {% if progcomp %}
+                <span class="d-lg-none ms-lg-0">Progcomp: </span>{{ progcomp.name }}
+                {% else %}
+                Progcomps List
+                {% endif %}
+              </a>
             </li>
+            {% if progcomp %}
             <div class="vr d-none d-lg-block "></div>
             <li class="nav-item">
               <a class="nav-link" href="/submissions">Submissions</a>
@@ -45,6 +51,7 @@
             <li class="nav-item">
               <a class="nav-link" href="/leaderboard">Leaderboard</a>
             </li>
+            {% endif %}
             {% endif %}
             <div class="vr ms-md-auto d-none d-lg-block "></div>
             <li class="nav-item ms-lg-2">
@@ -62,9 +69,15 @@
     </article>
 
     <footer class="w-100 mt-auto d-flex flex-wrap justify-content-between gap-2 py-3 mt-4 border-top">
-      <p class="flex-grow-1 flex-md-grow-0 mb-0 text-muted text-center">
-        Team: {{ username }} | <span id="countdown">Countdown soonTM</span>
-      </p>
+      <div class="flex-grow-1 flex-md-grow-0 mb-0 text-muted">
+        {% if progcomp %}
+        {{ progcomp.name }} |
+        {% if username %}
+        Team: {{ username }} |
+        {% endif %}
+        <span id="countdown">Countdown soonTM</span>
+        {% endif %}
+      </div>
       <div class="d-md-none" style="flex-basis: 100%; height: 0"></div>
       <a class="d-flex text-decoration-none" href="https://uwcs.co.uk">
         {% include "uwcs_logo.html" %}

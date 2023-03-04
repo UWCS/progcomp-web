@@ -42,8 +42,6 @@ def load_pc():
 def get_pc() -> Progcomp:
     name = session.get(PROGCOMP_SESSION_KEY)
     pc = db.session.query(Progcomp).where(Progcomp.name == name).first()
-    if pc is None:
-        raise Exception("Progcomp object does not exist")
     return pc
 
 
@@ -53,7 +51,9 @@ bp = Blueprint("progcomp", __name__)
 @bp.route("/")
 def menu() -> FlaskResponse:
     username = session.get(USERNAME_SESSION_KEY, "main")
-    return render_template("menu.html", progcomp=get_pc(), username=username)
+    if (pc := get_pc()) is None:
+        return redirect(url_for("progcomp.progcomps"))
+    return render_template("menu.html", progcomp=pc, username=username)
 
 
 @bp.route("/progcomps")
@@ -66,6 +66,14 @@ def progcomps() -> FlaskResponse:
         progcomp=get_pc(),
         username=username,
     )
+
+
+@bp.route("/progcomp/clear")
+def clear_progcomp() -> FlaskResponse:
+    session[PROGCOMP_SESSION_KEY] = None
+    session[USERNAME_SESSION_KEY] = None
+
+    return redirect(url_for("progcomp.progcomps"))
 
 
 @bp.route("/progcomp/<string:pc_name>")
@@ -93,6 +101,9 @@ def start() -> FlaskResponse:
     When someone hits the 'start' button
     """
 
+    if (pc := get_pc()) is None:
+        return redirect(url_for("progcomp.progcomps"))
+
     # Check username and password are in a valid format
     username = request.form.get("username")
     if username is None or not verify_input(username, 100):
@@ -103,13 +114,13 @@ def start() -> FlaskResponse:
         return redirect(url_for("progcomp.menu"))
 
     # Check password against potentially existing team
-    team = get_pc().get_team(username)
+    team = pc.get_team(username)
     print("Team", team)
     if team:
         if team.password != password:
             return redirect(url_for("progcomp.menu"))
     else:
-        get_pc().add_team(username, password)
+        pc.add_team(username, password)
 
     # Save their username
     session[USERNAME_SESSION_KEY] = username
@@ -135,17 +146,19 @@ def submissions() -> FlaskResponse:
     The submission page / home page for the contest
     """
 
+    if (pc := get_pc()) is None:
+        return redirect(url_for("progcomp.progcomps"))
+
     username = session.get(USERNAME_SESSION_KEY)
     if not username:
         return redirect(url_for("progcomp.menu"))
-    pc = get_pc()
     team = pc.get_team(username)
     if not team:
         return redirect(url_for("progcomp.menu"))
 
     # List out team submission info
     return render_template(
-        "submissions.html", team=team, progcomp=get_pc(), username=username
+        "submissions.html", team=team, progcomp=pc, username=username
     )
 
 
@@ -154,12 +167,14 @@ def problem(p_name) -> FlaskResponse:
     """
     Retrieve the page for a problem
     """
+    if (pc := get_pc()) is None:
+        return redirect(url_for("progcomp.progcomps"))
 
     username = session.get(USERNAME_SESSION_KEY)
     if not username:
         return redirect(url_for("progcomp.menu"))
 
-    problem = get_pc().get_problem(p_name)
+    problem = pc.get_problem(p_name)
     if not problem or not problem.visible:
         return redirect(url_for("progcomp.submissions"))
 
@@ -200,12 +215,12 @@ def problem(p_name) -> FlaskResponse:
         output.save(os.path.join(path, "output.txt"))
         script.save(os.path.join(path, script_name))
 
-        get_pc().make_submission(path, username, p_name, test, timestamp=time)
+        pc.make_submission(path, username, p_name, test, timestamp=time)
 
         return redirect(url_for("progcomp.submissions"))
 
     return render_template(
-        "problem.html", username=username, problem=problem, progcomp=get_pc()
+        "problem.html", username=username, problem=problem, progcomp=pc
     )
 
 
@@ -215,8 +230,11 @@ def dl_pdf() -> FlaskResponse:
     Download the main pdf
     """
 
+    if (pc := get_pc()) is None:
+        return redirect(url_for("progcomp.progcomps"))
+
     return send_from_directory(
-        os.path.join(os.getcwd(), "problems", get_pc().name),
+        os.path.join(os.getcwd(), "problems", pc.name),
         "problems.pdf",
         as_attachment=True,
     )
@@ -228,7 +246,10 @@ def download(p_name, filename) -> FlaskResponse:
     Download a specified problem input
     """
 
-    path = os.path.join(os.getcwd(), "problems", get_pc().name, p_name, "input")
+    if (pc := get_pc()) is None:
+        return redirect(url_for("progcomp.progcomps"))
+
+    path = os.path.join(os.getcwd(), "problems", pc.name, p_name, "input")
     if not os.path.exists(os.path.join(path, filename)):
         return redirect(url_for("progcomp.submissions"))
     return send_from_directory(path, filename, as_attachment=True)
@@ -236,32 +257,38 @@ def download(p_name, filename) -> FlaskResponse:
 
 @bp.route("/leaderboard", methods=["GET"])
 def leaderboard_main() -> FlaskResponse:
-    print("SHOW LEADEDBOARD", get_pc().show_leaderboard)
-    if not get_pc().show_leaderboard:
+
+    if (pc := get_pc()) is None:
+        return redirect(url_for("progcomp.progcomps"))
+
+    print("SHOW LEADEDBOARD", pc.show_leaderboard)
+    if not pc.show_leaderboard:
         return redirect(url_for("progcomp.menu"))
 
-    pc = get_pc()
     scores = pc.score_teams()
     username = session.get(USERNAME_SESSION_KEY)
     return render_template(
         "leaderboard_hub.html",
-        problems=[p for p in get_pc().visible_problems if p.name != "0"],
+        problems=[p for p in pc.visible_problems if p.name != "0"],
         scores=scores,
-        progcomp=get_pc(),
+        progcomp=pc,
         username=username,
     )
 
 
 @bp.route("/leaderboard/<string:p_name>/<string:p_set>", methods=["GET"])
 def leaderboard(p_name, p_set) -> FlaskResponse:
+    if (pc := get_pc()) is None:
+        return redirect(url_for("progcomp.progcomps"))
+
     if (
-        not get_pc().show_leaderboard
+        not pc.show_leaderboard
         or not re.match(r"^[A-Za-z0-9_]+$", p_name)
         or not re.match(r"^[A-Za-z0-9_]+$", p_name)
     ):
         return redirect(url_for("progcomp.menu"))
 
-    problem: Optional[Problem] = get_pc().get_problem(p_name)
+    problem: Optional[Problem] = pc.get_problem(p_name)
     if not problem:
         return redirect(url_for("progcomp.menu"))
     test: Optional[Test] = problem.get_test(p_set)
@@ -275,13 +302,15 @@ def leaderboard(p_name, p_set) -> FlaskResponse:
         p_name=p_name,
         p_set=p_set,
         submissions=subs,
-        progcomp=get_pc(),
+        progcomp=pc,
         username=username,
     )
 
 
 @bp.route("/poll", methods=["GET"])
 def poll() -> FlaskResponse:
-    pc = get_pc()
+    if (pc := get_pc()) is None:
+        return jsonify({})
+
     data = {"end_time": pc.end_time.timestamp() if pc.end_time else 0}
     return jsonify(data)
