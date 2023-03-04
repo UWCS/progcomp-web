@@ -5,16 +5,8 @@ import re
 from datetime import datetime
 from typing import Union
 
-from flask import (
-    Blueprint,
-    jsonify,
-    redirect,
-    render_template,
-    request,
-    send_from_directory,
-    session,
-    url_for,
-)
+from flask import (Blueprint, jsonify, redirect, render_template, request,
+                   send_from_directory, session, url_for)
 from werkzeug.utils import secure_filename
 from werkzeug.wrappers.response import Response
 
@@ -22,7 +14,6 @@ FlaskResponse = Union[Response, str]
 
 from .database import db
 from .models import *
-
 # from .adapters import GameUIAdapter
 from .session import PROGCOMP_SESSION_KEY, USERNAME_SESSION_KEY
 
@@ -60,6 +51,7 @@ def menu() -> FlaskResponse:
 def set_progcomp(pc_name) -> FlaskResponse:
     if db.session.query(Progcomp).where(Progcomp.name == pc_name).first():
         session[PROGCOMP_SESSION_KEY] = pc_name
+        session[USERNAME_SESSION_KEY] = None
 
     return redirect(url_for("progcomp.menu"))
 
