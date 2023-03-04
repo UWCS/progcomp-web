@@ -92,7 +92,7 @@ def start() -> FlaskResponse:
     # Save their username
     session[USERNAME_SESSION_KEY] = username
 
-    return redirect(url_for("progcomp.submit"))
+    return redirect(url_for("progcomp.submissions"))
 
 
 @bp.route("/logout", methods=["POST"])
@@ -107,8 +107,8 @@ def logout() -> FlaskResponse:
     return redirect(url_for("progcomp.menu"))
 
 
-@bp.route("/submit", methods=["GET"])
-def submit() -> FlaskResponse:
+@bp.route("/submissions", methods=["GET"])
+def submissions() -> FlaskResponse:
     """
     The submission page / home page for the contest
     """
@@ -139,7 +139,7 @@ def problem(p_name) -> FlaskResponse:
 
     problem = get_pc().get_problem(p_name)
     if not problem or not problem.visible:
-        return redirect(url_for("progcomp.submit"))
+        return redirect(url_for("progcomp.submissions"))
 
     if request.method == "POST":
         if not problem.open:
@@ -180,7 +180,7 @@ def problem(p_name) -> FlaskResponse:
 
         get_pc().make_submission(path, username, p_name, test, timestamp=time)
 
-        return redirect(url_for("progcomp.submit"))
+        return redirect(url_for("progcomp.submissions"))
 
     return render_template(
         "problem.html", username=username, problem=problem, progcomp=get_pc()
@@ -204,7 +204,7 @@ def download(p_name, filename) -> FlaskResponse:
 
     path = os.path.join(os.getcwd(), "problems", p_name, "input")
     if not os.path.exists(os.path.join(path, filename)):
-        return redirect(url_for("progcomp.submit"))
+        return redirect(url_for("progcomp.submissions"))
     return send_from_directory(path, filename, as_attachment=True)
 
 
