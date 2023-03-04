@@ -5,7 +5,7 @@ test = sys.argv[2]
 with app.app_context():
     pr = (
         db.session.query(Problem)
-        .where(Problem.progcomp.name == "main")
+        .where(Problem.progcomp.name == script_progcomp)
         .filter(Problem.name == prob)
         .first()
     )

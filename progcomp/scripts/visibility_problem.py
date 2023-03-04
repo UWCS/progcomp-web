@@ -11,7 +11,13 @@ else:
     print("Level must be one of `open`, `closed` or `hidden`.")
 
 with app.app_context():
-    pr = db.session.query(Problem).filter(Problem.name == sys.argv[1]).first()
+    pc = db.session.query(Progcomp).where(Progcomp.name == script_progcomp).first()
+    pr = (
+        db.session.query(Problem)
+        .filter(Problem.progcomp_id == pc.id)
+        .filter(Problem.name == sys.argv[1])
+        .first()
+    )
     print(pr)
     pr.visibility = level
     print(pr)

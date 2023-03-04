@@ -73,14 +73,12 @@ class Progcomp(Base):
 
     def update_problems(self) -> None:
         # Add any new problems, update existing ones
-        path = os.path.join(os.getcwd(), "problems")
+        path = os.path.join(os.getcwd(), "problems", self.name)
         p_names = sorted(os.listdir(path))
         for p_name in p_names:
             prob = self.get_problem(p_name, False)
             if not prob:
-                prob = Problem(
-                    name=p_name, progcomp_id=self.id, visibility=Visibility.HIDDEN
-                )
+                prob = Problem(name=p_name, progcomp=self, visibility=Visibility.HIDDEN)
                 db.session.add(prob)
             prob.update()
         db.session.commit()

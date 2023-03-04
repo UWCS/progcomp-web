@@ -1,6 +1,6 @@
 from __script_setup import *
 
-level = sys.argv[2].lower()
+level = sys.argv[1].lower()
 if level == "open":
     level = Visibility.OPEN
 elif level == "closed":
@@ -11,7 +11,7 @@ else:
     print("Level must be one of `open`, `closed` or `hidden`.")
 
 with app.app_context():
-    pr = db.session.query(Progcomp).filter(Progcomp.name == sys.argv[1]).first()
+    pr = db.session.query(Progcomp).where(Progcomp.name == script_progcomp).first()
     print(pr)
     pr.visibility = level
     print(pr)

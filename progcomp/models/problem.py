@@ -40,7 +40,13 @@ class Problem(Base):
         return self.visible == Visibility.OPEN
 
     def update(self) -> None:
-        path = os.path.join(os.getcwd(), "problems", self.name, "input")
+        path = os.path.join(
+            os.getcwd(),
+            "problems",
+            self.progcomp.name,
+            self.name,
+            "input",
+        )
         old = set(t.name for t in self.tests)
         new = set([x[:-4] for x in os.listdir(path)])
 

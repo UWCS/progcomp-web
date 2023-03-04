@@ -13,3 +13,5 @@ from progcomp.models import *
 with app.app_context():
     alembic: Alembic = Alembic()
     alembic.init_app(app)
+
+script_progcomp = os.environ["SCRIPT_PROGCOMP"]
