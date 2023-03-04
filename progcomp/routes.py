@@ -31,7 +31,7 @@ from .session import USERNAME_SESSION_KEY
 
 def load_pc():
     # with app.app_context():
-    pc = db.session.query(Progcomp).first()
+    pc = db.session.query(Progcomp).where(Progcomp.name == "main").first()
     if not pc:
         db.session.add(pc := Progcomp(name="main"))
         db.session.commit()
@@ -40,7 +40,7 @@ def load_pc():
 
 
 def get_pc() -> Progcomp:
-    pc = db.session.query(Progcomp).first()
+    pc = db.session.query(Progcomp).where(Progcomp.name == "main").first()
     if pc is None:
         raise Exception("Progcomp object does not exist")
     return pc

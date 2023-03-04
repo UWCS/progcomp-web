@@ -34,7 +34,7 @@ class Problem(Base):
     @property
     def visible(self) -> Visibility:
         return min(self.visibility, self.progcomp.visible)
-    
+
     @property
     def open(self) -> Visibility:
         return self.visible == Visibility.OPEN
@@ -46,7 +46,7 @@ class Problem(Base):
 
         print("Old new", old, new)
         for test_name in old - new:
-            test = db.session.query(Test).where(Test.name == test_name).first()
+            test = self.get_test(test_name)
             if test:
                 db.session.delete(test)
                 print("Removing Test", test)
@@ -59,7 +59,8 @@ class Problem(Base):
     def get_test(self, name: str) -> Optional["Test"]:
         return (
             db.session.query(Test)
-            .where(Test.problem_id == self.id, Test.name == name)
+            .where(Test.problem_id == self.id)
+            .where(Test.name == name)
             .first()
         )
 
@@ -81,10 +82,7 @@ class Test(Base):
         from progcomp.models import Submission
 
         submissions = (
-            db.session.query(Submission)
-            .where(Submission.test_id == self.id)
-            .where(Submission.problem_id == self.problem_id)
-            .all()
+            db.session.query(Submission).where(Submission.test_id == self.id).all()
         )
 
         team_scores: dict[str, "Submission"] = {}

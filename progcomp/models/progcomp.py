@@ -41,19 +41,34 @@ class Progcomp(Base):
         return self.visibility
 
     def get_team(self, name: str) -> Optional[Team]:
-        return db.session.query(Team).filter(Team.name == name).first()
+        return (
+            db.session.query(Team)
+            .where(Team.progcomp == self)
+            .filter(Team.name == name)
+            .first()
+        )
 
     def add_team(self, name: str, password: str) -> None:
         db.session.add(Team(progcomp_id=self.id, name=name, password=password))
         db.session.commit()
 
     def get_problem(self, name, visibility=Visibility.CLOSED) -> Optional[Problem]:
-        problems = db.session.query(Problem).where(Problem.name == name).all()
+        problems = (
+            db.session.query(Problem)
+            .where(Problem.progcomp == self)
+            .where(Problem.name == name)
+            .all()
+        )
         return next((p for p in problems if p.visible), None)
 
     @property
     def visible_problems(self) -> list[Problem]:
-        problems = db.session.query(Problem).order_by(Problem.name).all()
+        problems = (
+            db.session.query(Problem)
+            .where(Problem.progcomp == self)
+            .order_by(Problem.name)
+            .all()
+        )
         return [p for p in problems if p.visible]
 
     def update_problems(self) -> None:
