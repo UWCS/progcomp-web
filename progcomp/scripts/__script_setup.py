@@ -15,3 +15,4 @@ with app.app_context():
     alembic.init_app(app)
 
 script_progcomp = os.environ["SCRIPT_PROGCOMP"]
+print("Current editing Progcomp:", script_progcomp)

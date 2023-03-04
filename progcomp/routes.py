@@ -52,8 +52,7 @@ bp = Blueprint("progcomp", __name__)
 
 @bp.route("/")
 def menu() -> FlaskResponse:
-    username = session.get(USERNAME_SESSION_KEY)
-    session[PROGCOMP_SESSION_KEY] = "main"
+    username = session.get(USERNAME_SESSION_KEY, "main")
     return render_template("menu.html", progcomp=get_pc(), username=username)
 
 

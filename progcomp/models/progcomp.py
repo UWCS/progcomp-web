@@ -59,7 +59,7 @@ class Progcomp(Base):
             .where(Problem.name == name)
             .all()
         )
-        return next((p for p in problems if p.visible), None)
+        return next((p for p in problems if p.visible >= visibility), None)
 
     @property
     def visible_problems(self) -> list[Problem]:
@@ -76,7 +76,9 @@ class Progcomp(Base):
         path = os.path.join(os.getcwd(), "problems", self.name)
         p_names = sorted(os.listdir(path))
         for p_name in p_names:
-            prob = self.get_problem(p_name, False)
+            if not os.path.isdir(os.path.join(path, p_name)):
+                continue
+            prob = self.get_problem(p_name, Visibility.HIDDEN)
             if not prob:
                 prob = Problem(name=p_name, progcomp=self, visibility=Visibility.HIDDEN)
                 db.session.add(prob)

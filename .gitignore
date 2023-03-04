@@ -3,6 +3,7 @@ submissions/**
 /problems
 /progcomp.log
 /.env
+/progcomp/scripts/custom.py
 
 __pycache__
 /instance
