@@ -89,7 +89,7 @@ def start() -> FlaskResponse:
         return redirect(url_for("progcomp.menu"))
 
     pc_name = request.form.get("progcomp")
-    if pc_name is None or verify_input(pc_name, 50):
+    if pc_name is None or not verify_input(pc_name, 50):
         return redirect(url_for("progcomp.menu"))
     pc = db.session.query(Progcomp).where(Progcomp.name == pc_name).first()
     if pc is None or not pc.visible:
