@@ -30,17 +30,8 @@
           <ul class="navbar-nav d-flex w-100">
             <li class="nav-item">
               <a class="nav-link text-nowrap" href="/progcomps">
-                {% set visibility = progcomp.visible|string() %}
-                {% if visibility == "Open" %}
-                {% set row_color = 'text-bg-success' %}
-                {% elif visibility == "Closed" %}
-                {% set row_color = 'text-bg-danger' %}
-                {% else %}
-                {% set row_color = "text-bg-warning" %}
-                {% endif %}
                 {% if progcomp %}
                 <span class="d-lg-none ms-lg-0">Progcomp: </span>{{ progcomp.name }}
-                <small class="badge {{ row_color }}" style="height: fit-content">{{ progcomp.visible }}</small>
                 {% else %}
                 Progcomps List
                 {% endif %}
@@ -80,7 +71,16 @@
     <footer class="w-100 mt-auto d-flex flex-wrap justify-content-between gap-2 py-3 mt-4 border-top">
       <div class="flex-grow-1 flex-md-grow-0 mb-0 text-muted">
         {% if progcomp %}
-        {{ progcomp.name }} |
+        {% set visibility = progcomp.visible|string() %}
+        {% if visibility == "Open" %}
+        {% set row_color = 'text-bg-success' %}
+        {% elif visibility == "Closed" %}
+        {% set row_color = 'text-bg-danger' %}
+        {% else %}
+        {% set row_color = "text-bg-warning" %}
+        {% endif %}
+        {{ progcomp.name }}
+        <small class="badge {{ row_color }}" style="height: fit-content">{{ progcomp.visible }}</small> |
         {% if username %}
         Team: {{ username }} |
         {% endif %}
