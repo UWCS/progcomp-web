@@ -11,7 +11,7 @@ else:
     print("Level must be one of `open`, `closed` or `hidden`.")
 
 with app.app_context():
-    pc = db.session.query(Progcomp).where(Progcomp.name == script_progcomp).first()
+    pc = db.session.query(Progcomp).where(Progcomp.name == script_progcomp()).first()
     pr = (
         db.session.query(Problem)
         .filter(Problem.progcomp_id == pc.id)

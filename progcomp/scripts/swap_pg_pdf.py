@@ -5,7 +5,7 @@ from pathlib import Path
 
 from __script_setup import *
 
-root = Path("problems") / script_progcomp
+root = Path("problems") / script_progcomp()
 if not os.path.exists(sys.argv[1]):
     print(sys.argv[1] + " doesn't exist!")
 shutil.copyfile(sys.argv[1], root / "__problems_new.pdf")

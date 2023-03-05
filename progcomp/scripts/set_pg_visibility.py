@@ -12,7 +12,7 @@ else:
     sys.exit()
 
 with app.app_context():
-    pr = db.session.query(Progcomp).where(Progcomp.name == script_progcomp).first()
+    pr = db.session.query(Progcomp).where(Progcomp.name == script_progcomp()).first()
     print(pr)
     pr.visibility = level
     print(pr)
