@@ -40,11 +40,10 @@ class Progcomp(Base):
 
     teams = relationship(Team, back_populates="progcomp")
     problems = relationship(Problem, back_populates="progcomp", order_by=Problem.name)
-    alerts_r = relationship(Alert, back_populates="progcomp", order_by=Problem.name)
+    alerts_r = relationship(Alert, back_populates="progcomp", order_by=Alert.start_time)
 
     @property
     def alerts(self) -> list[Alert]:
-        now = datetime.now()
         return [a for a in self.alerts_r if a.visible]
 
     @property
