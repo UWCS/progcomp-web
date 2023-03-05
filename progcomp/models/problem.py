@@ -36,6 +36,10 @@ class Problem(Base):
     progcomp = relationship("Progcomp", back_populates="problems")
 
     @property
+    def path(self) -> str:
+        return os.path.join(os.getcwd(), "problems", self.progcomp.name, self.name)
+
+    @property
     def visible(self) -> Visibility:
         return min(self.visibility, self.progcomp.visible)
 
@@ -88,6 +92,10 @@ class Test(Base):
     submissions = relationship("Submission", back_populates="test")
 
     __table_args__ = (sa.UniqueConstraint("name", "problem_id", name="unq_tests_name"),)
+
+    @property
+    def input_path(self) -> str:
+        return os.path.join(self.problem.path, "input", self.name + ".txt")
 
     @property
     def ranked_submissions(self) -> list["Submission"]:
