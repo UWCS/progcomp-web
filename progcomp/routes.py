@@ -58,8 +58,8 @@ def get_progcomp_list():
 @bp.route("/")
 def menu() -> FlaskResponse:
     pc = get_pc()
-    username = session.get(USERNAME_SESSION_KEY, "main")
-    if not pc and username:
+    username = session.get(USERNAME_SESSION_KEY)
+    if (not pc) and username:
         return redirect(url_for("progcomp.logout"))
     partitions = get_progcomp_list()
     return render_template(
