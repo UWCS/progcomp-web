@@ -9,6 +9,7 @@ from sqlalchemy import ForeignKey, ForeignKeyConstraint, func
 from sqlalchemy.orm import relationship
 
 from progcomp.models import utils
+from progcomp.models.alert import Alert
 from progcomp.models.problem import Problem
 from progcomp.models.submission import Submission
 from progcomp.models.team import Team
@@ -39,6 +40,12 @@ class Progcomp(Base):
 
     teams = relationship(Team, back_populates="progcomp")
     problems = relationship(Problem, back_populates="progcomp", order_by=Problem.name)
+    alerts_r = relationship(Alert, back_populates="progcomp", order_by=Problem.name)
+
+    @property
+    def alerts(self) -> list[Alert]:
+        now = datetime.now()
+        return [a for a in self.alerts_r if a.visible]
 
     @property
     def visible(self) -> Visibility:
