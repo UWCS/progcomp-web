@@ -28,7 +28,7 @@ class Problem(Base):
         server_default="OPEN",
     )
     __table_args__ = (
-        sa.UniqueConstraint("name", "progcomp_id", name="unq_problem_name"),
+        sa.UniqueConstraint("name", "progcomp_id", name="unq_problems_name"),
     )
 
     tests = relationship("Test", back_populates="problem", order_by="Test.name")
