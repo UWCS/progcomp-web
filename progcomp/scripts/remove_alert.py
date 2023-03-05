@@ -2,9 +2,9 @@ import __utils
 from __script_setup import *
 
 with app.app_context():
-    new_time = __utils.parse_time(sys.argv[1])
+    name = sys.argv[1]
     pc = db.session.query(Progcomp).where(Progcomp.name == script_progcomp()).first()
-    print("Old", pc.end_time)
-    print("New", new_time)
-    pc.end_time = new_time
+    alert = next(a for a in pc.alerts_r if a.name == name)
+    print(alert)
+    db.session.delete(alert)
     db.session.commit()

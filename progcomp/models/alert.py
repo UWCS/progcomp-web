@@ -24,8 +24,14 @@ class Alert(Base):
     id = sa.Column(sa.Integer, primary_key=True)
     progcomp_id = sa.Column(sa.Integer, ForeignKey("progcomps.id"))
     name = sa.Column(sa.String)
+    title = sa.Column(sa.String)
+    text = sa.Column(sa.String)
     start_time = sa.Column(sa.DateTime, default=func.current_timestamp())
     end_time = sa.Column(sa.DateTime)
+
+    __table_args__ = (
+        sa.UniqueConstraint("name", "progcomp_id", name="unq_alerts_name"),
+    )
 
     progcomp = relationship("Progcomp", back_populates="alerts_r")
 

@@ -2,7 +2,7 @@
 
 Revision ID: 331a2c9c9c0a
 Revises: 81752bc872dd
-Create Date: 2023-03-05 15:27:11.159139
+Create Date: 2023-03-05 15:48:28.952941
 
 """
 import sqlalchemy as sa
@@ -22,6 +22,8 @@ def upgrade():
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("progcomp_id", sa.Integer(), nullable=True),
         sa.Column("name", sa.String(), nullable=True),
+        sa.Column("title", sa.String(), nullable=True),
+        sa.Column("text", sa.String(), nullable=True),
         sa.Column("start_time", sa.DateTime(), nullable=True),
         sa.Column("end_time", sa.DateTime(), nullable=True),
         sa.ForeignKeyConstraint(
@@ -29,6 +31,7 @@ def upgrade():
             ["progcomps.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("name", "progcomp_id", name="unq_alerts_name"),
     )
     # ### end Alembic commands ###
 
