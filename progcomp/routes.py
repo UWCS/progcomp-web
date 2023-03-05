@@ -73,7 +73,7 @@ def verify_input(inp: Optional[str], max_len: int = 100) -> bool:
         or inp == ""
         or inp.isspace()
         or len(inp) > max_len
-        or not inp.isalnum()
+        or not re.match(r"^[A-Za-z0-9_]+$", inp)
     )
 
 
@@ -275,7 +275,7 @@ def leaderboard(p_name, p_set) -> FlaskResponse:
     if (
         not pc.show_leaderboard
         or not re.match(r"^[A-Za-z0-9_]+$", p_name)
-        or not re.match(r"^[A-Za-z0-9_]+$", p_name)
+        or not re.match(r"^[A-Za-z0-9_]+$", p_set)
     ):
         return redirect(url_for("progcomp.menu"))
 
