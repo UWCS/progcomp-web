@@ -57,10 +57,13 @@ def get_progcomp_list():
 
 @bp.route("/")
 def menu() -> FlaskResponse:
+    pc = get_pc()
     username = session.get(USERNAME_SESSION_KEY, "main")
+    if not pc and username:
+        return redirect(url_for("progcomp.logout"))
     partitions = get_progcomp_list()
     return render_template(
-        "menu.html", progcomp=get_pc(), partitions=partitions, username=username
+        "menu.html", progcomp=pc, partitions=partitions, username=username
     )
 
 
@@ -130,7 +133,7 @@ def submissions() -> FlaskResponse:
     """
 
     if (pc := get_pc()) is None:
-        return redirect(url_for("progcomp.progcomps"))
+        return redirect(url_for("progcomp.menu"))
 
     username = session.get(USERNAME_SESSION_KEY)
     if not username:
@@ -151,7 +154,7 @@ def problem(p_name) -> FlaskResponse:
     Retrieve the page for a problem
     """
     if (pc := get_pc()) is None:
-        return redirect(url_for("progcomp.progcomps"))
+        return redirect(url_for("progcomp.main"))
 
     username = session.get(USERNAME_SESSION_KEY)
     if not username:
@@ -214,7 +217,7 @@ def dl_pdf() -> FlaskResponse:
     """
 
     if (pc := get_pc()) is None:
-        return redirect(url_for("progcomp.progcomps"))
+        return redirect(url_for("progcomp.main"))
 
     return send_from_directory(
         os.path.join(os.getcwd(), "problems", pc.name),
@@ -230,7 +233,7 @@ def download(p_name, filename) -> FlaskResponse:
     """
 
     if (pc := get_pc()) is None:
-        return redirect(url_for("progcomp.progcomps"))
+        return redirect(url_for("progcomp.main"))
 
     path = os.path.join(os.getcwd(), "problems", pc.name, p_name, "input")
     if not os.path.exists(os.path.join(path, filename)):
@@ -242,9 +245,8 @@ def download(p_name, filename) -> FlaskResponse:
 def leaderboard_main() -> FlaskResponse:
 
     if (pc := get_pc()) is None:
-        return redirect(url_for("progcomp.progcomps"))
+        return redirect(url_for("progcomp.main"))
 
-    print("SHOW LEADEDBOARD", pc.show_leaderboard)
     if not pc.show_leaderboard:
         return redirect(url_for("progcomp.menu"))
 
@@ -262,7 +264,7 @@ def leaderboard_main() -> FlaskResponse:
 @bp.route("/leaderboard/<string:p_name>/<string:p_set>", methods=["GET"])
 def leaderboard(p_name, p_set) -> FlaskResponse:
     if (pc := get_pc()) is None:
-        return redirect(url_for("progcomp.progcomps"))
+        return redirect(url_for("progcomp.main"))
 
     if (
         not pc.show_leaderboard
