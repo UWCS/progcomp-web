@@ -4,15 +4,15 @@ import sys
 parent = os.path.abspath(".")
 sys.path.insert(1, parent)
 
-from flask_alembic import Alembic
+import flask_migrate
+from flask_migrate import Migrate
 
 from progcomp import app
 from progcomp.database import db
 from progcomp.models import *
 
 with app.app_context():
-    alembic: Alembic = Alembic()
-    alembic.init_app(app)
+    migrate: Migrate = Migrate(app, db, render_as_batch=True)
 
 script_progcomp = os.environ["SCRIPT_PROGCOMP"]
 print("Current editing Progcomp:", script_progcomp)
