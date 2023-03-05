@@ -3,7 +3,7 @@ import os
 
 from flask import Flask
 
-from .database import db
+from .database import db, migrate
 
 logging.basicConfig(
     level=logging.getLevelName("INFO"),
@@ -24,6 +24,7 @@ def create_app() -> Flask:
     )
 
     db.init_app(app)
+    migrate.init_app(app, db)
 
     from . import routes
 
