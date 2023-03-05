@@ -42,7 +42,7 @@ class Submission(Base):
 
     def mark(self) -> None:
         # Relative directories of the locations needed
-        problem_dir = os.path.join("problems", self.problem.name)
+        problem_dir = self.problem.path
         mark_file = os.path.join(problem_dir, "mark.py")
         submission_file = os.path.join(
             self.directory,
