@@ -4,6 +4,7 @@ from collections import Counter, defaultdict
 from datetime import datetime
 from typing import Callable, Optional, Union
 
+import sqlalchemy as sa
 from sqlalchemy import ForeignKey, ForeignKeyConstraint, func
 from sqlalchemy.orm import relationship
 
@@ -20,19 +21,21 @@ from ..database import Base, db
 class Progcomp(Base):
     __tablename__ = "progcomps"
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=True)
-    start_time = db.Column(db.DateTime, default=func.current_timestamp())
-    show_leaderboard = db.Column(
-        db.Boolean, nullable=False, default=False, server_default="f"
+    id = sa.Column(sa.Integer, primary_key=True)
+    name = sa.Column(sa.String)
+    start_time = sa.Column(sa.DateTime, default=func.current_timestamp())
+    show_leaderboard = sa.Column(
+        sa.Boolean, nullable=False, default=False, server_default="f"
     )
-    visibility = db.Column(
-        db.Enum(Visibility),
+    visibility = sa.Column(
+        sa.Enum(Visibility),
         nullable=False,
         default=Visibility.OPEN,
         server_default="OPEN",
     )
-    end_time = db.Column(db.DateTime)
+    end_time = sa.Column(sa.DateTime)
+
+    __table_args__ = (sa.UniqueConstraint("name", name="unq_progcomps_name"),)
 
     teams = relationship(Team, back_populates="progcomp")
     problems = relationship(Problem, back_populates="progcomp", order_by=Problem.name)

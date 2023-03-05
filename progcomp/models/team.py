@@ -1,3 +1,4 @@
+import sqlalchemy as sa
 from sqlalchemy import ForeignKey, ForeignKeyConstraint, desc
 from sqlalchemy.orm import relationship
 
@@ -11,13 +12,13 @@ from ..database import Base, db
 class Team(Base):
     __tablename__ = "teams"
 
-    id = db.Column(db.Integer, primary_key=True)
-    progcomp_id = db.Column(db.Integer, ForeignKey("progcomps.id"))
-    name = db.Column(db.String)
-    password = db.Column(db.String, nullable=False)
-    score = db.Column(db.Integer, default=0)
+    id = sa.Column(sa.Integer, primary_key=True)
+    progcomp_id = sa.Column(sa.Integer, ForeignKey("progcomps.id"))
+    name = sa.Column(sa.String)
+    password = sa.Column(sa.String, nullable=False)
+    score = sa.Column(sa.Integer, default=0)
 
-    db.UniqueConstraint("Team.name", "Team.progcomp_id", name="unq_team_name")
+    __table_args__ = (sa.UniqueConstraint("name", "progcomp_id", name="unq_team_name"),)
 
     submissions = relationship(
         "Submission", back_populates="team", order_by=Submission.timestamp.desc()

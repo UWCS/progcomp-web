@@ -2,7 +2,8 @@ import os
 import typing
 from typing import Optional
 
-from sqlalchemy import ForeignKey, ForeignKeyConstraint, func
+import sqlalchemy as sa
+from sqlalchemy import ForeignKey, ForeignKeyConstraint, UniqueConstraint, func
 from sqlalchemy.orm import relationship
 
 from progcomp.models.utils import Status, Visibility, auto_str
@@ -17,16 +18,18 @@ from ..database import Base, db
 class Problem(Base):
     __tablename__ = "problems"
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    progcomp_id = db.Column(db.Integer, ForeignKey("progcomps.id"))
-    visibility = db.Column(
-        db.Enum(Visibility),
+    id = sa.Column(sa.Integer, primary_key=True)
+    name = sa.Column(sa.String)
+    progcomp_id = sa.Column(sa.Integer, ForeignKey("progcomps.id"))
+    visibility = sa.Column(
+        sa.Enum(Visibility),
         nullable=False,
         default=Visibility.OPEN,
         server_default="OPEN",
     )
-    db.UniqueConstraint("Problem.name", "Problem.progcomp_id", name="unq_problem_name")
+    __table_args__ = (
+        sa.UniqueConstraint("name", "progcomp_id", name="unq_problem_name"),
+    )
 
     tests = relationship("Test", back_populates="problem", order_by="Test.name")
     submissions = relationship("Submission", back_populates="problem")
@@ -76,15 +79,15 @@ class Problem(Base):
 class Test(Base):
     __tablename__ = "tests"
 
-    id = db.Column(db.Integer, primary_key=True)
-    problem_id = db.Column(db.Integer, ForeignKey(Problem.id))
-    name = db.Column(db.String, nullable=False)
-    max_score = db.Column(db.Integer, nullable=True)
+    id = sa.Column(sa.Integer, primary_key=True)
+    problem_id = sa.Column(sa.Integer, ForeignKey(Problem.id))
+    name = sa.Column(sa.String, nullable=False)
+    max_score = sa.Column(sa.Integer, nullable=True)
 
     problem = relationship(Problem, back_populates="tests")
     submissions = relationship("Submission", back_populates="test")
 
-    db.UniqueConstraint("Test.name", "Test.problem_id", "unq_test_name")
+    __table_args__ = (sa.UniqueConstraint("name", "problem_id", name="unq_tests_name"),)
 
     @property
     def ranked_submissions(self) -> list["Submission"]:
