@@ -112,6 +112,7 @@ class Progcomp(Base):
         # Add any new problems, update existing ones
         path = os.path.join(os.getcwd(), "problems", self.name)
         p_names = sorted(os.listdir(path))
+        print(f"\x1b[35m{p_names=}")
         for p_name in p_names:
             if not os.path.isdir(os.path.join(path, p_name)):
                 continue
@@ -122,6 +123,15 @@ class Progcomp(Base):
             prob.update()
         db.session.commit()
         print("Problems", repr(self.problems))
+
+    def refresh_problems(self) -> None:
+        # Remove all problems, then update them again
+        problems = db.session.query(Problem).all()
+        for prob in problems:
+            db.session.delete(prob)
+        db.session.commit()
+        print("Problems", repr(self.problems))
+        self.update_problems()
 
     def make_submission(
         self,

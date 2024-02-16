@@ -48,6 +48,7 @@ class Problem(Base):
         return self.visible == Visibility.OPEN
 
     def update(self) -> None:
+        print(f"\x1b[32mupdate({self})\x1b[0m")
         path = os.path.join(
             os.getcwd(),
             "problems",
@@ -56,26 +57,35 @@ class Problem(Base):
             "input",
         )
         old = set(t.name for t in self.tests)
-        print("path:", os.listdir(path))
-        new = set([x.rstrip(".txt") for x in os.listdir(path) if x.endswith(".txt")])
+
+        def check(x: str) -> Optional[tuple[str, str]]:
+            for ext in ["txt", "in"]:
+                if x.endswith(f".{ext}"):
+                    return x.rstrip(f".{ext}"), ext
+            return None
+
+        new = set(map(check, os.listdir(path)))
+        new = set(s for s in new if s is not None)
 
         print("Old new", old, new)
-        for test_name in old - new:
-            test = self.get_test(test_name)
+        for test_name, test_ext in old - new:
+            print(f"\x1b[32m{test_name}\x1b[0m")
+            test = self.get_test(test_name, test_ext)
             if test:
                 db.session.delete(test)
                 print("Removing Test", test)
-        for test_name in new - old:
-            db.session.add(test := Test(problem_id=self.id, name=test_name))
+        for test_name, test_ext in new - old:
+            db.session.add(test := Test(problem_id=self.id, name=test_name, ext=test_ext))
             print("Adding Test", test)
         db.session.commit()
         db.session.flush()
 
-    def get_test(self, name: str) -> Optional["Test"]:
+    def get_test(self, name: str, ext: str) -> Optional["Test"]:
         return (
             db.session.query(Test)
             .where(Test.problem_id == self.id)
             .where(Test.name == name)
+            .where(Test.ext == ext)
             .first()
         )
 
@@ -88,6 +98,7 @@ class Test(Base):
     problem_id = sa.Column(sa.Integer, ForeignKey(Problem.id))
     name = sa.Column(sa.String, nullable=False)
     max_score = sa.Column(sa.Integer, nullable=True)
+    ext = sa.Column(sa.String, nullable=False)
 
     problem = relationship(Problem, back_populates="tests")
     submissions = relationship("Submission", back_populates="test")
@@ -96,7 +107,7 @@ class Test(Base):
 
     @property
     def input_path(self) -> str:
-        return os.path.join(self.problem.path, "input", self.name + ".txt")
+        return os.path.join(self.problem.path, "input", self.name + "." + self.ext)
 
     @property
     def ranked_submissions(self) -> list["Submission"]:

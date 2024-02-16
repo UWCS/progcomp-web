@@ -8,7 +8,7 @@ elif level == "closed":
 elif level == "hidden":
     level = Visibility.HIDDEN
 else:
-    print("Level must be one of `open`, `closed` or `hidden`.")
+    raise ValueError("Level must be one of `open`, `closed` or `hidden`.")
 
 with app.app_context():
     pc = db.session.query(Progcomp).where(Progcomp.name == script_progcomp()).first()
