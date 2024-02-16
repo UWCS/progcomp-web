@@ -6,4 +6,4 @@ submissions/**
 /progcomp/scripts/custom.py
 
 __pycache__
-/instance
+# /instance
