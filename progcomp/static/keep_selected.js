@@ -10,6 +10,7 @@ const selected = function () {
 
 // Set toggle button on load
 window.addEventListener('load', function () {
+    console.log("yoooo");
     test_select_elem = document.getElementById("test_select");
     selected();
 

@@ -56,7 +56,8 @@ class Problem(Base):
             "input",
         )
         old = set(t.name for t in self.tests)
-        new = set([x[:-4] for x in os.listdir(path)])
+        print("path:", os.listdir(path))
+        new = set([x.rstrip(".txt") for x in os.listdir(path) if x.endswith(".txt")])
 
         print("Old new", old, new)
         for test_name in old - new:

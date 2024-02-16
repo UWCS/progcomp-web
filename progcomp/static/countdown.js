@@ -1,5 +1,16 @@
 // Borrowed from github.com/uwcs/warwickspeedrun
 
+const arraysEqual = function (a, b) {
+  if (a === b) return true;
+  if (a == null || b == null) return false;
+  if (a.length !== b.length) return false;
+
+  for (var i = 0; i < a.length; ++i) {
+    if (Math.abs(a[i] - b[i]) >= 1e-4) return false;
+  }
+  return true;
+}
+
 const formatPlural = function (n, term) {
     if (n == 0) return "";
     if (n == 1) return `${n} ${term}`;
@@ -68,17 +79,19 @@ const countdown = function () {
 
         // Set update time
         if (days > 0) {
-            setIntervals(60, 300, "days");
+            setIntervals(60, 3, "days");
         } else if (days == 0 && hours > 1) {
-            setIntervals(1, 60, "hours");
+            setIntervals(1, 3, "hours");
         } else if (hours <= 1) {
-            setIntervals(1, 15, "mins");
+            setIntervals(1, 3, "mins");
         }
     }
 
 };
 
-const updateTarget = function () {
+var lastAlert;
+
+const updateTarget = function (initAlert = false) {
     fetch("/poll")
         .then((r) => r.json())
         .then((json) => {
@@ -88,10 +101,21 @@ const updateTarget = function () {
                 Cookies.set("end_time", newDate.getTime(), { SameSite: "Strict" });
                 countdown();
             }
+
+            if (initAlert) {
+                lastAlert = json["last_alert"];
+                // if (lastAlert.length > 0) {
+                //     alert("Announcements!");
+                // }
+            } else {
+                if (!arraysEqual(json["last_alert"], lastAlert)) {
+                    location.reload();
+                }
+            }
         });
 }
 
-updateTarget();
+updateTarget(true);
 
 window.addEventListener('load', () => {
     cd = document.getElementById("countdown");

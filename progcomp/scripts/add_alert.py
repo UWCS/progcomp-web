@@ -2,6 +2,10 @@ import __utils
 from __script_setup import *
 
 with app.app_context():
+    if len(sys.argv) == 1:
+        print(f"\x1b[36mUsage: python {sys.argv[0]} <name> <start_time> <end_time> <title> <text>\x1b[0m")
+        exit(0)
+
     start_time = __utils.parse_time(sys.argv[2])
     end_time = __utils.parse_time(sys.argv[3])
     title = sys.argv[4]

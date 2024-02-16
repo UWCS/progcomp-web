@@ -244,6 +244,7 @@ def download(p_name, t_name) -> FlaskResponse:
     fname = test.name + ".txt"
     if not os.path.exists(os.path.join(path, fname)):
         return redirect(url_for("progcomp.submissions"))
+    print(f"\x1b[36mfname: {fname}\x1b[0m")
     return send_from_directory(path, fname, as_attachment=True)
 
 
@@ -303,5 +304,7 @@ def poll() -> FlaskResponse:
     if (pc := get_pc()) is None:
         return jsonify({})
 
-    data = {"end_time": pc.end_time.timestamp() if pc.end_time else 0}
+    data = {}
+    data["end_time"] = pc.end_time.timestamp() if pc.end_time else 0
+    data["last_alert"] = pc.alert_timestamps()
     return jsonify(data)
