@@ -17,8 +17,8 @@ depends_on = None
 
 
 def upgrade():
-    pass
+    op.add_column("tests", sa.Column("ext", sa.String(), nullable=False))
 
 
 def downgrade():
-    pass
+    op.drop_column("tests", "ext")

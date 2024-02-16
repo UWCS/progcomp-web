@@ -37,7 +37,7 @@ class Problem(Base):
 
     @property
     def path(self) -> str:
-        return os.path.join(os.getcwd(), "problems", self.progcomp.name, self.name)
+        return os.path.join(os.getcwd(), "problems", self.progcomp.name, self.name + "." + self.ext)
 
     @property
     def visible(self) -> Visibility:
@@ -56,7 +56,7 @@ class Problem(Base):
             self.name,
             "input",
         )
-        old = set(t.name for t in self.tests)
+        old = set((t.name, t.ext) for t in self.tests)
 
         def check(x: str) -> Optional[tuple[str, str]]:
             for ext in ["txt", "in"]:
@@ -79,6 +79,7 @@ class Problem(Base):
             print("Adding Test", test)
         db.session.commit()
         db.session.flush()
+        print(f"\x1b[36mTests: {self.tests}\x1b[0m")
 
     def get_test(self, name: str, ext: str) -> Optional["Test"]:
         return (

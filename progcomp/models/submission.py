@@ -55,7 +55,7 @@ class Submission(Base):
                 "python",
                 mark_file,
                 problem_dir,
-                self.test.name + ".txt",
+                self.test.name,
                 submission_file,
             ],
             capture_output=True,

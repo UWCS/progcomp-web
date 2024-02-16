@@ -112,7 +112,7 @@ class Progcomp(Base):
         # Add any new problems, update existing ones
         path = os.path.join(os.getcwd(), "problems", self.name)
         p_names = sorted(os.listdir(path))
-        print(f"\x1b[35m{p_names=}")
+        print(f"\x1b[35m{p_names=}\x1b[0m")
         for p_name in p_names:
             if not os.path.isdir(os.path.join(path, p_name)):
                 continue
