@@ -10,7 +10,7 @@ with app.app_context():
         .first()
     )
     print(pr)
-    test = pr.get_test(test)
+    test = pr.get_test(test, "in")
     # print(test.ranked_submissions)
     for sub in test.ranked_submissions:
         logging.info(

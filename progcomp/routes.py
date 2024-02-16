@@ -235,12 +235,12 @@ def download(p_name, t_name) -> FlaskResponse:
         return redirect(url_for("progcomp.menu"))
     if (problem := pc.get_problem(p_name)) is None:
         return redirect(url_for("progcomp.menu"))
-    test_name = t_name.removesuffix(".txt")
-    if (test := problem.get_test(test_name)) is None:
+    test_name = t_name.removesuffix(".in")
+    if (test := problem.get_test(test_name, "in")) is None:
         return redirect(url_for("progcomp.menu"))
 
     path = os.path.join(problem.path, "input")
-    fname = test.name + ".txt"
+    fname = test.name + ".in"
     if not os.path.exists(os.path.join(path, fname)):
         return redirect(url_for("progcomp.submissions"))
     print(f"\x1b[36mfname: {fname}\x1b[0m")

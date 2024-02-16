@@ -81,7 +81,7 @@ class Problem(Base):
         db.session.flush()
         print(f"\x1b[36mTests: {self.tests}\x1b[0m")
 
-    def get_test(self, name: str, ext: str) -> Optional["Test"]:
+    def get_test(self, name: str, ext: str = "in") -> Optional["Test"]:
         return (
             db.session.query(Test)
             .where(Test.problem_id == self.id)

@@ -145,7 +145,7 @@ class Progcomp(Base):
         problem = self.get_problem(p_name)
         if not team or not problem:
             return False
-        if not (test := problem.get_test(test_name)):
+        if not (test := problem.get_test(test_name, "in")):
             return False
         db.session.add(
             sub := Submission(
