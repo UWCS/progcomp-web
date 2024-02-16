@@ -113,12 +113,11 @@ def start() -> FlaskResponse:
     return redirect(url_for("progcomp.submissions"))
 
 
-@bp.route("/logout", methods=["POST"])
+@bp.route("/logout", methods=["GET", "POST"])
 def logout() -> FlaskResponse:
     """
     When someone hits the 'logout' button
     """
-
     # Save their username
     session[USERNAME_SESSION_KEY] = None
     session[PROGCOMP_SESSION_KEY] = None
@@ -308,3 +307,9 @@ def poll() -> FlaskResponse:
     data["end_time"] = pc.end_time.timestamp() if pc.end_time else 0
     data["last_alert"] = pc.alert_timestamps()
     return jsonify(data)
+
+
+@bp.route("/general_advice", methods=["GET"])
+def general_advice() -> FlaskResponse:
+    pc = get_pc()
+    return render_template("general_advice.html", progcomp=pc)
