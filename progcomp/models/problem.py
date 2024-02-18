@@ -37,7 +37,7 @@ class Problem(Base):
 
     @property
     def path(self) -> str:
-        return os.path.join(os.getcwd(), "problems", self.progcomp.name, self.name + "." + self.ext)
+        return os.path.join(os.getcwd(), "problems", self.progcomp.name, self.name)
 
     @property
     def visible(self) -> Visibility:
@@ -124,10 +124,11 @@ class Test(Base):
             if sub.status not in [Status.CORRECT, Status.PARTIAL, Status.SCORED]:
                 continue
             current = team_scores.get(sub.team.name)
+            # We take earliest submission with highest score
             if (
                 not current
                 or (sub.score > current.score)
-                or (sub.score == current.score and sub.timestamp > current.timestamp)
+                or (sub.score == current.score and sub.timestamp < current.timestamp)
             ):
                 team_scores[sub.team.name] = sub
 

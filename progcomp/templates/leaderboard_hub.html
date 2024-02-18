@@ -4,6 +4,7 @@
 
 {% block content %}
 
+
 <div class="row pt-5" id="header">
     <h2><b>Per-Problem Leaderboards</b></h2>
 </div>
@@ -23,6 +24,47 @@
 
 <hr>
 <div class="row justify-content-center">
+	<!-- TODO: Make a plot -->
+	<!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
+	<!-- <svg id="lb-plot" width="600" height="400"></svg> -->
+
+    <div class="col-auto">
+        <div class="row p-2  text-center" id="header">
+            <h2>Live Leaderboard</h2>
+        </div>
+        <table class="table table-hover table-sm">
+            <thead>
+                <tr>
+                    <th scope="col" class="text-center">Position</th>
+                    <th scope="col" class="text-center">Team</th>
+                    <th scope="col" class="text-center">Total</th>
+                    {% for prob in problems %}
+                    <th scope="col" class="text-center">{{ prob.name }}</th>
+                    {% endfor %}
+                    <th scope="col" class="text-center">Submission Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for score in scores %}
+                <tr>
+                    <td class="text-center">{{ loop.index }}</td>
+                    <td class="text-center">{{ score.team.name }}</td>
+                    <th class="text-center">{{ score.total }}</td>
+					{% for prob in problems %}
+                    <td class="text-center">{{ score.per_round[loop.index - 1] }}</td>
+                    {% endfor %}
+                    <td class="text-center">{{ score.time_str }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+	<!-- <script> -->
+	<!-- 	let data = [{time:1,score:10},{time:2,score:20}]; -->
+	<!-- 	updatePlot(data); -->
+	<!-- </script> -->
+
     <!-- <div class="col-auto"> -->
     <!--     <div class="row p-2  text-center" id="header"> -->
     <!--         <h2>End of Progcomp Leaderboard</h2> -->
@@ -286,34 +328,8 @@
     <!--         </tbody> -->
     <!--     </table> -->
     <!-- </div> -->
-    <div class="col-auto">
-        <div class="row p-2  text-center" id="header">
-            <h2>Live Leaderboard</h2>
-        </div>
-        <table class="table table-hover table-sm">
-            <thead>
-                <tr>
-                    <th scope="col" class="text-center">Position</th>
-                    <th scope="col" class="text-center">Team</th>
-                    <th scope="col" class="text-center">Total</th>
-                    {% for prob in problems %}
-                    <th scope="col" class="text-center">{{ prob.name }}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for score in scores %}
-                <tr>
-                    <td class="text-center">{{ loop.index }}</td>
-                    <td class="text-center">{{ score.team.name }}</td>
-                    <th class="text-center">{{ score.total }}</td>
-                        {% for prob in problems %}
-                    <td class="text-center">{{ score.per_round[loop.index-1] }}</td>
-                    {% endfor %}
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
 </div>
+
+
 {% endblock %}
+

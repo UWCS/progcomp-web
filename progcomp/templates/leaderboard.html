@@ -45,7 +45,7 @@
                     {% set sc = submission.score ~ "/" ~ submission.test.max_score %}
                     {% endif %}
                     <th class="text-center">{{ sc }}</td>
-                    <td class="text-center">{{ submission.time_str }}</td>
+					<td class="text-center">{{ submission.time_str }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

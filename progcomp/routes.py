@@ -232,16 +232,20 @@ def download(p_name, t_name) -> FlaskResponse:
     """
 
     if (pc := get_pc()) is None:
+        print("case 1")
         return redirect(url_for("progcomp.menu"))
     if (problem := pc.get_problem(p_name)) is None:
+        print(f"redicting after {p_name}")
         return redirect(url_for("progcomp.menu"))
     test_name = t_name.removesuffix(".in")
     if (test := problem.get_test(test_name, "in")) is None:
+        print("case 3 with", test_name)
         return redirect(url_for("progcomp.menu"))
 
     path = os.path.join(problem.path, "input")
     fname = test.name + ".in"
     if not os.path.exists(os.path.join(path, fname)):
+        print("case 4:", path, fname)
         return redirect(url_for("progcomp.submissions"))
     print(f"\x1b[36mfname: {fname}\x1b[0m")
     return send_from_directory(path, fname, as_attachment=True)
@@ -288,6 +292,7 @@ def leaderboard(p_name, p_set) -> FlaskResponse:
 
     subs = test.ranked_submissions
     username = session.get(USERNAME_SESSION_KEY)
+    print(">>>>>>", subs)
     return render_template(
         "leaderboard.html",
         p_name=p_name,

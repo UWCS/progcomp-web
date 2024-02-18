@@ -165,7 +165,7 @@ class Progcomp(Base):
         total: dict[str, float] = defaultdict(float)
         per_prob = []
 
-        conv: Callable[[Union[int, float]], int] = lambda x: round(x * 100)
+        conv: Callable[[Union[int, float]], int] = lambda x: round(x * 1000) / 10
         for problem in self.visible_problems:
             if problem.name == "0":
                 continue
@@ -173,36 +173,66 @@ class Progcomp(Base):
                 score = self.score_max(problem)
             else:  # Is optimisation
                 score = self.score_optimisation(problem)
+            timestamps = self.timestamps()
             per_prob.append(score)
             for t, s in score.items():
                 total[t] += s
 
         actual: list[OverallScore] = []
         for team in self.teams:
-            sc = OverallScore(
-                team,
-                conv(total[team.name]),
-                [conv(per_prob[i][team.name]) for i in range(len(per_prob))],
-            )
+            # TODO: do this smarter (blacklist)
+            if team.name in ["poggers", "ac"]:
+                sk = -1
+                sc = OverallScore(
+                    team,
+                    sk * len(per_prob),
+                    [sk for _ in per_prob],
+                    datetime.utcfromtimestamp(0)
+                )
+            else:
+                sc = OverallScore(
+                    team,
+                    conv(total[team.name]),
+                    [conv(per_prob[i][team.name]) for i in range(len(per_prob))],
+                    timestamps.get(team.name, datetime.utcfromtimestamp(0))
+                )
             actual.append(sc)
-        actual.sort(key=lambda x: x.total)
-        actual.reverse()
+        # TODO: Fix
+        actual.sort(key=lambda x: (-x.total, x.timestamp))
         return actual
+
+    def timestamps(self) -> dict[str, datetime]:
+        timestamps: dict[str, datetime] = {}
+        for problem in self.problems:
+            for test in problem.tests:
+                for sub in test.ranked_submissions:
+                    if sub.score == 0:
+                        continue
+                    cur_time = timestamps.get(sub.team.name, datetime.utcfromtimestamp(0))
+                    timestamps[sub.team.name] = max(cur_time, sub.timestamp)
+        return timestamps
 
     def score_max(self, problem: Problem) -> dict[str, float]:
         score: dict[str, float] = defaultdict(float)
         print(problem)
         total = len(problem.tests)
         for test in problem.tests:
+            # TODO: do this smarters (test score weights)
+            weight = {
+                ("5", "1"): 0.4,
+                ("5", "2"): 0.4,
+                ("5", "3"): 0.4,
+            }.get((problem.name, test.name.split("_")[0]), 1)
             test_scores = test.ranked_submissions
             print(
-                "\tTest Score", test.name, [(t.team.name, t.score) for t in test_scores]
+                "\tTest Score", weight, test.name, [(t.team.name, t.score) for t in test_scores]
             )
             for sub in test_scores:
+                print(f"\x1b[35mtest: {test} | sub: {sub}\x1b[0m")
                 if sub.status == Status.CORRECT:
-                    score[sub.team.name] += 1.25 / total
+                    score[sub.team.name] += weight * 1.25 / total
                 if sub.status == Status.PARTIAL:
-                    score[sub.team.name] += float(sub.score) / test.max_score / total
+                    score[sub.team.name] += weight * float(sub.score) / test.max_score / total
         print("Score", problem.name, score)
         return score
 
@@ -223,7 +253,12 @@ class Progcomp(Base):
 
 @auto_str
 class OverallScore:
-    def __init__(self, team, total, per_round) -> None:
+    def __init__(self, team, total, per_round, timestamp) -> None:
         self.team = team
         self.total = total
         self.per_round = per_round
+        self.timestamp = timestamp
+
+    @property
+    def time_str(self) -> str:
+        return self.timestamp.strftime("%c")
