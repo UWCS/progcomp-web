@@ -84,16 +84,20 @@ def start() -> FlaskResponse:
     """
     # Check username and password are in a valid format
     username = request.form.get("username")
+    print(username)
     if username is None or not verify_input(username, 100):
         return redirect(url_for("progcomp.menu"))
 
     password = request.form.get("password")
+    print(password)
     if password is None or not verify_input(password, 30):
         return redirect(url_for("progcomp.menu"))
 
     pc_name = request.form.get("progcomp")
+    print(pc_name)
     if pc_name is None or not verify_input(pc_name, 50):
         return redirect(url_for("progcomp.menu"))
+    
     pc = db.session.query(Progcomp).where(Progcomp.name == pc_name).first()
     if pc is None or not pc.visible:
         return redirect(url_for("progcomp.menu"))
