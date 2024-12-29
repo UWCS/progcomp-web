@@ -16,7 +16,7 @@
 <div class="d-flex flex-wrap gap-2">
     {% for test in problem.tests %}
     <a class="flex-grow-1 btn btn-primary" style="min-width: max-content;"
-        href="{{ url_for('progcomp.download', p_name=problem.name, t_name=test.name+'.in') }}">
+        href="{{ url_for('progcomp.download', p_name=problem.name, t_name=test.name+'.'+test.ext) }}">
         <i class="bi-download me-1"></i>&nbsp;{{ test.name }}</a>
     {% endfor %}
 </div>
@@ -34,7 +34,7 @@
         <div class="flex-grow-1">
             <select class="form-select" id="test_select" name="test_select">
                 {% for test in problem.tests %}
-                <option value="{{ test.name }}">{{ test.name}}</option>
+                <option value="{{ test.name+'.'+test.ext }}">{{ test.name }}</option>
                 {% endfor %}
             </select>
         </div>

@@ -171,11 +171,9 @@ def problem(p_name) -> FlaskResponse:
         return render_template(
             "problem.html", username=username, problem=problem, progcomp=pc
         )
-    else:  # POST
+    else:  # POST (Submission Handling)
         if not problem.open:
             return redirect(request.url)
-        # TODO: Multiple files (script + output data at the same time)
-        # check if the post request has the file part
 
         if "output" not in request.files or "script" not in request.files:
             return redirect(request.url)
@@ -194,12 +192,16 @@ def problem(p_name) -> FlaskResponse:
         if not test:
             return redirect(request.url)
 
+        match = re.search(r"^(.*)\.(.*)$", test)
+        test_name = match.group(1)
+        test_ext = match.group(2)
+
         time = datetime.now()
         time_str = time.strftime("%Y-%m-%d_%H-%M-%S")
 
         # need to folder w/ timestamp on path
         path = os.path.join(
-            os.getcwd(), "submissions", pc.name, username, p_name, test, time_str
+            os.getcwd(), "submissions", pc.name, username, p_name, test_name, time_str
         )
 
         os.makedirs(path, exist_ok=True)
@@ -208,7 +210,7 @@ def problem(p_name) -> FlaskResponse:
         output.save(os.path.join(path, "output.txt"))
         script.save(os.path.join(path, script_name))
 
-        pc.make_submission(path, username, p_name, test, timestamp=time)
+        pc.make_submission(path, username, p_name, test_name, test_ext, timestamp=time)
 
         return redirect(url_for("progcomp.submissions"))
 
@@ -236,20 +238,24 @@ def download(p_name, t_name) -> FlaskResponse:
     """
 
     if (pc := get_pc()) is None:
-        print("case 1")
+        print("case 1 (No ProgComp)")
         return redirect(url_for("progcomp.menu"))
     if (problem := pc.get_problem(p_name)) is None:
         print(f"redicting after {p_name}")
         return redirect(url_for("progcomp.menu"))
-    test_name = t_name.removesuffix(".in")
-    if (test := problem.get_test(test_name, "in")) is None:
-        print("case 3 with", test_name)
+    
+    match = re.search(r"^(.*)\.(.*)$", t_name)
+    test_name = match.group(1)
+    ext = match.group(2)
+    
+    if (test := problem.get_test(test_name, ext)) is None:
+        print("case 3 (Test no registered) with", test_name)
         return redirect(url_for("progcomp.menu"))
 
     path = os.path.join(problem.path, "input")
-    fname = test.name + ".in"
+    fname = f"{test.name}.{test.ext}"
     if not os.path.exists(os.path.join(path, fname)):
-        print("case 4:", path, fname)
+        print("case 4 (Test not found):", path, fname)
         return redirect(url_for("progcomp.submissions"))
     print(f"\x1b[36mfname: {fname}\x1b[0m")
     return send_from_directory(path, fname, as_attachment=True)

@@ -120,6 +120,7 @@ class Progcomp(Base):
             if not prob:
                 prob = Problem(name=p_name, progcomp=self, visibility=Visibility.HIDDEN)
                 db.session.add(prob)
+                db.session.commit()
             prob.update()
         db.session.commit()
         print("Problems", repr(self.problems))
@@ -139,13 +140,14 @@ class Progcomp(Base):
         team_name: str,
         p_name: str,
         test_name: str,
+        test_ext: str,
         timestamp: datetime,
     ) -> bool:
         team = self.get_team(team_name)
         problem = self.get_problem(p_name)
         if not team or not problem:
             return False
-        if not (test := problem.get_test(test_name, "in")):
+        if not (test := problem.get_test(test_name, test_ext)):
             return False
         db.session.add(
             sub := Submission(
@@ -214,7 +216,6 @@ class Progcomp(Base):
 
     def score_max(self, problem: Problem) -> dict[str, float]:
         score: dict[str, float] = defaultdict(float)
-        print(problem)
         total = len(problem.tests)
         for test in problem.tests:
             # TODO: do this smarters (test score weights)
