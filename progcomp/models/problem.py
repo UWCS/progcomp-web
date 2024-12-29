@@ -1,4 +1,5 @@
 import os
+import json
 import typing
 from typing import Optional
 
@@ -56,6 +57,22 @@ class Problem(Base):
             self.name,
             "input",
         )
+
+        # Check for Config
+        config_path = os.path.join(
+            os.getcwd(),
+            "problems",
+            self.progcomp.name,
+            self.name,
+            "config.json",
+        )
+
+        config = None
+        if (os.path.isfile(config_path)):
+            with open(config_path) as f:
+                config = json.load(f)
+        
+
         old = set((t.name, t.ext) for t in self.tests)
 
         def check(x: str) -> Optional[tuple[str, str]]:
@@ -75,7 +92,10 @@ class Problem(Base):
                 db.session.delete(test)
                 print("Removing Test", test)
         for test_name, test_ext in new - old:
-            db.session.add(test := Test(problem_id=self.id, name=test_name, ext=test_ext))
+            if config:
+                test_max = config[test_name]["max"]
+                test_weight = config[test_name]["weight"]
+            db.session.add(test := Test(problem_id=self.id, name=test_name, ext=test_ext, max=test_max, weight=test_weight))
             print("Adding Test", test)
         db.session.commit()
         db.session.flush()
