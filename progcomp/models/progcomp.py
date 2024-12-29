@@ -182,8 +182,7 @@ class Progcomp(Base):
 
         actual: list[OverallScore] = []
         for team in self.teams:
-            # TODO: do this smarter (blacklist)
-            if team.name in ["poggers", "ac"]:
+            if (config := utils.global_config() ) and ("blacklist" in config) and team.name in config["blacklist"]:
                 sk = -1
                 sc = OverallScore(
                     team,
@@ -199,6 +198,7 @@ class Progcomp(Base):
                     timestamps.get(team.name, datetime.utcfromtimestamp(0))
                 )
             actual.append(sc)
+        
         # TODO: Fix
         actual.sort(key=lambda x: (-x.total, x.timestamp))
         return actual
@@ -218,12 +218,8 @@ class Progcomp(Base):
         score: dict[str, float] = defaultdict(float)
         total = len(problem.tests)
         for test in problem.tests:
-            # TODO: do this smarters (test score weights)
-            weight = {
-                ("5", "1"): 0.4,
-                ("5", "2"): 0.4,
-                ("5", "3"): 0.4,
-            }.get((problem.name, test.name.split("_")[0]), 1)
+            weight = test.weight if test.weight else 1
+
             test_scores = test.ranked_submissions
             print(
                 "\tTest Score", weight, test.name, [(t.team.name, t.score) for t in test_scores]

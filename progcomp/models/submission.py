@@ -49,13 +49,15 @@ class Submission(Base):
             "output.txt",
         )
 
+
+
         # Needs to be in a subprocess so we can add and remove on the fly
         ps = subprocess.run(
             [
                 "python",
                 mark_file,
                 problem_dir,
-                self.test.name + '.' + self.test.ext,
+                self.test.name,
                 submission_file,
             ],
             capture_output=True,
@@ -68,19 +70,21 @@ class Submission(Base):
 
         nums = [int(n) for n in line.split()]
 
-        if len(nums) == 2:
-            self.score, max_score = nums
-            if self.test.max_score is None:
-                self.test.max_score = max_score
-            if self.score == 0:
+        if len(nums) > 0:
+            self.score = nums[0]
+
+            # Optimisation Problems
+            if not self.test.max_score:
+                self.status = Status.SCORED
+
+            # Max-Score Problems
+            elif self.score == 0:
                 self.status = Status.WRONG
             elif self.score == self.test.max_score:
                 self.status = Status.CORRECT
             else:
                 self.status = Status.PARTIAL
-        elif len(nums) == 1:
-            (self.score,) = nums
-            self.status = Status.SCORED
+
         else:
             self.status = Status.INVALID
 

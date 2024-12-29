@@ -58,21 +58,7 @@ class Problem(Base):
             "input",
         )
 
-        # Check for Config
-        config_path = os.path.join(
-            os.getcwd(),
-            "problems",
-            self.progcomp.name,
-            self.name,
-            "config.json",
-        )
-
-        config = None
-        if (os.path.isfile(config_path)):
-            with open(config_path) as f:
-                config = json.load(f)
-        
-
+      
         old = set((t.name, t.ext) for t in self.tests)
 
         def check(x: str) -> Optional[tuple[str, str]]:
@@ -92,11 +78,31 @@ class Problem(Base):
                 db.session.delete(test)
                 print("Removing Test", test)
         for test_name, test_ext in new - old:
-            if config:
+            db.session.add(test := Test(problem_id=self.id, name=test_name, ext=test_ext))
+            print("Adding Test", test)
+
+        db.session.commit()
+        
+        # Check for Config
+        config_path = os.path.join(
+            os.getcwd(),
+            "problems",
+            self.progcomp.name,
+            self.name,
+            "config.json",
+        )
+
+        if (os.path.isfile(config_path)):
+            with open(config_path) as f:
+                config = json.load(f)
+
+            # Ensure Config is up to date
+            for test_name, test_ext in new:
                 test_max = config[test_name]["max"]
                 test_weight = config[test_name]["weight"]
-            db.session.add(test := Test(problem_id=self.id, name=test_name, ext=test_ext, max=test_max, weight=test_weight))
-            print("Adding Test", test)
+                (test := self.get_test(test_name, test_ext)).max_score = test_max
+                test.weight = test_weight
+
         db.session.commit()
         db.session.flush()
         print(f"\x1b[36mTests: {self.tests}\x1b[0m")
@@ -118,8 +124,9 @@ class Test(Base):
     id = sa.Column(sa.Integer, primary_key=True)
     problem_id = sa.Column(sa.Integer, ForeignKey(Problem.id))
     name = sa.Column(sa.String, nullable=False)
-    max_score = sa.Column(sa.Integer, nullable=True)
     ext = sa.Column(sa.String, nullable=False)
+    max_score = sa.Column(sa.Integer, nullable=True)
+    weight = sa.Column(sa.Float, nullable=True)
 
     problem = relationship(Problem, back_populates="tests")
     submissions = relationship("Submission", back_populates="test")
