@@ -4,13 +4,24 @@
 
 {% block head %}
 <script src="{{ url_for('static', filename='keep_selected.js') }}"></script>
+<style>
+    #prob_desc code {
+        color: palevioletred;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 
-<div class="row pt-5" id="header">
+<div class="row pt-5 mb-4" id="header">
     <h3>Problem <b>{{ problem.name }}</b></span></h3>
 </div>
+
+{% if problem_description %}
+    <div class="card p-4 mb-4" id="prob_desc">
+        {{ problem_description | safe }}
+    </div>
+{% endif %}
 
 <h4>Download Input Test Data</h4><br>
 <div class="d-flex flex-wrap gap-2">

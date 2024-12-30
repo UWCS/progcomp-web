@@ -19,6 +19,8 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.wrappers.response import Response
 
+import markdown
+
 FlaskResponse = Union[Response, str]
 
 from .database import db
@@ -169,9 +171,31 @@ def problem(p_name) -> FlaskResponse:
         return redirect(url_for("progcomp.submissions"))
 
     if request.method == "GET":
-        return render_template(
-            "problem.html", username=username, problem=problem, progcomp=pc
+        
+        content_path = os.path.join(
+            os.getcwd(),
+            "problems",
+            problem.progcomp.name,
+            problem.name,
+            problem.name + ".md"
         )
+
+        print(content_path)
+
+        content = None
+        if os.path.isfile(content_path):
+            with open(content_path) as f:
+                content = markdown.markdown(
+                    f.read(), 
+                    extensions=['nl2br', 'fenced_code']
+                )
+        
+        print(content)
+
+        return render_template(
+            "problem.html", username=username, problem=problem, progcomp=pc, problem_description=content
+        )
+    
     else:  # POST (Submission Handling)
         if not problem.open:
             return redirect(request.url)
