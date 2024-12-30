@@ -20,6 +20,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.wrappers.response import Response
 
 import markdown
+from uuid import uuid4 as uuid
+
+
+from progcomp.models.utils import global_config
 
 FlaskResponse = Union[Response, str]
 
@@ -367,6 +371,25 @@ def general_advice() -> FlaskResponse:
 
 
 # ADMIN
-@bp.route("/admin")
+
+# These aren't meant to persist, so keeping them in memory will do
+admin_sessions = {}
+
+@bp.route("/admin", methods=["GET", "POST"])
 def admin() -> FlaskResponse:
+    if request.method == "GET":
+        session_id = session.get("admin_session")
+        if (record := admin_sessions.get(session_id)) and record[0] == request.remote_addr and record[1] == request.remote_user:
+            return render_template("admin.html", authenticated=True)
+
+    else:
+        key_in = request.form.get("key")
+        key_actual = global_config()["admin_key"]
+
+        if check_password_hash(key_actual, key_in):
+            new_id = uuid()
+            admin_sessions[new_id] = (request.remote_addr, request.remote_user, datetime.now())
+            session["admin_session"] = new_id
+            return render_template("admin.html", authenticated=True)
+
     return render_template("admin.html", authenticated=False)

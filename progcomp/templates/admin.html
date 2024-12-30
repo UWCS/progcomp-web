@@ -59,7 +59,7 @@
                 
                 <div class="form-group my-3">
                     <label for="key">Admin Passkey</label>
-                    <input type="password" class="form-control" id="password" name="password"
+                    <input type="password" class="form-control" id="password" name="key"
                         placeholder="Enter Secret Key">
                     <small id="username-help" class="form-text text-muted">Can be found on VaultWarden.</small>
                 </div>
@@ -69,6 +69,10 @@
             </form>
         </div>
         
+        {% else %}
+
+        Authenticated
+
         {% endif %}
 
     </article>

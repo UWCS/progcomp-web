@@ -9,3 +9,4 @@ __pycache__
 # /instance
 TODO.md
 config.json
+secret.*
