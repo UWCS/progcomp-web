@@ -7,3 +7,5 @@ submissions/**
 /.venv
 __pycache__
 # /instance
+TODO.md
+secret.conf

@@ -16,6 +16,7 @@ from flask import (
     url_for,
 )
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.wrappers.response import Response
 
 FlaskResponse = Union[Response, str]
@@ -105,10 +106,10 @@ def start() -> FlaskResponse:
     # Check password against potentially existing team
     team = pc.get_team(username)
     if team:
-        if team.password != password:
+        if not check_password_hash(team.password, password):
             return redirect(url_for("progcomp.menu"))
     else:
-        pc.add_team(username, password)
+        pc.add_team(username, generate_password_hash(password))
 
     # Save their username
     session[USERNAME_SESSION_KEY] = username
