@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>ADMIN - UWCS Challenge</title>
+  
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+    crossorigin="anonymous"></script>
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+
+  <!-- Cookies -->
+  <script src=" https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js "></script>
+  
+  <!-- Local Assets -->
+  <link rel="shortcut icon" href="{{ url_for('static', filename='challenge_icon.svg') }}" type="image/x-icon">
+  <script src="{{ url_for('static', filename='countdown.js') }}"></script>
+  <script src="{{ url_for('static', filename='darkmode.js') }}"></script>
+
+</head>
+
+<body>
+  <div class="container min-vh-100 d-flex flex-column align-items-center">
+    <nav class="w-100 navbar navbar-expand-lg rounded-bottom bg-primary-subtle" style="min-width: fit-content">
+      <div class="container-fluid align-items-center">
+        <a class="navbar-brand" href="/">
+          {% include "chall_logo.html" %}
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor03"
+          aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarColor03">
+          <ul class="navbar-nav d-flex w-100">
+            <div class="vr ms-md-auto d-none d-lg-block "></div>
+            <li class="nav-item ms-lg-2">
+              <a id="dark-mode" class="nav-link ml-1" href="#">
+                <i class="bi-moon-fill" id="dark-mode-icon"></i>
+                <span class="d-lg-none ms-2 ms-lg-0">Toggle Dark Mode</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <article id="content" class="w-100">
+        
+        {% if not authenticated %}
+
+        <div class="d-flex flex-column align-items-center gap-3 my-5">
+            <img class="mw-100 p-2" style="width: 500px" src="static/challenge_logo.svg" alt="Logo"></img>
+            <h1>Admin Panel</h1>
+            <form class="mw-100" style="width: 300px" action="{{ url_for('progcomp.admin') }}" method="POST">
+                
+                <div class="form-group my-3">
+                    <label for="key">Admin Passkey</label>
+                    <input type="password" class="form-control" id="password" name="password"
+                        placeholder="Enter Secret Key">
+                    <small id="username-help" class="form-text text-muted">Can be found on VaultWarden.</small>
+                </div>
+                <div class="form-group text-center my-3">
+                    <button type="submit" class="btn btn-success btn-lg">Enter</button>
+                </div>
+            </form>
+        </div>
+        
+        {% endif %}
+
+    </article>
+
+    <footer class="w-100 mt-auto d-flex flex-wrap justify-content-between gap-2 py-3 mt-4 border-top">
+      <div class="flex-grow-1 flex-md-grow-0 mb-0 text-muted">
+        {% if progcomp %}
+        {% set visibility = progcomp.visible|string() %}
+        {% if visibility == "Open" %}
+        {% set row_color = 'text-bg-success' %}
+        {% elif visibility == "Closed" %}
+        {% set row_color = 'text-bg-danger' %}
+        {% else %}
+        {% set row_color = "text-bg-warning" %}
+        {% endif %}
+        {{ progcomp.name }}
+        <small class="badge {{ row_color }}" style="height: fit-content">{{ progcomp.visible }}</small> |
+        {% if username %}
+        Team: {{ username }} |
+        {% endif %}
+        <span id="countdown">Countdown soonTM</span>
+        {% endif %}
+      </div>
+      <div class="d-md-none" style="flex-basis: 100%; height: 0"></div>
+      <a class="d-flex text-decoration-none" href="https://uwcs.co.uk">
+        {% include "uwcs_logo.html" %}
+      </a>
+
+      <ul class="nav justify-content-end list-unstyled d-flex">
+        <li class="ms-3">
+          <a class="text-muted" href="https://github.com/UWCS/progcomp-web"><i class="bi-github"
+              aria-hidden="true"></i></a>
+        </li>
+        <li class="ms-3">
+          <a class="text-muted" href="https://discord.uwcs.co.uk"><i class="bi-discord" aria-hidden="true"></i></a>
+        </li>
+        <li class="ms-3">
+          <a class="text-muted" href="https://uwcs.co.uk"><i class="bi-globe" aria-hidden="true"></i></a>
+        </li>
+      </ul>
+    </footer>
+  </div>
+</body>
+
+</html>

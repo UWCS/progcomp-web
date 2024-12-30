@@ -180,17 +180,13 @@ def problem(p_name) -> FlaskResponse:
             problem.name + ".md"
         )
 
-        print(content_path)
-
         content = None
         if os.path.isfile(content_path):
             with open(content_path) as f:
                 content = markdown.markdown(
                     f.read(), 
-                    extensions=['nl2br', 'fenced_code']
+                    extensions=['nl2br', 'fenced_code', 'tables']
                 )
-        
-        print(content)
 
         return render_template(
             "problem.html", username=username, problem=problem, progcomp=pc, problem_description=content
@@ -239,21 +235,36 @@ def problem(p_name) -> FlaskResponse:
 
         return redirect(url_for("progcomp.submissions"))
 
+@bp.route("/problems/asset/<string:prob>/<string:file>", methods=["GET"])
+def asset(prob : str, file : str):
+    prob = secure_filename(prob)
+    file = secure_filename(file)
 
-@bp.route("/download/pdf", methods=["GET"])
-def dl_pdf() -> FlaskResponse:
-    """
-    Download the main pdf
-    """
-
-    if (pc := get_pc()) is None:
-        return redirect(url_for("progcomp.menu"))
-
-    return send_from_directory(
-        os.path.join(os.getcwd(), "problems", pc.name),
-        "problems.pdf",
-        as_attachment=True,
+    path = os.path.join(
+        os.getcwd(),
+        "problems",
+        get_pc().name,
+        prob,
+        "assets"
     )
+
+    return send_from_directory(directory=path, path=file)
+    
+
+# @bp.route("/download/pdf", methods=["GET"])
+# def dl_pdf() -> FlaskResponse:
+#     """
+#     Download the main pdf
+#     """
+
+#     if (pc := get_pc()) is None:
+#         return redirect(url_for("progcomp.menu"))
+
+#     return send_from_directory(
+#         os.path.join(os.getcwd(), "problems", pc.name),
+#         "problems.pdf",
+#         as_attachment=True,
+#     )
 
 
 @bp.route("/download/<string:p_name>/<string:t_name>", methods=["GET"])
@@ -265,8 +276,8 @@ def download(p_name, t_name) -> FlaskResponse:
     if (pc := get_pc()) is None:
         print("case 1 (No ProgComp)")
         return redirect(url_for("progcomp.menu"))
-    if (problem := pc.get_problem(p_name)) is None:
-        print(f"redicting after {p_name}")
+    if (problem := pc.get_problem(p_name)) is None or not problem.visible:
+        print(f"redirecting after {p_name}")
         return redirect(url_for("progcomp.menu"))
     
     match = re.search(r"^(.*)\.(.*)$", t_name)
@@ -353,3 +364,9 @@ def poll() -> FlaskResponse:
 def general_advice() -> FlaskResponse:
     pc = get_pc()
     return render_template("general_advice.html", progcomp=pc)
+
+
+# ADMIN
+@bp.route("/admin")
+def admin() -> FlaskResponse:
+    return render_template("admin.html", authenticated=False)

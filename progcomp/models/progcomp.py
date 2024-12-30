@@ -168,6 +168,8 @@ class Progcomp(Base):
         per_prob = []
 
         conv: Callable[[Union[int, float]], int] = lambda x: round(x * 1000) / 10
+        
+        timestamps = self.timestamps()
         for problem in self.visible_problems:
             if problem.name == "0":
                 continue
@@ -188,14 +190,14 @@ class Progcomp(Base):
                     team,
                     sk * len(per_prob),
                     [sk for _ in per_prob],
-                    datetime.utcfromtimestamp(0)
+                    datetime.fromtimestamp(0)
                 )
             else:
                 sc = OverallScore(
                     team,
                     conv(total[team.name]),
                     [conv(per_prob[i][team.name]) for i in range(len(per_prob))],
-                    timestamps.get(team.name, datetime.utcfromtimestamp(0))
+                    timestamps.get(team.name, datetime.fromtimestamp(0))
                 )
             actual.append(sc)
         
@@ -204,13 +206,16 @@ class Progcomp(Base):
         return actual
 
     def timestamps(self) -> dict[str, datetime]:
+        """
+        Returns a dictionary, which maps team names to their most recent submission to any test.
+        """
         timestamps: dict[str, datetime] = {}
         for problem in self.problems:
             for test in problem.tests:
                 for sub in test.ranked_submissions:
                     if sub.score == 0:
                         continue
-                    cur_time = timestamps.get(sub.team.name, datetime.utcfromtimestamp(0))
+                    cur_time = timestamps.get(sub.team.name, datetime.fromtimestamp(0))
                     timestamps[sub.team.name] = max(cur_time, sub.timestamp)
         return timestamps
 
@@ -227,7 +232,7 @@ class Progcomp(Base):
             for sub in test_scores:
                 print(f"\x1b[35mtest: {test} | sub: {sub}\x1b[0m")
                 if sub.status == Status.CORRECT:
-                    score[sub.team.name] += weight * 1.25 / total
+                    score[sub.team.name] += weight * 1.25 / total # TODO: HUHHH?????
                 if sub.status == Status.PARTIAL:
                     score[sub.team.name] += weight * float(sub.score) / test.max_score / total
         print("Score", problem.name, score)

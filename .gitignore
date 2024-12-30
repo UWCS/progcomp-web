@@ -8,4 +8,4 @@ submissions/**
 __pycache__
 # /instance
 TODO.md
-secret.conf
+config.json
