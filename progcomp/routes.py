@@ -289,7 +289,7 @@ def download(p_name, t_name) -> FlaskResponse:
     test_name = match.group(1)
     ext = match.group(2)
     
-    if (test := problem.get_test(test_name, ext)) is None:
+    if (test := problem.get_test(test_name)) is None:
         print("case 3 (Test no registered) with", test_name)
         return redirect(url_for("progcomp.menu"))
 
@@ -419,29 +419,36 @@ def admin_update() -> FlaskResponse:
     print("~" * 100)
     print(body)
 
-    if body["level"] == "pc":
+    vis_map = {
+        "Open": Visibility.OPEN, 
+        "Closed": Visibility.CLOSED, 
+        "Hidden": Visibility.HIDDEN
+    }
 
-        pc = None
-        if body["operation"] != "create":
-                pc = db.session.query(Progcomp).where(Progcomp.name == body["name"]).first()
+
+    pc = None if body["operation"] == "create" else db.session.query(Progcomp).where(Progcomp.name == body["name"]).first()
+        
+    match body["operation"]:
+        case "create":
+            db.session.add(pc := Progcomp(name=body["name"], visibility=Visibility.HIDDEN))
+        case "delete": db.session.delete(pc)
+        case "update": pc.update_problems()
+        case "reload": pc.refresh_problems()
+        case "configure":
+            pc.start_time = datetime.strptime(body["config"]["start-time"], "%Y-%m-%dT%H:%M")
+            pc.end_time = datetime.strptime(body["config"]["end-time"], "%Y-%m-%dT%H:%M")
+            pc.show_leaderboard = body["config"]["show_leaderboard"]
+            pc.visibility = vis_map[body["config"]["visibility"]]
             
-        match body["operation"]:
-            case "create":
-                db.session.add(pc := Progcomp(name=body["name"], visibility=Visibility.HIDDEN))
-            case "delete": db.session.delete(pc)
-            case "update": pc.update_problems()
-            case "reload": pc.refresh_problems()
-            case "configure":
-                pc.start_time = datetime.strptime(body["config"]["start-time"], "%Y-%m-%dT%H:%M")
-                pc.end_time = datetime.strptime(body["config"]["end-time"], "%Y-%m-%dT%H:%M")
-                pc.show_leaderboard = body["config"]["show_leaderboard"]
-                pc.visibility = {
-                    "Open": Visibility.OPEN, 
-                    "Closed": Visibility.CLOSED, 
-                    "Hidden": Visibility.HIDDEN
-                }[body["config"]["visibility"]]
+            if (problem_config := body["config"]["problem_changes"].get(pc.name)):
+                for problem, visibility in problem_config.items():
+                    pc.get_problem(problem, Visibility.HIDDEN).visibility = vis_map[visibility]
+            
+            if (blacklist_config := body["config"]["blacklist_changes"].get(pc.name)):
+                for team, status in blacklist_config.items():
+                    pc.get_team(team).blacklist = status
 
-        print(f"NEW/UPDATED PROGCOMP: {pc}")
+    print(f"NEW/UPDATED PROGCOMP: {pc}")
 
     print("~" * 100)
     

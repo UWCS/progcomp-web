@@ -117,6 +117,16 @@ class Progcomp(Base):
             .all()
         )
         return [p for p in problems]
+    
+    @property
+    def all_teams(self) -> list[Team]:
+        teams = (
+            db.session.query(Team)
+            .where(Team.progcomp == self)
+            .order_by(Team.name)
+            .all()
+        )
+        return [t for t in teams]
 
     def update_problems(self) -> None:
         # Add any new problems, update existing ones
@@ -157,7 +167,7 @@ class Progcomp(Base):
         problem = self.get_problem(p_name)
         if not team or not problem:
             return False
-        if not (test := problem.get_test(test_name, test_ext)):
+        if not (test := problem.get_test(test_name)):
             return False
         db.session.add(
             sub := Submission(

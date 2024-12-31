@@ -82,7 +82,7 @@ class Problem(Base):
         print("Old new", old, new)
         for test_name, test_ext in old - new:
             print(f"\x1b[32m{test_name}\x1b[0m")
-            test = self.get_test(test_name, test_ext)
+            test = self.get_test(test_name)
             if test:
                 db.session.delete(test)
                 print("Removing Test", test)
@@ -109,19 +109,18 @@ class Problem(Base):
             for test_name, test_ext in new:
                 test_max = config[test_name]["max"]
                 test_weight = config[test_name]["weight"]
-                (test := self.get_test(test_name, test_ext)).max_score = test_max
+                (test := self.get_test(test_name)).max_score = test_max
                 test.weight = test_weight
 
         db.session.commit()
         db.session.flush()
         print(f"\x1b[36mTests: {self.tests}\x1b[0m")
 
-    def get_test(self, name: str, ext: str = "in") -> Optional["Test"]:
+    def get_test(self, name: str) -> Optional["Test"]:
         return (
             db.session.query(Test)
             .where(Test.problem_id == self.id)
             .where(Test.name == name)
-            .where(Test.ext == ext)
             .first()
         )
 

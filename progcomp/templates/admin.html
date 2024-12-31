@@ -147,18 +147,15 @@
                 <i class="bi bi-arrow-clockwise"></i>
                 Update Problems
               </button>
-              <button class="col-3 btn btn-secondary" onclick="ReloadPC( '{{ progcomp.name }}' )" data-bs-toggle="modal"
-                data-bs-target="#pcDeleteModal">
+              <button class="col-3 btn btn-secondary" onclick="ReloadPC( '{{ progcomp.name }}' )">
                 <i class="bi bi-file-arrow-down-fill"></i>
                 Reload Problems
               </button>
-              <button class="col-3 btn btn-success" onclick="ApplyPCSettings('{{ progcomp.name }}')"
-                data-bs-toggle="modal" data-bs-target="#pcDeleteModal">
+              <button class="col-3 btn btn-success" onclick="ApplyPCSettings('{{ progcomp.name }}')">
                 <i class="bi bi-floppy"></i>
                 Save Changes
               </button>
-              <button class="col-3 btn btn-warning" onclick="ConfirmDelete( '{{ progcomp.name }}' )"
-                data-bs-toggle="modal" data-bs-target="#pcDeleteModal">
+              <button class="col-3 btn btn-warning" onclick="ConfirmDelete( '{{ progcomp.name }}' )" data-bs-toggle="modal" data-bs-target="#pcDeleteModal">
                 <i class="bi bi-trash3"></i>
                 Delete
               </button>
@@ -193,40 +190,93 @@
                   <script>
                     window.addEventListener("load", () => {
                       document.getElementById("{{ progcomp.name }}-leaderboard-toggle").checked = "{{ progcomp.show_leaderboard }}" == "True"
-                      console.log("{{ progcomp.show_leaderboard }}")
                     })
                   </script>
                 </div>
               </span>
             </div>
 
+            <hr/>
             <h2>Problems</h2>
-            <ul class="list-group list-group-flush">
+            <div id="{{progcomp.name}}-problems card">
               {% for problem in progcomp.all_problems %}
-              <li class="list-group-item">
-                <div class="container-fluid">
-                  <div class="row align-items-center">
-                    <div class="col-8">Problem {{problem.name}}</div>
-                    <div class="col-4">
-                      <div class="input-group">
-                        <span class="input-group-text" id="visibility-label">Visibility</span>
-                        <button id="{{ progcomp.name }}-visibility" class="btn btn-outline-secondary dropdown-toggle"
-                          type="button" data-bs-toggle="dropdown" aria-expanded="false">{{ problem.visibility }}</button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                          <li><a class="dropdown-item" onclick="SetProblemVisibilityField('{{ progcomp.name }}', '{{ problem.name }}', 'Open')">Open</a></li>
-                          <li><a class="dropdown-item" onclick="SetProblemVisibilityField('{{ progcomp.name }}', '{{ problem.name }}', 'Closed')">Closed</a></li>
-                          <li><a class="dropdown-item" onclick="SetProblemVisibilityField('{{ progcomp.name }}', '{{ problem.name }}', 'Hidden')">Hidden</a></li>
-                        </ul>
-                      </div>
-                    </div>
+              <div class="card mb-3">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                  <h5 class="card-title mb-0">Problem {{ problem.name }}</h5>
+                  <div class="input-group" style="width: auto;">
+                    <span class="input-group-text" id="visibility-label">Visibility</span>
+                    <button id="{{progcomp.name}}-{{problem.name}}-visibility" class="btn btn-outline-secondary dropdown-toggle"
+                      type="button" data-bs-toggle="dropdown" aria-expanded="false">{{ problem.visibility }}</button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                      <li><a class="dropdown-item" onclick="SetProblemVisibilityField('{{ progcomp.name }}', '{{ problem.name }}', 'Open')">Open</a></li>
+                      <li><a class="dropdown-item" onclick="SetProblemVisibilityField('{{ progcomp.name }}', '{{ problem.name }}', 'Closed')">Closed</a></li>
+                      <li><a class="dropdown-item" onclick="SetProblemVisibilityField('{{ progcomp.name }}', '{{ problem.name }}', 'Hidden')">Hidden</a></li>
+                    </ul>
                   </div>
                 </div>
-              </li>
+              </div>
               {% endfor %}
-            </ul>
+            </div>
+            
+            <hr/>
             <h2>Teams</h2>
+            <div id="{{progcomp.name}}-teams card">
+              {% for team in progcomp.all_teams %}
+              <div class="card mb-3">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                  <h5 class="card-title mb-0">Team: {{ team.name }}</h5>
+
+                  <div class="input-group" style="width: auto;">
+                    <span class="input-group-text" id="visibility-label">Blacklist</span>
+                    <span class="input-group-text justify-content-center"
+                    style="background-color: var(--bs-form-control-bg);">
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch"
+                          id="{{ progcomp.name }}-{{ team.name }}-blacklist" onclick="RecordBlacklistChange('{{ progcomp.name }}', '{{ team.name }}')">
+                        <script>
+                          window.addEventListener("load", () => {
+                            document.getElementById("{{ progcomp.name }}-{{ team.name }}-blacklist").checked = "{{ team.blacklist }}" == "True"
+                          })
+                        </script>
+                      </div>
+                    </span>
+                  </div>
+
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            <hr/>
             <h2>Alerts</h2>
+            
+            <hr/>
             <h2>Leaderboard</h2>
+            <!-- <table class="table table-hover table-sm">
+              <thead>
+                  <tr>
+                      <th scope="col" class="text-center">Position</th>
+                      <th scope="col" class="text-center">Team</th>
+                      <th scope="col" class="text-center">Total</th>
+                      {% for prob in problems %}
+                      <th scope="col" class="text-center">{{ prob.name }}</th>
+                      {% endfor %}
+                      <th scope="col" class="text-center">Submission Time</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for score in scores %}
+                  <tr>
+                      <td class="text-center">{{ loop.index }}</td>
+                      <td class="text-center">{{ score.team.name }}</td>
+                      <th class="text-center">{{ score.total }}</td>
+            {% for prob in problems %}
+                      <td class="text-center">{{ score.per_round[loop.index - 1] }}</td>
+                      {% endfor %}
+                      <td class="text-center">{{ score.time_str }}</td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table> -->
 
           </div>
         </div>
@@ -310,11 +360,10 @@
 
   }
 
-  <!-- PC Level -->
+  /* PC Level */
 
   let CreateNewPC = () => {
     Update({
-      "level": "pc",
       "operation": "create",
       "name": document.getElementById("new-pc-name").value
     })
@@ -326,7 +375,6 @@
 
   let DeletePC = () => {
     Update({
-      "level": "pc",
       "operation": "delete",
       "name": document.getElementById("pc-delete").innerText
     })
@@ -334,7 +382,6 @@
 
   let UpdatePC = (pc) => {
     Update({
-      "level": "pc",
       "operation": "update",
       "name": pc
     })
@@ -342,7 +389,6 @@
 
   let ReloadPC = (pc) => {
     Update({
-      "level": "pc",
       "operation": "reload",
       "name": pc
     })
@@ -354,17 +400,36 @@
 
   let ApplyPCSettings = (progcomp) => {
     Update({
-      "level": "pc",
       "operation": "configure",
       "name": progcomp,
       "config": {
         "start-time": document.getElementById(progcomp + "-start-time").value,
         "end-time": document.getElementById(progcomp + "-end-time").value,
         "visibility": document.getElementById(progcomp + "-visibility").innerText,
-        "show_leaderboard": document.getElementById(progcomp + "-leaderboard-toggle").checked
+        "show_leaderboard": document.getElementById(progcomp + "-leaderboard-toggle").checked,
+        "problem_changes": problem_changes,
+        "blacklist_changes": blacklist_changes
       }
     })
   }
+
+  
+  /* Problem Changes */
+  
+  problem_changes = {}
+  let SetProblemVisibilityField = (progcomp, problem, mode) => {
+    document.getElementById(progcomp + "-" + problem + "-visibility").innerHTML = mode
+    problem_changes[progcomp] = problem_changes[progcomp] || {}
+    problem_changes[progcomp][problem] = mode
+  }
+
+  /* Team (Blacklist) Changes */
+  blacklist_changes = {}
+  let RecordBlacklistChange = (progcomp, team) => {
+    blacklist_changes[progcomp] = blacklist_changes[progcomp] || {}
+    blacklist_changes[progcomp][team] = document.getElementById(progcomp + "-" + team + "-blacklist").checked
+  }
+
 </script>
 
 </html>
