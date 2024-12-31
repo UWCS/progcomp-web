@@ -46,6 +46,10 @@ class Progcomp(Base):
     def alerts(self) -> list[Alert]:
         return [a for a in self.alerts_r if a.visible]
 
+    @property
+    def all_alerts(self) -> list[Alert]:
+        return [a for a in self.alerts_r]
+
     def alert_timestamps(self) -> list[datetime]:
         return [a.start_time.timestamp() for a in self.alerts]
 

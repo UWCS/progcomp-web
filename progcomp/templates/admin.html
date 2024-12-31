@@ -87,6 +87,7 @@
         </button>
       </div>
 
+      <!-- New ProgComp Modal -->
       <div class="modal fade" id="pcModal" tabindex="-1" aria-labelledby="pcLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -102,6 +103,44 @@
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               <button type="button" class="btn btn-primary" onclick="CreateNewPC()">Create</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- New ProgComp Modal -->
+      <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="alertLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="alertLabel">New Alert</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              
+              <form action="{{ url_for('progcomp.admin_add_alert') }}" method="post" class="form-group">
+                
+                <label for="alert-name-input" class="form-label">Enter Alert Name</label>
+                <input type="text" placeholder="Alert Name" name="name" class="form-control mb-4" id="alert-name-input" required>
+                
+                <label for="alert-title-input" class="form-label">Enter Title</label>
+                <input type="text" placeholder="Title" name="title" class="form-control mb-4" id="alert-title-input" required>
+                
+                <label for="alert-body-input" class="form-label">Enter Alert Body</label>
+                <textarea name="text" placeholder="Enter Body..." class="form-control mb-4" id="alert-body-input" required></textarea>
+                
+                <label for="alert-start-input" class="form-label">Start Time:</label>
+                <input type="datetime-local" id="alert-start-input" name="start-time" class="form-control mb-4" required>
+                
+                <label for="alert-end-input" class="form-label">End Time:</label>
+                <input type="datetime-local" id="alert-end-input" name="end-time" class="form-control mb-4" required>
+                
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+
+              </form>
             </div>
           </div>
         </div>
@@ -227,7 +266,7 @@
                   <h5 class="card-title mb-0">Team: {{ team.name }}</h5>
 
                   <div class="input-group" style="width: auto;">
-                    <span class="input-group-text" id="visibility-label">Blacklist</span>
+                    <span class="input-group-text" id="blacklist-label">Blacklist</span>
                     <span class="input-group-text justify-content-center"
                     style="background-color: var(--bs-form-control-bg);">
                       <div class="form-check form-switch">
@@ -248,7 +287,44 @@
             </div>
             <hr/>
             <h2>Alerts</h2>
-            
+
+            <!-- Create New Alert -->
+            <div class="container my-4">
+              <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#alertModal">
+                <i class="bi bi-plus"></i>
+                New Alert
+              </button>
+            </div>
+
+            <div id="{{progcomp.name}}-teams card">
+              {% for alert in progcomp.all_alerts %}
+              <div class="card mb-3">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                  <h5 class="card-title mb-0">Name: {{ alert.name }}</h5>
+                  <div class="card-body">
+                    <h6>Title: {{ alert.title }}</h6>
+                    <p>{{ alert.text }}</p>
+                  </div>
+
+                  <div class="input-group mb-3">
+                    <span class="input-group-text" id="start-time-label">Start Time</span>
+                    <input id="{{ progcomp.name }}-{{ alert.name }}-start-time" type="datetime-local"
+                      value="{{ alert.start_time.strftime('%Y-%m-%d %H:%M:%S') if alert.start_time }}" disabled
+                      class="form-control" aria-label="start-time" aria-describedby="start-time-label">
+      
+                    <span class="input-group-text" id="end-time-label">End Time</span>
+                    <input id="{{ progcomp.name }}-{{ alert.name }}-end-time" type="datetime-local"
+                      value="{{ alert.end_time.strftime('%Y-%m-%d %H:%M:%S') if alert.end_time}}" disabled
+                      class="form-control" aria-label="end-time" aria-describedby="end-time-label">
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+
+
             <hr/>
             <h2>Leaderboard</h2>
             <!-- <table class="table table-hover table-sm">

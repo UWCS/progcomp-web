@@ -454,3 +454,13 @@ def admin_update() -> FlaskResponse:
     
     db.session.commit()
     return Response(status=200)
+
+
+@bp.route("/admin/add_alert")
+def admin_add_alert() -> FlaskResponse:
+    session_id = session.get(ADMIN_SESSION_KEY)
+    record = admin_sessions.get(session_id)
+    if not (record and record[0] == request.remote_addr and record[1] == request.user_agent.string):
+        return Response(status=403)
+
+    return Response(status=200)
