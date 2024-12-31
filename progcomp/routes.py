@@ -2,7 +2,7 @@ import glob
 import logging
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Union
 
 from flask import (
@@ -31,7 +31,7 @@ from .database import db
 from .models import *
 
 # from .adapters import GameUIAdapter
-from .session import PROGCOMP_SESSION_KEY, USERNAME_SESSION_KEY
+from .session import *
 
 
 def get_pc() -> Progcomp:
@@ -132,6 +132,7 @@ def logout() -> FlaskResponse:
     # Save their username
     session[USERNAME_SESSION_KEY] = None
     session[PROGCOMP_SESSION_KEY] = None
+    session[ADMIN_SESSION_KEY] = None
 
     return redirect(url_for("progcomp.menu"))
 
@@ -373,14 +374,26 @@ def general_advice() -> FlaskResponse:
 # ADMIN
 
 # These aren't meant to persist, so keeping them in memory will do
-admin_sessions = {}
+admin_sessions : dict[str, tuple[str, str, datetime]]= {}
 
 @bp.route("/admin", methods=["GET", "POST"])
 def admin() -> FlaskResponse:
+
+    open_comp = request.args.get("open")
+
+    progcomps = db.session.query(Progcomp)
+
     if request.method == "GET":
-        session_id = session.get("admin_session")
-        if (record := admin_sessions.get(session_id)) and record[0] == request.remote_addr and record[1] == request.remote_user:
-            return render_template("admin.html", authenticated=True)
+        session_id = session.get(ADMIN_SESSION_KEY)
+        record = admin_sessions.get(session_id)
+        
+        print("=" * 100)
+        print(admin_sessions)
+        print(record)
+        print("=" * 100)
+
+        if record and record[0] == request.remote_addr and record[1] == request.user_agent.string:
+            return render_template("admin.html", authenticated=True, progcomps=progcomps, open=open_comp)
 
     else:
         key_in = request.form.get("key")
@@ -388,8 +401,49 @@ def admin() -> FlaskResponse:
 
         if check_password_hash(key_actual, key_in):
             new_id = uuid()
-            admin_sessions[new_id] = (request.remote_addr, request.remote_user, datetime.now())
-            session["admin_session"] = new_id
-            return render_template("admin.html", authenticated=True)
+            admin_sessions[new_id] = (request.remote_addr, request.user_agent.string, datetime.now())
+            session[ADMIN_SESSION_KEY] = new_id
+            return render_template("admin.html", authenticated=True, progcomps=progcomps, open=open_comp)
 
     return render_template("admin.html", authenticated=False)
+
+@bp.route("/admin/update", methods=["POST"])
+def admin_update() -> FlaskResponse:
+    session_id = session.get(ADMIN_SESSION_KEY)
+    record = admin_sessions.get(session_id)
+    if not (record and record[0] == request.remote_addr and record[1] == request.user_agent.string):
+        return Response(status=403)
+    
+    body = request.get_json(force=True)
+    
+    print("~" * 100)
+    print(body)
+
+    if body["level"] == "pc":
+
+        pc = None
+        if body["operation"] != "create":
+                pc = db.session.query(Progcomp).where(Progcomp.name == body["name"]).first()
+            
+        match body["operation"]:
+            case "create":
+                db.session.add(pc := Progcomp(name=body["name"], visibility=Visibility.HIDDEN))
+            case "delete": db.session.delete(pc)
+            case "update": pc.update_problems()
+            case "reload": pc.refresh_problems()
+            case "configure":
+                pc.start_time = datetime.strptime(body["config"]["start-time"], "%Y-%m-%dT%H:%M")
+                pc.end_time = datetime.strptime(body["config"]["end-time"], "%Y-%m-%dT%H:%M")
+                pc.show_leaderboard = body["config"]["show_leaderboard"]
+                pc.visibility = {
+                    "Open": Visibility.OPEN, 
+                    "Closed": Visibility.CLOSED, 
+                    "Hidden": Visibility.HIDDEN
+                }[body["config"]["visibility"]]
+
+        print(f"NEW/UPDATED PROGCOMP: {pc}")
+
+    print("~" * 100)
+    
+    db.session.commit()
+    return Response(status=200)

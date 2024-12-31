@@ -24,7 +24,7 @@ class Progcomp(Base):
 
     id = sa.Column(sa.Integer, primary_key=True)
     name = sa.Column(sa.String)
-    start_time = sa.Column(sa.DateTime, default=func.current_timestamp())
+    start_time = sa.Column(sa.DateTime, default=(dtnow := datetime.now().replace(second=0, microsecond=0)))
     show_leaderboard = sa.Column(
         sa.Boolean, nullable=False, default=False, server_default="f"
     )
@@ -107,6 +107,16 @@ class Progcomp(Base):
             .all()
         )
         return [p for p in problems if p.visible]
+    
+    @property
+    def all_problems(self) -> list[Problem]:
+        problems = (
+            db.session.query(Problem)
+            .where(Problem.progcomp == self)
+            .order_by(Problem.name)
+            .all()
+        )
+        return [p for p in problems]
 
     def update_problems(self) -> None:
         # Add any new problems, update existing ones
@@ -184,7 +194,7 @@ class Progcomp(Base):
 
         actual: list[OverallScore] = []
         for team in self.teams:
-            if (config := utils.global_config() ) and ("blacklist" in config) and team.name in config["blacklist"]:
+            if team.blacklist:
                 sk = -1
                 sc = OverallScore(
                     team,
@@ -201,7 +211,7 @@ class Progcomp(Base):
                 )
             actual.append(sc)
         
-        # TODO: Fix
+        # TODO: Fix (????)
         actual.sort(key=lambda x: (-x.total, x.timestamp))
         return actual
 

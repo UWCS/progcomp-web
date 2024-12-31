@@ -1,5 +1,6 @@
 import os
 import json
+import re
 import typing
 from typing import Optional
 
@@ -50,7 +51,8 @@ class Problem(Base):
 
     def update(self) -> None:
         print(f"\x1b[32mupdate({self})\x1b[0m")
-        path = os.path.join(
+        
+        input_path = os.path.join(
             os.getcwd(),
             "problems",
             self.progcomp.name,
@@ -58,16 +60,23 @@ class Problem(Base):
             "input",
         )
 
-      
+        output_path = os.path.join(
+            os.getcwd(),
+            "problems",
+            self.progcomp.name,
+            self.name,
+            "output",
+        )
+
         old = set((t.name, t.ext) for t in self.tests)
 
-        def check(x: str) -> Optional[tuple[str, str]]:
-            for ext in ["txt", "in"]:
-                if x.endswith(f".{ext}"):
-                    return x.rstrip(f".{ext}"), ext
+        def check(test_input_filename: str) -> Optional[tuple[str, str]]:
+            if os.path.isfile(os.path.join(output_path, test_input_filename if not test_input_filename.endswith(".in") else test_input_filename.removesuffix(".in") + ".out")):
+                match = re.search(r"^(.*)\.(.*)$", test_input_filename)
+                return match.group(1), match.group(2)
             return None
 
-        new = set(map(check, os.listdir(path)))
+        new = set(map(check, os.listdir(input_path)))
         new = set(s for s in new if s is not None)
 
         print("Old new", old, new)

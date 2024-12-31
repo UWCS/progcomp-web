@@ -17,6 +17,7 @@ class Team(Base):
     name = sa.Column(sa.String)
     password = sa.Column(sa.String, nullable=False)
     score = sa.Column(sa.Integer, default=0)
+    blacklist = sa.Column(sa.Boolean, default=False)
 
     __table_args__ = (sa.UniqueConstraint("name", "progcomp_id", name="unq_team_name"),)
 

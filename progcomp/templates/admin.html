@@ -2,20 +2,20 @@
 <html>
 
 <head>
-  <title>ADMIN - UWCS Challenge</title>
-  
+  <title>Admin - UWCS Challenge</title>
+
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
     crossorigin="anonymous"></script>
-  
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
   <!-- Cookies -->
   <script src=" https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js "></script>
-  
+
   <!-- Local Assets -->
   <link rel="shortcut icon" href="{{ url_for('static', filename='challenge_icon.svg') }}" type="image/x-icon">
   <script src="{{ url_for('static', filename='countdown.js') }}"></script>
@@ -35,7 +35,14 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarColor03">
-          <ul class="navbar-nav d-flex w-100">
+          <ul class="navbar-nav d-flex w-100 align-contents-center">
+            {% if authenticated %}
+            <li class="nav-item ms-lg-2">
+              <a class="nav-link ml-1" href="{{ url_for('progcomp.logout') }}">
+                <button class="btn btn-danger btn-lg">Logout</button>
+              </a>
+            </li>
+            {% endif %}
             <div class="vr ms-md-auto d-none d-lg-block "></div>
             <li class="nav-item ms-lg-2">
               <a id="dark-mode" class="nav-link ml-1" href="#">
@@ -49,31 +56,184 @@
     </nav>
 
     <article id="content" class="w-100">
-        
-        {% if not authenticated %}
 
-        <div class="d-flex flex-column align-items-center gap-3 my-5">
-            <img class="mw-100 p-2" style="width: 500px" src="static/challenge_logo.svg" alt="Logo"></img>
-            <h1>Admin Panel</h1>
-            <form class="mw-100" style="width: 300px" action="{{ url_for('progcomp.admin') }}" method="POST">
-                
-                <div class="form-group my-3">
-                    <label for="key">Admin Passkey</label>
-                    <input type="password" class="form-control" id="password" name="key"
-                        placeholder="Enter Secret Key">
-                    <small id="username-help" class="form-text text-muted">Can be found on VaultWarden.</small>
-                </div>
-                <div class="form-group text-center my-3">
-                    <button type="submit" class="btn btn-success btn-lg">Enter</button>
-                </div>
-            </form>
+      {% if not authenticated %}
+
+      <div class="d-flex flex-column align-items-center gap-3 my-5">
+        <img class="mw-100 p-2" style="width: 500px" src="static/challenge_logo.svg" alt="Logo"></img>
+        <h1>Admin Panel</h1>
+        <form class="mw-100" style="width: 300px" action="{{ url_for('progcomp.admin') }}" method="POST">
+
+          <div class="form-group my-3">
+            <label for="key">Admin Passkey</label>
+            <input type="password" class="form-control" id="password" name="key" placeholder="Enter Secret Key">
+            <small id="username-help" class="form-text text-muted">Can be found on VaultWarden.</small>
+          </div>
+          <div class="form-group text-center my-3">
+            <button type="submit" class="btn btn-success btn-lg">Enter</button>
+          </div>
+        </form>
+      </div>
+
+      {% else %}
+
+      <!-- Authenticated View -->
+
+      <!-- Create New ProgComp -->
+      <div class="container my-4">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#pcModal">
+          <i class="bi bi-plus"></i>
+          New ProgComp
+        </button>
+      </div>
+
+      <div class="modal fade" id="pcModal" tabindex="-1" aria-labelledby="pcLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="pcLabel">New ProgComp</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <input type="text" id="new-pc-name" class="form-control" placeholder="Enter ProgComp Name">
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" onclick="CreateNewPC()">Create</button>
+            </div>
+          </div>
         </div>
-        
-        {% else %}
+      </div>
 
-        Authenticated
+      <!-- Delete ProgComp Modal -->
+      <div class="modal fade" id="pcDeleteModal" tabindex="-1" aria-labelledby="pcDeleteLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="pcDeleteLabel">Delete ProgComp</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              Are you sure you want to delete <span id="pc-delete"></span>?
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-danger" onclick="DeletePC()">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        {% endif %}
+      <div class="card my-4 shadow rounded accordion accordion-flush" id="accordion">
+
+        {% for progcomp in progcomps %}
+
+        <div class="accordion-item">
+
+          <h1 class="accordion-header">
+            <button id="{{progcomp.name}}-acc-btn" class="accordion-button collapsed fs-2" data-bs-toggle="collapse"
+              data-bs-target="#{{progcomp.name}}-content" role="button" aria-expanded="false"
+              aria-controls="{{progcomp.name}}-content" onclick="open_comp = '{{progcomp.name}}'">
+              {{ progcomp.name }}
+            </button>
+          </h1>
+
+          <div class="container-fluid accordion-collapse collapse mt-4" id="{{progcomp.name}}-content" data-bs-parent="#accordion">
+
+            <div class="btn-group col-12 mb-4" role="group">
+              <button class="col-3 btn btn-primary" onclick="UpdatePC('{{ progcomp.name }}')">
+                <i class="bi bi-arrow-clockwise"></i>
+                Update Problems
+              </button>
+              <button class="col-3 btn btn-secondary" onclick="ReloadPC( '{{ progcomp.name }}' )" data-bs-toggle="modal"
+                data-bs-target="#pcDeleteModal">
+                <i class="bi bi-file-arrow-down-fill"></i>
+                Reload Problems
+              </button>
+              <button class="col-3 btn btn-success" onclick="ApplyPCSettings('{{ progcomp.name }}')"
+                data-bs-toggle="modal" data-bs-target="#pcDeleteModal">
+                <i class="bi bi-floppy"></i>
+                Save Changes
+              </button>
+              <button class="col-3 btn btn-warning" onclick="ConfirmDelete( '{{ progcomp.name }}' )"
+                data-bs-toggle="modal" data-bs-target="#pcDeleteModal">
+                <i class="bi bi-trash3"></i>
+                Delete
+              </button>
+            </div>
+
+            <div class="input-group mb-3">
+              <span class="input-group-text" id="start-time-label">Start Time</span>
+              <input id="{{ progcomp.name }}-start-time" type="datetime-local"
+                value="{{ progcomp.start_time.strftime('%Y-%m-%d %H:%M:%S') if progcomp.start_time }}"
+                class="form-control" aria-label="start-time" aria-describedby="start-time-label">
+
+              <span class="input-group-text" id="end-time-label">End Time</span>
+              <input id="{{ progcomp.name }}-end-time" type="datetime-local"
+                value="{{ progcomp.end_time.strftime('%Y-%m-%d %H:%M:%S') if progcomp.end_time}}" class="form-control"
+                aria-label="end-time" aria-describedby="end-time-label">
+
+              <span class="input-group-text" id="visibility-label">Visibility</span>
+              <button id="{{ progcomp.name }}-visibility" class="btn btn-outline-secondary dropdown-toggle"
+                type="button" data-bs-toggle="dropdown" aria-expanded="false">{{ progcomp.visibility }}</button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" onclick="SetPCVisibilityField('{{ progcomp.name }}', 'Open')">Open</a></li>
+                <li><a class="dropdown-item" onclick="SetPCVisibilityField('{{ progcomp.name }}', 'Closed')">Closed</a></li>
+                <li><a class="dropdown-item" onclick="SetPCVisibilityField('{{ progcomp.name }}', 'Hidden')">Hidden</a></li>
+              </ul>
+
+              <span class="input-group-text" id="leaderboard-label">Show Leaderboard</span>
+              <span class="input-group-text justify-content-center"
+                style="background-color: var(--bs-form-control-bg);">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" role="switch"
+                    id="{{ progcomp.name }}-leaderboard-toggle">
+                  <script>
+                    window.addEventListener("load", () => {
+                      document.getElementById("{{ progcomp.name }}-leaderboard-toggle").checked = "{{ progcomp.show_leaderboard }}" == "True"
+                      console.log("{{ progcomp.show_leaderboard }}")
+                    })
+                  </script>
+                </div>
+              </span>
+            </div>
+
+            <h2>Problems</h2>
+            <ul class="list-group list-group-flush">
+              {% for problem in progcomp.all_problems %}
+              <li class="list-group-item">
+                <div class="container-fluid">
+                  <div class="row align-items-center">
+                    <div class="col-8">Problem {{problem.name}}</div>
+                    <div class="col-4">
+                      <div class="input-group">
+                        <span class="input-group-text" id="visibility-label">Visibility</span>
+                        <button id="{{ progcomp.name }}-visibility" class="btn btn-outline-secondary dropdown-toggle"
+                          type="button" data-bs-toggle="dropdown" aria-expanded="false">{{ problem.visibility }}</button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                          <li><a class="dropdown-item" onclick="SetProblemVisibilityField('{{ progcomp.name }}', '{{ problem.name }}', 'Open')">Open</a></li>
+                          <li><a class="dropdown-item" onclick="SetProblemVisibilityField('{{ progcomp.name }}', '{{ problem.name }}', 'Closed')">Closed</a></li>
+                          <li><a class="dropdown-item" onclick="SetProblemVisibilityField('{{ progcomp.name }}', '{{ problem.name }}', 'Hidden')">Hidden</a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              {% endfor %}
+            </ul>
+            <h2>Teams</h2>
+            <h2>Alerts</h2>
+            <h2>Leaderboard</h2>
+
+          </div>
+        </div>
+
+        {% endfor %}
+      </div>
+      {% endif %}
 
     </article>
 
@@ -116,5 +276,95 @@
     </footer>
   </div>
 </body>
+
+{% if open %}
+<script>
+  window.addEventListener('load', () => {
+    document.getElementById("{{open}}-content").classList.add("show")
+    document.getElementById("{{open}}-acc-btn").classList.remove("collapsed")
+    open_comp = '{{open}}'
+  })
+</script>
+{% endif %}
+
+<script>
+
+  open_comp = null;
+
+  let Update = (body) => {
+
+    console.log(body)
+
+    fetch("{{ url_for('progcomp.admin_update') }}",
+      {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      }
+    ).then(() => {
+      location.replace("/admin?open=" + open_comp)
+    })
+
+
+  }
+
+  <!-- PC Level -->
+
+  let CreateNewPC = () => {
+    Update({
+      "level": "pc",
+      "operation": "create",
+      "name": document.getElementById("new-pc-name").value
+    })
+  }
+
+  let ConfirmDelete = (name) => {
+    document.getElementById("pc-delete").innerText = name
+  }
+
+  let DeletePC = () => {
+    Update({
+      "level": "pc",
+      "operation": "delete",
+      "name": document.getElementById("pc-delete").innerText
+    })
+  }
+
+  let UpdatePC = (pc) => {
+    Update({
+      "level": "pc",
+      "operation": "update",
+      "name": pc
+    })
+  }
+
+  let ReloadPC = (pc) => {
+    Update({
+      "level": "pc",
+      "operation": "reload",
+      "name": pc
+    })
+  }
+
+  let SetPCVisibilityField = (progcomp, mode) => {
+    document.getElementById(progcomp + "-visibility").innerText = mode
+  }
+
+  let ApplyPCSettings = (progcomp) => {
+    Update({
+      "level": "pc",
+      "operation": "configure",
+      "name": progcomp,
+      "config": {
+        "start-time": document.getElementById(progcomp + "-start-time").value,
+        "end-time": document.getElementById(progcomp + "-end-time").value,
+        "visibility": document.getElementById(progcomp + "-visibility").innerText,
+        "show_leaderboard": document.getElementById(progcomp + "-leaderboard-toggle").checked
+      }
+    })
+  }
+</script>
 
 </html>
