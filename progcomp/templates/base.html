@@ -97,7 +97,7 @@
 
     <header class="w-100 d-flex flex-column gap-3 px-3">
       {% for alert in progcomp.alerts %}
-      <div class="alert alert-success px-3 py-2 mt-3 mb-0" role="alert">
+      <div class="alert alert-info px-3 py-2 mt-3 mb-0" role="alert">
         {% if alert.title %}<h5 class="alert-heading">{{ alert.title }}</h5>{% endif %}
         {% if alert.text %}{{ alert.text }}</h4>{% endif %}
       </div>

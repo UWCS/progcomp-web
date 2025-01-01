@@ -21,7 +21,7 @@ class Submission(Base):
 
     id = sa.Column(sa.Integer, primary_key=True)
     team_id = sa.Column(sa.Integer, ForeignKey("teams.id"))
-    problem_id = sa.Column(sa.Integer, ForeignKey(Problem.id))
+    problem_id = sa.Column(sa.Integer, ForeignKey(Problem.id), nullable=False)
     test_id = sa.Column(sa.Integer, ForeignKey(Test.id), nullable=False)
     timestamp = sa.Column(sa.DateTime, default=func.current_timestamp())
     status = sa.Column(sa.Enum(Status), default=Status.UNKNOWN)

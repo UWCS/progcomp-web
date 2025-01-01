@@ -401,7 +401,7 @@ def admin() -> FlaskResponse:
             new_id = uuid()
             admin_sessions[new_id] = (request.remote_addr, request.user_agent.string, datetime.now())
             session[ADMIN_SESSION_KEY] = new_id
-            return render_template("admin.html", authenticated=True, progcomps=progcomps)
+            return redirect(url_for('progcomp.admin'))
 
     return render_template("admin.html", authenticated=False)
 
@@ -448,6 +448,14 @@ def admin_update() -> FlaskResponse:
                 for team, status in blacklist_config.items():
                     pc.get_team(team).blacklist = status
         
+            if (alert_config := body["config"]["alert_changes"].get(pc.name)):
+                for alert, properties in alert_config.items():
+                    a = next(a for a in pc.alerts_r if a.name == alert)
+                    a.title = properties["title"]
+                    a.text = properties["text"]
+                    a.start_time = datetime.strptime(properties["start"], "%Y-%m-%dT%H:%M")
+                    a.end_time = datetime.strptime(properties["end"], "%Y-%m-%dT%H:%M")
+
         case "add-alert":
             db.session.add(alert := Alert(
                 progcomp=pc,

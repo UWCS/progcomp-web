@@ -333,16 +333,23 @@
                 </div>
 
                 <div class="card-body">
-                  <h6 class="card-subtitle mb-3 text-muted font-weight-bold">{{ alert.title }}</h6>
-                  <p class="card-text mb-4 font-weight-light">{{ alert.text }}</p>
+                  <input type="text" class="form-control mb-3" value="{{ alert.title }}"
+                    id="{{ progcomp.name }}-alert-{{ alert.name }}-title"
+                    onchange="RecordAlertChange('{{progcomp.name}}', '{{alert.name}}')">
+                  <textarea class="form-control mb-4" id="{{ progcomp.name }}-alert-{{ alert.name }}-text" rows="3"
+                    onchange="RecordAlertChange('{{progcomp.name}}', '{{alert.name}}')">{{ alert.text }}</textarea>
 
                   <div class="input-group">
                     <span class="input-group-text">Starts</span>
                     <input type="datetime-local" class="form-control"
-                      value="{{ alert.start_time.strftime('%Y-%m-%d %H:%M:%S') if alert.start_time }}" disabled>
+                      value="{{ alert.start_time.strftime('%Y-%m-%d %H:%M:%S') if alert.start_time }}"
+                      id="{{ progcomp.name }}-alert-{{ alert.name }}-start"
+                      onchange="RecordAlertChange('{{progcomp.name}}', '{{alert.name}}')">
                     <span class="input-group-text">Ends</span>
                     <input type="datetime-local" class="form-control"
-                      value="{{ alert.end_time.strftime('%Y-%m-%d %H:%M:%S') if alert.end_time }}" disabled>
+                      value="{{ alert.end_time.strftime('%Y-%m-%d %H:%M:%S') if alert.end_time }}"
+                      id="{{ progcomp.name }}-alert-{{ alert.name }}-end"
+                      onchange="RecordAlertChange('{{progcomp.name}}', '{{alert.name}}')">
                   </div>
                 </div>
 
@@ -358,33 +365,98 @@
             </div>
             <hr />
             <h2>Leaderboard</h2>
-            <!-- <table class="table table-hover table-sm">
-                <thead>
-                    <tr>
-                        <th scope="col" class="text-center">Position</th>
-                        <th scope="col" class="text-center">Team</th>
-                        <th scope="col" class="text-center">Total</th>
-                        {% for prob in problems %}
-                        <th scope="col" class="text-center">{{ prob.name }}</th>
-                        {% endfor %}
-                        <th scope="col" class="text-center">Submission Time</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for score in scores %}
-                    <tr>
-                        <td class="text-center">{{ loop.index }}</td>
-                        <td class="text-center">{{ score.team.name }}</td>
-                        <th class="text-center">{{ score.total }}</td>
-              {% for prob in problems %}
-                        <td class="text-center">{{ score.per_round[loop.index - 1] }}</td>
-                        {% endfor %}
-                        <td class="text-center">{{ score.time_str }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table> -->
+            <table class="table table-hover table-sm">
+              <thead>
+                <tr>
+                  <th scope="col" class="text-center">Position</th>
+                  <th scope="col" class="text-center">Team</th>
+                  <th scope="col" class="text-center">Total</th>
+                  {% for prob in problems %}
+                  <th scope="col" class="text-center">{{ prob.name }}</th>
+                  {% endfor %}
+                  <th scope="col" class="text-center">Submission Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for score in progcomp.score_teams() %}
+                <tr>
+                  <td class="text-center">{{ loop.index }}</td>
+                  <td class="text-center">{{ score.team.name }}</td>
+                  <th class="text-center">{{ score.total }}</td>
+                    {% for prob in problems %}
+                  <td class="text-center">{{ score.per_round[loop.index - 1] }}</td>
+                  {% endfor %}
+                  <td class="text-center">{{ score.time_str }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
 
+            <h4 class="text-muted">Select a Problem</h2>
+            <div class="accordion accordion-flush mb-4" id="{{progcomp.name}}-problem-leaderboards">
+
+              {% for problem in progcomp.all_problems %}
+
+              <div class="accordion-item">
+                
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{{progcomp.name}}-prob-{{problem.name}}-lead"
+                    aria-expanded="false">
+                    Problem {{ problem.name }}
+                  </button>
+                </h2>
+                <div id="{{progcomp.name}}-prob-{{problem.name}}-lead" class="accordion-collapse collapse" data-bs-parent="#{{progcomp.name}}-problem-leaderboards">
+                  <div class="accordion-body">
+                    <div class="accordion" id="{{progcomp.name}}-prob-{{problem.name}}-tests">
+                      {% for test in problem.tests %}
+                      <div class="accordion-item">
+                        <h3 class="accordion-header">
+                          <button class="accordion-button collapsed" type="button"
+                                  data-bs-toggle="collapse"
+                                  data-bs-target="#{{progcomp.name}}-prob-{{problem.name}}-test-{{test.name}}"
+                                  aria-expanded="false"
+                                  aria-controls="{{progcomp.name}}-prob-{{problem.name}}-test-{{test.name}}">
+                            Test {{ test.name }}
+                          </button>
+                        </h3>
+                        <div id="{{progcomp.name}}-prob-{{problem.name}}-test-{{test.name}}"
+                             class="accordion-collapse collapse"
+                             data-bs-parent="#{{progcomp.name}}-prob-{{problem.name}}-tests">
+                          <div class="accordion-body">
+                            <table class="table table-hover table-sm">
+                              <thead>
+                                <tr>
+                                  <th scope="col" class="text-center">Position</th>
+                                  <th scope="col" class="text-center">Team</th>
+                                  <th scope="col" class="text-center">Status</th>
+                                  <th scope="col" class="text-center">Score</th>
+                                  <th scope="col" class="text-center">Submission Time</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% for sub in test.ranked_submissions %}
+                                <tr>
+                                  <td class="text-center">{{ loop.index }}</td>
+                                  <td class="text-center">{{ sub.team.name }}</td>
+                                  <td class="text-center">{{ sub.status_str }}</td>
+                                  <td class="text-center">{{ sub.score }} / {{sub.test.max_score or ''}}</td>
+                                  <td class="text-center">{{ sub.timestamp }}</td>
+                                </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {% endfor %}
+
+            </div>
           </div>
         </div>
 
@@ -438,7 +510,7 @@
 </body>
 
 <script>
-  
+
   window.addEventListener('load', () => {
     if (!Cookies.get("open-comp")) return
 
@@ -527,7 +599,8 @@
         "visibility": document.getElementById(progcomp + "-visibility").innerText,
         "show_leaderboard": document.getElementById(progcomp + "-leaderboard-toggle").checked,
         "problem_changes": problem_changes,
-        "blacklist_changes": blacklist_changes
+        "blacklist_changes": blacklist_changes,
+        "alert_changes": alert_changes
       }
     })
   }
@@ -573,13 +646,24 @@
 
   };
 
-  let DeleteAlert = (progcomp, alertName) => {
+  let DeleteAlert = (progcomp, alert) => {
     Update({
       "operation": "delete-alert",
       "name": progcomp,
-      "alert": alertName
+      "alert": alert
     });
   };
+
+  alert_changes = {}
+  let RecordAlertChange = (progcomp, alert) => {
+    alert_changes[progcomp] = alert_changes[progcomp] || {}
+    alert_changes[progcomp][alert] = {
+      title: document.getElementById(progcomp + "-alert-" + alert + "-title").value,
+      text: document.getElementById(progcomp + "-alert-" + alert + "-text").value,
+      start: document.getElementById(progcomp + "-alert-" + alert + "-start").value,
+      end: document.getElementById(progcomp + "-alert-" + alert + "-end").value
+    }
+  }
 
 </script>
 
