@@ -6,7 +6,7 @@ submissions/**
 /progcomp/scripts/custom.py
 /.venv
 __pycache__
-# /instance
+/instance
 TODO.md
 config.json
 secret.*
