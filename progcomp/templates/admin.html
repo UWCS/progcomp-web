@@ -168,6 +168,19 @@
         </div>
       </div>
 
+      <!-- Save Changes Toast -->
+      <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="saveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="toast-header">
+            <strong class="me-auto">Admin Console</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body">
+            Changes saved successfully!
+          </div>
+        </div>
+      </div>
+
       <div class="card my-4 shadow rounded accordion accordion-flush" id="accordion">
 
         {% for progcomp in progcomps %}
@@ -428,9 +441,14 @@
   
   window.addEventListener('load', () => {
     if (!Cookies.get("open-comp")) return
-    
+
     document.getElementById(Cookies.get("open-comp") + "-content").classList.add("show")
     document.getElementById(Cookies.get("open-comp") + "-acc-btn").classList.remove("collapsed")
+
+    if (Cookies.get('show-toast') == "true") {
+      bootstrap.Toast.getOrCreateInstance(document.getElementById("saveToast")).show()
+      Cookies.set('show-toast', false)
+    }
   })
 
   let HandleOpen = (progcomp) => {
@@ -454,6 +472,7 @@
         body: JSON.stringify(body)
       }
     ).then(() => {
+      Cookies.set('show-toast', true)
       location.reload(true)
     })
 
