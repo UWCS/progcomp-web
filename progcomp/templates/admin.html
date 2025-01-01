@@ -117,29 +117,32 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              
-              <form action="{{ url_for('progcomp.admin_add_alert') }}" method="post" class="form-group">
-                
+              <form class="form-group" id="alert-form">
+
                 <label for="alert-name-input" class="form-label">Enter Alert Name</label>
-                <input type="text" placeholder="Alert Name" name="name" class="form-control mb-4" id="alert-name-input" required>
-                
+                <input type="text" placeholder="Alert Name" name="name" class="form-control mb-4" id="alert-name-input"
+                  required>
+
                 <label for="alert-title-input" class="form-label">Enter Title</label>
-                <input type="text" placeholder="Title" name="title" class="form-control mb-4" id="alert-title-input" required>
-                
+                <input type="text" placeholder="Title" name="title" class="form-control mb-4" id="alert-title-input"
+                  required>
+
                 <label for="alert-body-input" class="form-label">Enter Alert Body</label>
-                <textarea name="text" placeholder="Enter Body..." class="form-control mb-4" id="alert-body-input" required></textarea>
-                
+                <textarea name="text" placeholder="Enter Body..." class="form-control mb-4" id="alert-body-input"
+                  required></textarea>
+
                 <label for="alert-start-input" class="form-label">Start Time:</label>
-                <input type="datetime-local" id="alert-start-input" name="start-time" class="form-control mb-4" required>
-                
+                <input type="datetime-local" id="alert-start-input" name="start-time" class="form-control mb-4"
+                  required>
+
                 <label for="alert-end-input" class="form-label">End Time:</label>
                 <input type="datetime-local" id="alert-end-input" name="end-time" class="form-control mb-4" required>
-                
+
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="submit" class="btn btn-primary">Create</button>
+                  <button type="submit" class="btn btn-primary" onclick="CreateAlert(event)"
+                    id="alert-form-submit">Create</button>
                 </div>
-
               </form>
             </div>
           </div>
@@ -174,12 +177,13 @@
           <h1 class="accordion-header">
             <button id="{{progcomp.name}}-acc-btn" class="accordion-button collapsed fs-2" data-bs-toggle="collapse"
               data-bs-target="#{{progcomp.name}}-content" role="button" aria-expanded="false"
-              aria-controls="{{progcomp.name}}-content" onclick="open_comp = '{{progcomp.name}}'">
+              aria-controls="{{progcomp.name}}-content" onclick="HandleOpen('{{progcomp.name}}')">
               {{ progcomp.name }}
             </button>
           </h1>
 
-          <div class="container-fluid accordion-collapse collapse mt-4" id="{{progcomp.name}}-content" data-bs-parent="#accordion">
+          <div class="container-fluid accordion-collapse collapse mt-4" id="{{progcomp.name}}-content"
+            data-bs-parent="#accordion">
 
             <div class="btn-group col-12 mb-4" role="group">
               <button class="col-3 btn btn-primary" onclick="UpdatePC('{{ progcomp.name }}')">
@@ -194,7 +198,8 @@
                 <i class="bi bi-floppy"></i>
                 Save Changes
               </button>
-              <button class="col-3 btn btn-warning" onclick="ConfirmDelete( '{{ progcomp.name }}' )" data-bs-toggle="modal" data-bs-target="#pcDeleteModal">
+              <button class="col-3 btn btn-warning" onclick="ConfirmDelete( '{{ progcomp.name }}' )"
+                data-bs-toggle="modal" data-bs-target="#pcDeleteModal">
                 <i class="bi bi-trash3"></i>
                 Delete
               </button>
@@ -216,8 +221,10 @@
                 type="button" data-bs-toggle="dropdown" aria-expanded="false">{{ progcomp.visibility }}</button>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li><a class="dropdown-item" onclick="SetPCVisibilityField('{{ progcomp.name }}', 'Open')">Open</a></li>
-                <li><a class="dropdown-item" onclick="SetPCVisibilityField('{{ progcomp.name }}', 'Closed')">Closed</a></li>
-                <li><a class="dropdown-item" onclick="SetPCVisibilityField('{{ progcomp.name }}', 'Hidden')">Hidden</a></li>
+                <li><a class="dropdown-item" onclick="SetPCVisibilityField('{{ progcomp.name }}', 'Closed')">Closed</a>
+                </li>
+                <li><a class="dropdown-item" onclick="SetPCVisibilityField('{{ progcomp.name }}', 'Hidden')">Hidden</a>
+                </li>
               </ul>
 
               <span class="input-group-text" id="leaderboard-label">Show Leaderboard</span>
@@ -235,7 +242,7 @@
               </span>
             </div>
 
-            <hr/>
+            <hr />
             <h2>Problems</h2>
             <div id="{{progcomp.name}}-problems card">
               {% for problem in progcomp.all_problems %}
@@ -244,20 +251,27 @@
                   <h5 class="card-title mb-0">Problem {{ problem.name }}</h5>
                   <div class="input-group" style="width: auto;">
                     <span class="input-group-text" id="visibility-label">Visibility</span>
-                    <button id="{{progcomp.name}}-{{problem.name}}-visibility" class="btn btn-outline-secondary dropdown-toggle"
-                      type="button" data-bs-toggle="dropdown" aria-expanded="false">{{ problem.visibility }}</button>
+                    <button id="{{progcomp.name}}-prob-{{problem.name}}-visibility"
+                      class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                      aria-expanded="false">{{ problem.visibility }}</button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                      <li><a class="dropdown-item" onclick="SetProblemVisibilityField('{{ progcomp.name }}', '{{ problem.name }}', 'Open')">Open</a></li>
-                      <li><a class="dropdown-item" onclick="SetProblemVisibilityField('{{ progcomp.name }}', '{{ problem.name }}', 'Closed')">Closed</a></li>
-                      <li><a class="dropdown-item" onclick="SetProblemVisibilityField('{{ progcomp.name }}', '{{ problem.name }}', 'Hidden')">Hidden</a></li>
+                      <li><a class="dropdown-item"
+                          onclick="SetProblemVisibilityField('{{ progcomp.name }}', '{{ problem.name }}', 'Open')">Open</a>
+                      </li>
+                      <li><a class="dropdown-item"
+                          onclick="SetProblemVisibilityField('{{ progcomp.name }}', '{{ problem.name }}', 'Closed')">Closed</a>
+                      </li>
+                      <li><a class="dropdown-item"
+                          onclick="SetProblemVisibilityField('{{ progcomp.name }}', '{{ problem.name }}', 'Hidden')">Hidden</a>
+                      </li>
                     </ul>
                   </div>
                 </div>
               </div>
               {% endfor %}
             </div>
-            
-            <hr/>
+
+            <hr />
             <h2>Teams</h2>
             <div id="{{progcomp.name}}-teams card">
               {% for team in progcomp.all_teams %}
@@ -268,13 +282,14 @@
                   <div class="input-group" style="width: auto;">
                     <span class="input-group-text" id="blacklist-label">Blacklist</span>
                     <span class="input-group-text justify-content-center"
-                    style="background-color: var(--bs-form-control-bg);">
+                      style="background-color: var(--bs-form-control-bg);">
                       <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" role="switch"
-                          id="{{ progcomp.name }}-{{ team.name }}-blacklist" onclick="RecordBlacklistChange('{{ progcomp.name }}', '{{ team.name }}')">
+                          id="{{ progcomp.name }}-team-{{ team.name }}-blacklist"
+                          onclick="RecordBlacklistChange('{{ progcomp.name }}', '{{ team.name }}')">
                         <script>
                           window.addEventListener("load", () => {
-                            document.getElementById("{{ progcomp.name }}-{{ team.name }}-blacklist").checked = "{{ team.blacklist }}" == "True"
+                            document.getElementById("{{ progcomp.name }}-team-{{ team.name }}-blacklist").checked = "{{ team.blacklist }}" == "True"
                           })
                         </script>
                       </div>
@@ -285,74 +300,77 @@
               </div>
               {% endfor %}
             </div>
-            <hr/>
+            <hr />
             <h2>Alerts</h2>
 
             <!-- Create New Alert -->
             <div class="container my-4">
-              <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#alertModal">
+              <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#alertModal"
+                onclick="alert_target = '{{ progcomp.name }}'">
                 <i class="bi bi-plus"></i>
                 New Alert
               </button>
             </div>
 
-            <div id="{{progcomp.name}}-teams card">
+            <div id="{{progcomp.name}}-alerts" class="card-grid">
               {% for alert in progcomp.all_alerts %}
               <div class="card mb-3">
-                <div class="card-body d-flex justify-content-between align-items-center">
-                  <h5 class="card-title mb-0">Name: {{ alert.name }}</h5>
-                  <div class="card-body">
-                    <h6>Title: {{ alert.title }}</h6>
-                    <p>{{ alert.text }}</p>
-                  </div>
+                <div class="card-header">
+                  <h5 class="card-title mb-0">{{ alert.name }}</h5>
+                </div>
 
-                  <div class="input-group mb-3">
-                    <span class="input-group-text" id="start-time-label">Start Time</span>
-                    <input id="{{ progcomp.name }}-{{ alert.name }}-start-time" type="datetime-local"
-                      value="{{ alert.start_time.strftime('%Y-%m-%d %H:%M:%S') if alert.start_time }}" disabled
-                      class="form-control" aria-label="start-time" aria-describedby="start-time-label">
-      
-                    <span class="input-group-text" id="end-time-label">End Time</span>
-                    <input id="{{ progcomp.name }}-{{ alert.name }}-end-time" type="datetime-local"
-                      value="{{ alert.end_time.strftime('%Y-%m-%d %H:%M:%S') if alert.end_time}}" disabled
-                      class="form-control" aria-label="end-time" aria-describedby="end-time-label">
-                    </div>
-                  </div>
+                <div class="card-body">
+                  <h6 class="card-subtitle mb-3 text-muted font-weight-bold">{{ alert.title }}</h6>
+                  <p class="card-text mb-4 font-weight-light">{{ alert.text }}</p>
 
+                  <div class="input-group">
+                    <span class="input-group-text">Starts</span>
+                    <input type="datetime-local" class="form-control"
+                      value="{{ alert.start_time.strftime('%Y-%m-%d %H:%M:%S') if alert.start_time }}" disabled>
+                    <span class="input-group-text">Ends</span>
+                    <input type="datetime-local" class="form-control"
+                      value="{{ alert.end_time.strftime('%Y-%m-%d %H:%M:%S') if alert.end_time }}" disabled>
+                  </div>
+                </div>
+
+                <div class="card-footer text-end">
+                  <button type="button" class="btn btn-danger"
+                    onclick="DeleteAlert('{{ progcomp.name }}', '{{ alert.name }}')">
+                    <i class="bi bi-trash"></i>
+                    Delete Alert
+                  </button>
                 </div>
               </div>
               {% endfor %}
             </div>
-
-
-            <hr/>
+            <hr />
             <h2>Leaderboard</h2>
             <!-- <table class="table table-hover table-sm">
-              <thead>
-                  <tr>
-                      <th scope="col" class="text-center">Position</th>
-                      <th scope="col" class="text-center">Team</th>
-                      <th scope="col" class="text-center">Total</th>
-                      {% for prob in problems %}
-                      <th scope="col" class="text-center">{{ prob.name }}</th>
-                      {% endfor %}
-                      <th scope="col" class="text-center">Submission Time</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {% for score in scores %}
-                  <tr>
-                      <td class="text-center">{{ loop.index }}</td>
-                      <td class="text-center">{{ score.team.name }}</td>
-                      <th class="text-center">{{ score.total }}</td>
-            {% for prob in problems %}
-                      <td class="text-center">{{ score.per_round[loop.index - 1] }}</td>
-                      {% endfor %}
-                      <td class="text-center">{{ score.time_str }}</td>
-                  </tr>
-                  {% endfor %}
-              </tbody>
-          </table> -->
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-center">Position</th>
+                        <th scope="col" class="text-center">Team</th>
+                        <th scope="col" class="text-center">Total</th>
+                        {% for prob in problems %}
+                        <th scope="col" class="text-center">{{ prob.name }}</th>
+                        {% endfor %}
+                        <th scope="col" class="text-center">Submission Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for score in scores %}
+                    <tr>
+                        <td class="text-center">{{ loop.index }}</td>
+                        <td class="text-center">{{ score.team.name }}</td>
+                        <th class="text-center">{{ score.total }}</td>
+              {% for prob in problems %}
+                        <td class="text-center">{{ score.per_round[loop.index - 1] }}</td>
+                        {% endfor %}
+                        <td class="text-center">{{ score.time_str }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table> -->
 
           </div>
         </div>
@@ -360,62 +378,68 @@
         {% endfor %}
       </div>
       {% endif %}
+  </div>
 
-    </article>
 
-    <footer class="w-100 mt-auto d-flex flex-wrap justify-content-between gap-2 py-3 mt-4 border-top">
-      <div class="flex-grow-1 flex-md-grow-0 mb-0 text-muted">
-        {% if progcomp %}
-        {% set visibility = progcomp.visible|string() %}
-        {% if visibility == "Open" %}
-        {% set row_color = 'text-bg-success' %}
-        {% elif visibility == "Closed" %}
-        {% set row_color = 'text-bg-danger' %}
-        {% else %}
-        {% set row_color = "text-bg-warning" %}
-        {% endif %}
-        {{ progcomp.name }}
-        <small class="badge {{ row_color }}" style="height: fit-content">{{ progcomp.visible }}</small> |
-        {% if username %}
-        Team: {{ username }} |
-        {% endif %}
-        <span id="countdown">Countdown soonTM</span>
-        {% endif %}
-      </div>
-      <div class="d-md-none" style="flex-basis: 100%; height: 0"></div>
-      <a class="d-flex text-decoration-none" href="https://uwcs.co.uk">
-        {% include "uwcs_logo.html" %}
-      </a>
 
-      <ul class="nav justify-content-end list-unstyled d-flex">
-        <li class="ms-3">
-          <a class="text-muted" href="https://github.com/UWCS/progcomp-web"><i class="bi-github"
-              aria-hidden="true"></i></a>
-        </li>
-        <li class="ms-3">
-          <a class="text-muted" href="https://discord.uwcs.co.uk"><i class="bi-discord" aria-hidden="true"></i></a>
-        </li>
-        <li class="ms-3">
-          <a class="text-muted" href="https://uwcs.co.uk"><i class="bi-globe" aria-hidden="true"></i></a>
-        </li>
-      </ul>
-    </footer>
+  </article>
+
+  <footer class="w-100 mt-auto d-flex flex-wrap justify-content-between gap-2 py-3 mt-4 border-top">
+    <div class="flex-grow-1 flex-md-grow-0 mb-0 text-muted">
+      {% if progcomp %}
+      {% set visibility = progcomp.visible|string() %}
+      {% if visibility == "Open" %}
+      {% set row_color = 'text-bg-success' %}
+      {% elif visibility == "Closed" %}
+      {% set row_color = 'text-bg-danger' %}
+      {% else %}
+      {% set row_color = "text-bg-warning" %}
+      {% endif %}
+      {{ progcomp.name }}
+      <small class="badge {{ row_color }}" style="height: fit-content">{{ progcomp.visible }}</small> |
+      {% if username %}
+      Team: {{ username }} |
+      {% endif %}
+      <span id="countdown">Countdown soonTM</span>
+      {% endif %}
+    </div>
+    <div class="d-md-none" style="flex-basis: 100%; height: 0"></div>
+    <a class="d-flex text-decoration-none" href="https://uwcs.co.uk">
+      {% include "uwcs_logo.html" %}
+    </a>
+
+    <ul class="nav justify-content-end list-unstyled d-flex">
+      <li class="ms-3">
+        <a class="text-muted" href="https://github.com/UWCS/progcomp-web"><i class="bi-github"
+            aria-hidden="true"></i></a>
+      </li>
+      <li class="ms-3">
+        <a class="text-muted" href="https://discord.uwcs.co.uk"><i class="bi-discord" aria-hidden="true"></i></a>
+      </li>
+      <li class="ms-3">
+        <a class="text-muted" href="https://uwcs.co.uk"><i class="bi-globe" aria-hidden="true"></i></a>
+      </li>
+    </ul>
+  </footer>
   </div>
 </body>
 
-{% if open %}
 <script>
+  
   window.addEventListener('load', () => {
-    document.getElementById("{{open}}-content").classList.add("show")
-    document.getElementById("{{open}}-acc-btn").classList.remove("collapsed")
-    open_comp = '{{open}}'
+    if (!Cookies.get("open-comp")) return
+    
+    document.getElementById(Cookies.get("open-comp") + "-content").classList.add("show")
+    document.getElementById(Cookies.get("open-comp") + "-acc-btn").classList.remove("collapsed")
   })
-</script>
-{% endif %}
 
-<script>
-
-  open_comp = null;
+  let HandleOpen = (progcomp) => {
+    if (Cookies.get('open-comp') == progcomp) {
+      Cookies.set('open-comp', '')
+    } else {
+      Cookies.set('open-comp', progcomp)
+    }
+  }
 
   let Update = (body) => {
 
@@ -430,7 +454,7 @@
         body: JSON.stringify(body)
       }
     ).then(() => {
-      location.replace("/admin?open=" + open_comp)
+      location.reload(true)
     })
 
 
@@ -489,12 +513,11 @@
     })
   }
 
-  
+
   /* Problem Changes */
-  
   problem_changes = {}
   let SetProblemVisibilityField = (progcomp, problem, mode) => {
-    document.getElementById(progcomp + "-" + problem + "-visibility").innerHTML = mode
+    document.getElementById(progcomp + "-prob-" + problem + "-visibility").innerHTML = mode
     problem_changes[progcomp] = problem_changes[progcomp] || {}
     problem_changes[progcomp][problem] = mode
   }
@@ -503,8 +526,41 @@
   blacklist_changes = {}
   let RecordBlacklistChange = (progcomp, team) => {
     blacklist_changes[progcomp] = blacklist_changes[progcomp] || {}
-    blacklist_changes[progcomp][team] = document.getElementById(progcomp + "-" + team + "-blacklist").checked
+    blacklist_changes[progcomp][team] = document.getElementById(progcomp + "-team-" + team + "-blacklist").checked
   }
+
+  /* Alert Changes */
+  let CreateAlert = (e) => {
+
+    e.preventDefault()
+
+    // Get the form element
+    const form = document.getElementById("alert-form")
+
+    // Create an object from the form data
+    const formData = {
+      name: form.elements["name"].value,
+      title: form.elements["title"].value,
+      text: form.elements["text"].value,
+      start: form.elements["start-time"].value,
+      end: form.elements["end-time"].value
+    }
+
+    Update({
+      "operation": "add-alert",
+      "name": alert_target,
+      "form": formData
+    })
+
+  };
+
+  let DeleteAlert = (progcomp, alertName) => {
+    Update({
+      "operation": "delete-alert",
+      "name": progcomp,
+      "alert": alertName
+    });
+  };
 
 </script>
 

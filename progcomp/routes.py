@@ -379,8 +379,6 @@ admin_sessions : dict[str, tuple[str, str, datetime]]= {}
 @bp.route("/admin", methods=["GET", "POST"])
 def admin() -> FlaskResponse:
 
-    open_comp = request.args.get("open")
-
     progcomps = db.session.query(Progcomp)
 
     if request.method == "GET":
@@ -393,7 +391,7 @@ def admin() -> FlaskResponse:
         print("=" * 100)
 
         if record and record[0] == request.remote_addr and record[1] == request.user_agent.string:
-            return render_template("admin.html", authenticated=True, progcomps=progcomps, open=open_comp)
+            return render_template("admin.html", authenticated=True, progcomps=progcomps)
 
     else:
         key_in = request.form.get("key")
@@ -403,7 +401,7 @@ def admin() -> FlaskResponse:
             new_id = uuid()
             admin_sessions[new_id] = (request.remote_addr, request.user_agent.string, datetime.now())
             session[ADMIN_SESSION_KEY] = new_id
-            return render_template("admin.html", authenticated=True, progcomps=progcomps, open=open_comp)
+            return render_template("admin.html", authenticated=True, progcomps=progcomps)
 
     return render_template("admin.html", authenticated=False)
 
@@ -431,9 +429,11 @@ def admin_update() -> FlaskResponse:
     match body["operation"]:
         case "create":
             db.session.add(pc := Progcomp(name=body["name"], visibility=Visibility.HIDDEN))
+        
         case "delete": db.session.delete(pc)
         case "update": pc.update_problems()
         case "reload": pc.refresh_problems()
+        
         case "configure":
             pc.start_time = datetime.strptime(body["config"]["start-time"], "%Y-%m-%dT%H:%M")
             pc.end_time = datetime.strptime(body["config"]["end-time"], "%Y-%m-%dT%H:%M")
@@ -447,20 +447,25 @@ def admin_update() -> FlaskResponse:
             if (blacklist_config := body["config"]["blacklist_changes"].get(pc.name)):
                 for team, status in blacklist_config.items():
                     pc.get_team(team).blacklist = status
+        
+        case "add-alert":
+            db.session.add(alert := Alert(
+                progcomp=pc,
+                name=body["form"]["name"],
+                title=body["form"]["title"],
+                text=body["form"]["text"],
+                start_time=datetime.strptime(body["form"]["start"], "%Y-%m-%dT%H:%M"),
+                end_time=datetime.strptime(body["form"]["end"], "%Y-%m-%dT%H:%M") 
+            ))
+            print(f"NEW ALERT: {alert}")
+
+        case "delete-alert":
+            alert = next(a for a in pc.alerts_r if a.name == body["alert"])
+            db.session.delete(alert)
 
     print(f"NEW/UPDATED PROGCOMP: {pc}")
 
     print("~" * 100)
     
     db.session.commit()
-    return Response(status=200)
-
-
-@bp.route("/admin/add_alert")
-def admin_add_alert() -> FlaskResponse:
-    session_id = session.get(ADMIN_SESSION_KEY)
-    record = admin_sessions.get(session_id)
-    if not (record and record[0] == request.remote_addr and record[1] == request.user_agent.string):
-        return Response(status=403)
-
     return Response(status=200)
