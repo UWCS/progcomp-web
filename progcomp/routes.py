@@ -23,8 +23,6 @@ import markdown
 from uuid import uuid4 as uuid
 
 
-from progcomp.models.utils import global_config
-
 FlaskResponse = Union[Response, str]
 
 from .database import db
@@ -256,22 +254,6 @@ def asset(prob : str, file : str):
     return send_from_directory(directory=path, path=file)
     
 
-# @bp.route("/download/pdf", methods=["GET"])
-# def dl_pdf() -> FlaskResponse:
-#     """
-#     Download the main pdf
-#     """
-
-#     if (pc := get_pc()) is None:
-#         return redirect(url_for("progcomp.menu"))
-
-#     return send_from_directory(
-#         os.path.join(os.getcwd(), "problems", pc.name),
-#         "problems.pdf",
-#         as_attachment=True,
-#     )
-
-
 @bp.route("/download/<string:p_name>/<string:t_name>", methods=["GET"])
 def download(p_name, t_name) -> FlaskResponse:
     """
@@ -395,7 +377,7 @@ def admin() -> FlaskResponse:
 
     else:
         key_in = request.form.get("key")
-        key_actual = global_config()["admin_key"]
+        key_actual = os.environ["ADMIN_KEY_HASH"]
 
         if check_password_hash(key_actual, key_in):
             new_id = uuid()

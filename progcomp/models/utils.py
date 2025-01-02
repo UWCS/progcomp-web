@@ -1,8 +1,6 @@
 import enum
-import os
-import json
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Optional, no_type_check
 
 
@@ -63,11 +61,6 @@ def format_time_range(start: DT, end: DT, now: datetime):
         return f"End{enten}: {end_str}"
     else:
         return f"Start{sten}: {start_str}"
-
-def global_config() -> dict:
-    path = os.path.join(os.getcwd(), "config.json")
-    with open(path) as f:
-        return json.load(f)
 
 class Status(enum.Enum):
     UNKNOWN = 0
