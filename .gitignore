@@ -2,11 +2,11 @@ submissions/**
 /.vscode
 /problems
 /progcomp.log
-/.env
 /progcomp/scripts/custom.py
 /.venv
 __pycache__
 /instance
 TODO.md
+.env
 config.json
 secret.*

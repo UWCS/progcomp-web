@@ -20,7 +20,7 @@ logging.basicConfig(
 def create_app() -> Flask:
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
-        SECRET_KEY=uuid().hex,
+        SECRET_KEY=os.environ["SECRET_KEY"],
         MAX_CONTENT_LENGTH=1000 * 1000 * 1000,  # 1gb,
         SQLALCHEMY_DATABASE_URI=os.environ["DATABASE_URL"],
     )
