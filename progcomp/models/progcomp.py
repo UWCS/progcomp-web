@@ -24,7 +24,9 @@ class Progcomp(Base):
 
     id = sa.Column(sa.Integer, primary_key=True)
     name = sa.Column(sa.String)
-    start_time = sa.Column(sa.DateTime, default=(dtnow := datetime.now().replace(second=0, microsecond=0)))
+    start_time = sa.Column(
+        sa.DateTime, default=(dtnow := datetime.now().replace(second=0, microsecond=0))
+    )
     show_leaderboard = sa.Column(
         sa.Boolean, nullable=False, default=False, server_default="f"
     )
@@ -111,7 +113,7 @@ class Progcomp(Base):
             .all()
         )
         return [p for p in problems if p.visible]
-    
+
     @property
     def all_problems(self) -> list[Problem]:
         problems = (
@@ -121,7 +123,7 @@ class Progcomp(Base):
             .all()
         )
         return [p for p in problems]
-    
+
     @property
     def all_teams(self) -> list[Team]:
         teams = (
@@ -192,7 +194,7 @@ class Progcomp(Base):
         per_prob = []
 
         conv: Callable[[Union[int, float]], int] = lambda x: round(x * 1000) / 10
-        
+
         timestamps = self.timestamps()
         for problem in self.visible_problems:
             if problem.name == "0":
@@ -214,17 +216,17 @@ class Progcomp(Base):
                     team,
                     sk * len(per_prob),
                     [sk for _ in per_prob],
-                    datetime.fromtimestamp(0)
+                    datetime.fromtimestamp(0),
                 )
             else:
                 sc = OverallScore(
                     team,
                     conv(total[team.name]),
                     [conv(per_prob[i][team.name]) for i in range(len(per_prob))],
-                    timestamps.get(team.name, datetime.fromtimestamp(0))
+                    timestamps.get(team.name, datetime.fromtimestamp(0)),
                 )
             actual.append(sc)
-        
+
         # TODO: Fix (????)
         actual.sort(key=lambda x: (-x.total, x.timestamp))
         return actual
@@ -251,14 +253,19 @@ class Progcomp(Base):
 
             test_scores = test.ranked_submissions
             print(
-                "\tTest Score", weight, test.name, [(t.team.name, t.score) for t in test_scores]
+                "\tTest Score",
+                weight,
+                test.name,
+                [(t.team.name, t.score) for t in test_scores],
             )
             for sub in test_scores:
                 print(f"\x1b[35mtest: {test} | sub: {sub}\x1b[0m")
                 if sub.status == Status.CORRECT:
-                    score[sub.team.name] += weight * 1.25 / total # TODO: HUHHH?????
+                    score[sub.team.name] += weight * 1.25 / total  # TODO: HUHHH?????
                 if sub.status == Status.PARTIAL:
-                    score[sub.team.name] += weight * float(sub.score) / test.max_score / total
+                    score[sub.team.name] += (
+                        weight * float(sub.score) / test.max_score / total
+                    )
         print("Score", problem.name, score)
         return score
 

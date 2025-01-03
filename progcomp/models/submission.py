@@ -49,15 +49,15 @@ class Submission(Base):
             "output.txt",
         )
 
-
-
         # Needs to be in a subprocess so we can add and remove on the fly
         ps = subprocess.run(
             [
                 "python",
                 mark_file,
                 problem_dir,
-                self.test.name + "." + ("out" if self.test.ext == "in" else self.test.ext),
+                self.test.name
+                + "."
+                + ("out" if self.test.ext == "in" else self.test.ext),
                 submission_file,
             ],
             capture_output=True,

@@ -51,7 +51,7 @@ class Problem(Base):
 
     def update(self) -> None:
         print(f"\x1b[32mupdate({self})\x1b[0m")
-        
+
         input_path = os.path.join(
             os.getcwd(),
             "problems",
@@ -71,7 +71,16 @@ class Problem(Base):
         old = set((t.name, t.ext) for t in self.tests)
 
         def check(test_input_filename: str) -> Optional[tuple[str, str]]:
-            if os.path.isfile(os.path.join(output_path, test_input_filename if not test_input_filename.endswith(".in") else test_input_filename.removesuffix(".in") + ".out")):
+            if os.path.isfile(
+                os.path.join(
+                    output_path,
+                    (
+                        test_input_filename
+                        if not test_input_filename.endswith(".in")
+                        else test_input_filename.removesuffix(".in") + ".out"
+                    ),
+                )
+            ):
                 match = re.search(r"^(.*)\.(.*)$", test_input_filename)
                 return match.group(1), match.group(2)
             return None
@@ -87,11 +96,13 @@ class Problem(Base):
                 db.session.delete(test)
                 print("Removing Test", test)
         for test_name, test_ext in new - old:
-            db.session.add(test := Test(problem_id=self.id, name=test_name, ext=test_ext))
+            db.session.add(
+                test := Test(problem_id=self.id, name=test_name, ext=test_ext)
+            )
             print("Adding Test", test)
 
         db.session.commit()
-        
+
         # Check for Config
         config_path = os.path.join(
             os.getcwd(),
@@ -101,7 +112,7 @@ class Problem(Base):
             "config.json",
         )
 
-        if (os.path.isfile(config_path)):
+        if os.path.isfile(config_path):
             with open(config_path) as f:
                 config = json.load(f)
 

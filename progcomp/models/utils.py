@@ -62,6 +62,7 @@ def format_time_range(start: DT, end: DT, now: datetime):
     else:
         return f"Start{sten}: {start_str}"
 
+
 class Status(enum.Enum):
     UNKNOWN = 0
     SCORED = 1
