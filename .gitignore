@@ -1,5 +1,5 @@
 submissions/**
-/.vscode
+*/.vscode
 /problems
 /progcomp.log
 /progcomp/scripts/custom.py
