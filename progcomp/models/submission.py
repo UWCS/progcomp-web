@@ -2,6 +2,7 @@ import enum
 import logging
 import os
 import subprocess
+import requests
 
 import sqlalchemy as sa
 from sqlalchemy import ForeignKey, ForeignKeyConstraint, func
@@ -41,6 +42,10 @@ class Submission(Base):
         return str(self.status)[len("Status") + 1 :]
 
     def mark(self) -> None:
+
+        # Execute submitted program in ZTRE
+        self.execute()
+
         # Relative directories of the locations needed
         problem_dir = self.problem.path
         mark_file = os.path.join(problem_dir, "mark.py")
@@ -91,3 +96,33 @@ class Submission(Base):
         logging.info(
             f"New Submission for {self.problem.name}: {self.test.name} by {self.team.name} [{self.status}] {self.score}/{self.test.max_score or ''}"
         )
+
+    def execute(self) -> None:
+
+        # Get Input Path
+        problem_input = os.path.join(self.problem.path, "input", self.test.name + '.' + self.test.ext)
+
+        # Get Program Path
+        user_program = self.directory
+        for file in os.listdir(self.directory):
+            if file != "output.txt": user_program = os.path.join(user_program, file)
+        
+        api_files = {
+            "program": open(user_program, 'rb'),
+            "input": open(problem_input, 'rb')
+        }
+
+        response = requests.post("http://localhost:8080/execute", files=api_files)
+
+        # If request was successful
+        if response.status_code == 200:
+            # Save the returned file
+            with open(
+                output_path := os.path.join(
+                    self.directory,
+                    "output_api.txt",
+                ), 'wb') as f:
+                f.write(response.content)
+            print(f"File received and saved at '{output_path}'")
+        else:
+            print("Failed to send files:", response.text)

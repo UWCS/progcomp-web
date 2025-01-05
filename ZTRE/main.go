@@ -11,7 +11,6 @@ func main() {
 	r := gin.Default()
 
 	// Initialize Docker client
-	// cli, err := client.NewClientWithOpts(client.FromEnv)
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		log.Fatal(err)

@@ -22,8 +22,6 @@ type ExecutionResult struct {
 
 func handleExecution(c *gin.Context, cli *client.Client) {
 
-	// c.JSON(http.StatusOK, "TESTING")
-
 	// Get files from form
 	program, err := c.FormFile("program")
 	if err != nil {
@@ -34,6 +32,14 @@ func handleExecution(c *gin.Context, cli *client.Client) {
 	input, err := c.FormFile("input")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Input file required"})
+		return
+	}
+
+	const maxFileSize = 1024 * 1024 // 1MB limit
+
+	// Add before handling files
+	if program.Size > maxFileSize || input.Size > maxFileSize {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "File too large"})
 		return
 	}
 
@@ -50,11 +56,13 @@ func handleExecution(c *gin.Context, cli *client.Client) {
 	inputPath := filepath.Join(tempDir, "input.txt")
 	// outputPath := filepath.Join(tempDir, "output.txt")
 
+	// Save uploaded program into temp directory
 	if err := c.SaveUploadedFile(program, programPath); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save program file"})
 		return
 	}
 
+	// Save uploaded input into temp directory
 	if err := c.SaveUploadedFile(input, inputPath); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save input file"})
 		return
@@ -62,19 +70,24 @@ func handleExecution(c *gin.Context, cli *client.Client) {
 
 	// Create container
 	ctx := context.Background()
+	var pidLimit int64 = 10
 	resp, err := cli.ContainerCreate(ctx,
 		&container.Config{
 			Image: "python:3.9-slim",
-			Cmd:   []string{"python", "/app/program.py"},
+			Cmd:   []string{"/bin/sh", "-c", "python /app/program.py < /app/input.txt"},
 			Tty:   true,
 		},
 		&container.HostConfig{
+			SecurityOpt:    []string{"seccomp=profile.json", "no-new-privileges"},
+			ReadonlyRootfs: true,  // Make entire container filesystem read-only
+			Privileged:     false, // Ensure container isn't privileged
 			Binds: []string{
 				tempDir + ":/app:ro",
 			},
 			Resources: container.Resources{
-				Memory:   512 * 1024 * 1024, // 512MB
-				NanoCPUs: 500000000,         // 0.5 CPU
+				Memory:    512 * 1024 * 1024, // 512MB
+				NanoCPUs:  500000000,         // 0.5 CPU
+				PidsLimit: &pidLimit,         // Limit number of processes
 			},
 			NetworkMode: "none",
 		},
@@ -120,7 +133,10 @@ func handleExecution(c *gin.Context, cli *client.Client) {
 	}
 
 	// Get container logs
-	out, err := cli.ContainerLogs(ctx, resp.ID, container.LogsOptions{ShowStdout: true})
+	out, err := cli.ContainerLogs(ctx, resp.ID, container.LogsOptions{
+		ShowStdout: true,
+		ShowStderr: true,
+	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get output"})
 		return
