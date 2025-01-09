@@ -22,6 +22,8 @@ from werkzeug.wrappers.response import Response
 import markdown
 from uuid import uuid4 as uuid
 
+import requests_oauthlib
+
 
 FlaskResponse = Union[Response, str]
 
@@ -81,6 +83,47 @@ def verify_input(inp: Optional[str], max_len: int = 100) -> bool:
         or not re.match(r"^[A-Za-z0-9_]+$", inp)
     )
 
+def uwcs_auth():
+    keycloak = requests_oauthlib.OAuth2Session(
+    	os.environ.get("CLIENT_ID")
+	)
+    authorization_url, _ = keycloak.authorization_url(os.environ.get("AUTHORIZATION_BASE_URL"))
+
+    return redirect(authorization_url)
+
+@bp.route("/auth/callback")
+def uwcs_callback():
+
+    keycloak = requests_oauthlib.OAuth2Session(os.environ.get("CLIENT_ID"))
+    keycloak.fetch_token(
+    	os.environ.get("TOKEN_URL"), client_secret=os.environ.get("CLIENT_SECRET"), authorization_response=request.url
+	)
+
+    user_info = keycloak.get(os.environ.get("USERINFO_URL")).json()
+
+    print(user_info)
+
+    (username, password, pc_name) = session.get("start-form")
+
+    # Get ProgComp
+    pc = db.session.query(Progcomp).where(Progcomp.name == pc_name).first()
+    if pc is None or not pc.visible:
+        return redirect(url_for("progcomp.menu"))
+
+    # Check password against potentially existing team
+    team = pc.get_team(username)
+    if team:
+        if not check_password_hash(team.password, password):
+            return redirect(url_for("progcomp.menu"))
+    else:
+        pc.add_team(username, generate_password_hash(password))
+
+    # Save their username
+    session[USERNAME_SESSION_KEY] = username
+    session[PROGCOMP_SESSION_KEY] = pc_name
+
+    return redirect(url_for("progcomp.submissions"))
+
 
 @bp.route("/start", methods=["POST"])
 def start() -> FlaskResponse:
@@ -103,24 +146,8 @@ def start() -> FlaskResponse:
     if pc_name is None or not verify_input(pc_name, 50):
         return redirect(url_for("progcomp.menu"))
 
-    pc = db.session.query(Progcomp).where(Progcomp.name == pc_name).first()
-    if pc is None or not pc.visible:
-        return redirect(url_for("progcomp.menu"))
-
-    # Check password against potentially existing team
-    team = pc.get_team(username)
-    if team:
-        if not check_password_hash(team.password, password):
-            return redirect(url_for("progcomp.menu"))
-    else:
-        pc.add_team(username, generate_password_hash(password))
-
-    # Save their username
-    session[USERNAME_SESSION_KEY] = username
-    session[PROGCOMP_SESSION_KEY] = pc_name
-
-    return redirect(url_for("progcomp.submissions"))
-
+    session["start-form"] = (username, password, pc_name)
+    return uwcs_auth()
 
 @bp.route("/logout", methods=["GET", "POST"])
 def logout() -> FlaskResponse:
