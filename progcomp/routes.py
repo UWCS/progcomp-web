@@ -74,6 +74,7 @@ def menu() -> FlaskResponse:
     )
 
 
+
 def verify_input(inp: Optional[str], max_len: int = 100) -> bool:
     return not (
         inp is None
@@ -83,16 +84,12 @@ def verify_input(inp: Optional[str], max_len: int = 100) -> bool:
         or not re.match(r"^[A-Za-z0-9_]+$", inp)
     )
 
-def uwcs_auth():
-    keycloak = requests_oauthlib.OAuth2Session(
-    	os.environ.get("CLIENT_ID")
-	)
-    authorization_url, _ = keycloak.authorization_url(os.environ.get("AUTHORIZATION_BASE_URL"))
-
-    return redirect(authorization_url)
+login_sessions = {}
 
 @bp.route("/auth/callback")
 def uwcs_callback():
+
+    print("==================== CALLBACK ====================")
 
     keycloak = requests_oauthlib.OAuth2Session(os.environ.get("CLIENT_ID"))
     keycloak.fetch_token(
@@ -100,10 +97,12 @@ def uwcs_callback():
 	)
 
     user_info = keycloak.get(os.environ.get("USERINFO_URL")).json()
+    warwick_id = user_info["uni_id"]
 
-    print(user_info)
+    print("WARWICK ID : " + warwick_id)
 
-    (username, password, pc_name) = session.get("start-form")
+    (username, password, pc_name) = login_sessions.get(session.get(START_ID))
+    session[START_ID] = None
 
     # Get ProgComp
     pc = db.session.query(Progcomp).where(Progcomp.name == pc_name).first()
@@ -115,8 +114,20 @@ def uwcs_callback():
     if team:
         if not check_password_hash(team.password, password):
             return redirect(url_for("progcomp.menu"))
+        
+        # Reject if they aren't a member, and there's no space for more
+        elif warwick_id not in (ids := team.member_ids) and len(ids) >= pc.max_team_members:
+            return redirect(url_for("progcomp.menu"))
+        
+        elif len( [team for team in pc.all_teams if warwick_id in team.member_ids] ) > 1:
+            return redirect(url_for("progcomp.menu"))
+        
+        elif warwick_id not in ids:
+            team.add_member(warwick_id)
+            
     else:
-        pc.add_team(username, generate_password_hash(password))
+        team = pc.add_team(username, generate_password_hash(password))
+        team.add_member(warwick_id)
 
     # Save their username
     session[USERNAME_SESSION_KEY] = username
@@ -146,8 +157,20 @@ def start() -> FlaskResponse:
     if pc_name is None or not verify_input(pc_name, 50):
         return redirect(url_for("progcomp.menu"))
 
-    session["start-form"] = (username, password, pc_name)
-    return uwcs_auth()
+    # Record Login
+    start_id = uuid()
+    session[START_ID] = start_id
+    login_sessions[start_id] = (username, password, pc_name)
+    
+    # Redirect to UWCS Auth
+
+    keycloak = requests_oauthlib.OAuth2Session(
+    	os.environ.get("CLIENT_ID")
+	)
+    authorization_url, _ = keycloak.authorization_url(os.environ.get("AUTHORIZATION_BASE_URL"))
+
+    return redirect(authorization_url)
+
 
 @bp.route("/logout", methods=["GET", "POST"])
 def logout() -> FlaskResponse:
@@ -474,6 +497,7 @@ def admin_update() -> FlaskResponse:
             )
             pc.show_leaderboard = body["config"]["show_leaderboard"]
             pc.visibility = vis_map[body["config"]["visibility"]]
+            pc.max_team_members = body["config"]["max_team_members"]
 
             if problem_config := body["config"]["problem_changes"].get(pc.name):
                 for problem, visibility in problem_config.items():

@@ -37,6 +37,7 @@ class Progcomp(Base):
         server_default="OPEN",
     )
     end_time = sa.Column(sa.DateTime)
+    max_team_members = sa.Column(sa.Integer, default=3)
 
     __table_args__ = (sa.UniqueConstraint("name", name="unq_progcomps_name"),)
 
@@ -91,9 +92,10 @@ class Progcomp(Base):
             .first()
         )
 
-    def add_team(self, name: str, password: str) -> None:
-        db.session.add(Team(progcomp_id=self.id, name=name, password=password))
+    def add_team(self, name: str, password: str) -> Team:
+        db.session.add(team := Team(progcomp_id=self.id, name=name, password=password))
         db.session.commit()
+        return team
 
     def get_problem(self, name, visibility=Visibility.CLOSED) -> Optional[Problem]:
         problems = (

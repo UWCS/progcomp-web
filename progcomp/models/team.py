@@ -2,6 +2,7 @@ import sqlalchemy as sa
 from sqlalchemy import ForeignKey, ForeignKeyConstraint, desc
 from sqlalchemy.orm import relationship
 
+from progcomp.models.team_member import TeamMember
 from progcomp.models.submission import Submission
 from progcomp.models.utils import auto_str
 
@@ -26,3 +27,12 @@ class Team(Base):
     )
     # , order_by="submissions.timestamp"
     progcomp = relationship("Progcomp", back_populates="teams")
+    members = relationship("TeamMember", back_populates="team")
+
+    @property
+    def member_ids(self) -> list[str]:
+        return [member.id for member in self.members]
+    
+    def add_member(self, member_id):
+        db.session.add(TeamMember(id=member_id, team_id=self.id))
+        db.session.commit()

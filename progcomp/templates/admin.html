@@ -222,12 +222,12 @@
               <span class="input-group-text" id="start-time-label">Start Time</span>
               <input id="{{ progcomp.name }}-start-time" type="datetime-local"
                 value="{{ progcomp.start_time.strftime('%Y-%m-%d %H:%M:%S') if progcomp.start_time }}"
-                class="form-control" aria-label="start-time" aria-describedby="start-time-label">
+                class="form-control" aria-label="start-time" aria-describedby="start-time-label" style="width: 10rem">
 
               <span class="input-group-text" id="end-time-label">End Time</span>
               <input id="{{ progcomp.name }}-end-time" type="datetime-local"
                 value="{{ progcomp.end_time.strftime('%Y-%m-%d %H:%M:%S') if progcomp.end_time}}" class="form-control"
-                aria-label="end-time" aria-describedby="end-time-label">
+                aria-label="end-time" aria-describedby="end-time-label" style="width: 10rem">
 
               <span class="input-group-text" id="visibility-label">Visibility</span>
               <button id="{{ progcomp.name }}-visibility" class="btn btn-outline-secondary dropdown-toggle"
@@ -239,6 +239,10 @@
                 <li><a class="dropdown-item" onclick="SetPCVisibilityField('{{ progcomp.name }}', 'Hidden')">Hidden</a>
                 </li>
               </ul>
+
+              <span class="input-group-text" id="max-members-label">Max Members Per Team</span>
+              <input id="{{ progcomp.name }}-max-members" type="number" value="{{ progcomp.max_team_members}}"
+                class="form-control" aria-label="max-members" aria-describedby="max-members-label" style="width: 1rem">
 
               <span class="input-group-text" id="leaderboard-label">Show Leaderboard</span>
               <span class="input-group-text justify-content-center"
@@ -393,70 +397,70 @@
             </table>
 
             <h4 class="text-muted">Select a Problem</h2>
-            <div class="accordion accordion-flush mb-4" id="{{progcomp.name}}-problem-leaderboards">
+              <div class="accordion accordion-flush mb-4" id="{{progcomp.name}}-problem-leaderboards">
 
-              {% for problem in progcomp.all_problems %}
+                {% for problem in progcomp.all_problems %}
 
-              <div class="accordion-item">
-                
-                <h2 class="accordion-header">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{{progcomp.name}}-prob-{{problem.name}}-lead"
-                    aria-expanded="false">
-                    Problem {{ problem.name }}
-                  </button>
-                </h2>
-                <div id="{{progcomp.name}}-prob-{{problem.name}}-lead" class="accordion-collapse collapse" data-bs-parent="#{{progcomp.name}}-problem-leaderboards">
-                  <div class="accordion-body">
-                    <div class="accordion" id="{{progcomp.name}}-prob-{{problem.name}}-tests">
-                      {% for test in problem.tests %}
-                      <div class="accordion-item">
-                        <h3 class="accordion-header">
-                          <button class="accordion-button collapsed" type="button"
-                                  data-bs-toggle="collapse"
-                                  data-bs-target="#{{progcomp.name}}-prob-{{problem.name}}-test-{{test.name}}"
-                                  aria-expanded="false"
-                                  aria-controls="{{progcomp.name}}-prob-{{problem.name}}-test-{{test.name}}">
-                            Test {{ test.name }}
-                          </button>
-                        </h3>
-                        <div id="{{progcomp.name}}-prob-{{problem.name}}-test-{{test.name}}"
-                             class="accordion-collapse collapse"
-                             data-bs-parent="#{{progcomp.name}}-prob-{{problem.name}}-tests">
-                          <div class="accordion-body">
-                            <table class="table table-hover table-sm">
-                              <thead>
-                                <tr>
-                                  <th scope="col" class="text-center">Position</th>
-                                  <th scope="col" class="text-center">Team</th>
-                                  <th scope="col" class="text-center">Status</th>
-                                  <th scope="col" class="text-center">Score</th>
-                                  <th scope="col" class="text-center">Submission Time</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {% for sub in test.ranked_submissions %}
-                                <tr>
-                                  <td class="text-center">{{ loop.index }}</td>
-                                  <td class="text-center">{{ sub.team.name }}</td>
-                                  <td class="text-center">{{ sub.status_str }}</td>
-                                  <td class="text-center">{{ sub.score }} / {{sub.test.max_score or ''}}</td>
-                                  <td class="text-center">{{ sub.timestamp }}</td>
-                                </tr>
-                                {% endfor %}
-                              </tbody>
-                            </table>
+                <div class="accordion-item">
+
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                      data-bs-target="#{{progcomp.name}}-prob-{{problem.name}}-lead" aria-expanded="false">
+                      Problem {{ problem.name }}
+                    </button>
+                  </h2>
+                  <div id="{{progcomp.name}}-prob-{{problem.name}}-lead" class="accordion-collapse collapse"
+                    data-bs-parent="#{{progcomp.name}}-problem-leaderboards">
+                    <div class="accordion-body">
+                      <div class="accordion" id="{{progcomp.name}}-prob-{{problem.name}}-tests">
+                        {% for test in problem.tests %}
+                        <div class="accordion-item">
+                          <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                              data-bs-target="#{{progcomp.name}}-prob-{{problem.name}}-test-{{test.name}}"
+                              aria-expanded="false"
+                              aria-controls="{{progcomp.name}}-prob-{{problem.name}}-test-{{test.name}}">
+                              Test {{ test.name }}
+                            </button>
+                          </h3>
+                          <div id="{{progcomp.name}}-prob-{{problem.name}}-test-{{test.name}}"
+                            class="accordion-collapse collapse"
+                            data-bs-parent="#{{progcomp.name}}-prob-{{problem.name}}-tests">
+                            <div class="accordion-body">
+                              <table class="table table-hover table-sm">
+                                <thead>
+                                  <tr>
+                                    <th scope="col" class="text-center">Position</th>
+                                    <th scope="col" class="text-center">Team</th>
+                                    <th scope="col" class="text-center">Status</th>
+                                    <th scope="col" class="text-center">Score</th>
+                                    <th scope="col" class="text-center">Submission Time</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {% for sub in test.ranked_submissions %}
+                                  <tr>
+                                    <td class="text-center">{{ loop.index }}</td>
+                                    <td class="text-center">{{ sub.team.name }}</td>
+                                    <td class="text-center">{{ sub.status_str }}</td>
+                                    <td class="text-center">{{ sub.score }} / {{sub.test.max_score or ''}}</td>
+                                    <td class="text-center">{{ sub.timestamp }}</td>
+                                  </tr>
+                                  {% endfor %}
+                                </tbody>
+                              </table>
+                            </div>
                           </div>
                         </div>
+                        {% endfor %}
                       </div>
-                      {% endfor %}
                     </div>
                   </div>
                 </div>
+
+                {% endfor %}
+
               </div>
-
-              {% endfor %}
-
-            </div>
           </div>
         </div>
 
@@ -598,6 +602,7 @@
         "end-time": document.getElementById(progcomp + "-end-time").value,
         "visibility": document.getElementById(progcomp + "-visibility").innerText,
         "show_leaderboard": document.getElementById(progcomp + "-leaderboard-toggle").checked,
+        "max_team_members": document.getElementById(progcomp + "-max-members").value,
         "problem_changes": problem_changes,
         "blacklist_changes": blacklist_changes,
         "alert_changes": alert_changes
