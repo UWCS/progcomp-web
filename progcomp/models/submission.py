@@ -2,6 +2,7 @@ import enum
 import logging
 import os
 import subprocess
+import requests
 
 import sqlalchemy as sa
 from sqlalchemy import ForeignKey, ForeignKeyConstraint, func
@@ -41,6 +42,7 @@ class Submission(Base):
         return str(self.status)[len("Status") + 1 :]
 
     def mark(self) -> None:
+
         # Relative directories of the locations needed
         problem_dir = self.problem.path
         mark_file = os.path.join(problem_dir, "mark.py")
