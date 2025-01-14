@@ -432,15 +432,9 @@ def admin() -> FlaskResponse:
 
     else:
         key_in = request.form.get("key")
-        admin_key = os.environ["ADMIN_KEY"]
+        key_actual = os.environ["ADMIN_KEY_HASH"]
 
-        print("================================================================")
-        print(f"HASH IS : {admin_key} (type : {type(admin_key)})")
-        print(f"INPUT IS : {key_in} (type : {type(key_in)})")
-        print("CHECK : " + str(admin_key == key_in))
-        print("================================================================")
-
-        if key_in == admin_key:
+        if check_password_hash(key_actual, key_in):
             new_id = uuid()
             admin_sessions[new_id] = (
                 request.remote_addr,

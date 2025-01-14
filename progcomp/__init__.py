@@ -3,6 +3,8 @@ import os
 
 from flask import Flask
 
+from uuid import uuid4 as uuid
+
 from .database import db, migrate
 
 from dotenv import load_dotenv
@@ -10,10 +12,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 logging.basicConfig(
-    level=logging.getLevelName("DEBUG"),
+    level=logging.getLevelName("INFO"),
     format="[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler("log/progcomp.log"),
+        logging.FileHandler("progcomp.log"),
         logging.StreamHandler(),
     ],
 )

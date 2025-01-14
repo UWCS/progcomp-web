@@ -25,7 +25,6 @@ def upgrade():
             existing_type=sa.INTEGER(),
             type_=sa.Boolean(),
             existing_nullable=True,
-            postgresql_using="CASE WHEN blacklist = 1 THEN true ELSE false END"
         )
 
     # ### end Alembic commands ###
@@ -39,7 +38,6 @@ def downgrade():
             existing_type=sa.Boolean(),
             type_=sa.INTEGER(),
             existing_nullable=True,
-            postgresql_using="CASE WHEN blacklist THEN 1 ELSE 0 END"
         )
 
     # ### end Alembic commands ###
