@@ -3,8 +3,6 @@ import os
 
 from flask import Flask
 
-from uuid import uuid4 as uuid
-
 from .database import db, migrate
 
 from dotenv import load_dotenv

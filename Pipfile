@@ -35,6 +35,7 @@ tzdata = "*"
 tzlocal = "*"
 urllib3 = "*"
 werkzeug = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 
