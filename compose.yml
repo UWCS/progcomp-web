@@ -6,6 +6,7 @@ services:
     volumes:
       - "~/app/problems:/app/problems:ro"
       - "~/app/submissions:/app/submissions:rw"
+      - "~/app/log:/app/log:rw"
     depends_on:
       - db
     env_file:

@@ -10,10 +10,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 logging.basicConfig(
-    level=logging.getLevelName("INFO"),
+    level=logging.getLevelName("DEBUG"),
     format="[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler("progcomp.log"),
+        logging.FileHandler("log/progcomp.log"),
         logging.StreamHandler(),
     ],
 )
