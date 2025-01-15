@@ -418,6 +418,7 @@ def admin() -> FlaskResponse:
 
         print("=" * 100)
         print(admin_sessions)
+        print(session_id)
         print(record)
         print("=" * 100)
 
@@ -435,6 +436,7 @@ def admin() -> FlaskResponse:
         key_actual = os.environ["ADMIN_KEY_HASH"]
 
         if check_password_hash(key_actual, key_in):
+            print("LOGIN SUCCESS")
             new_id = uuid()
             admin_sessions[new_id] = (
                 request.remote_addr,
