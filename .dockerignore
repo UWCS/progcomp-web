@@ -1,0 +1,8 @@
+/.github
+/.vscode
+/.git
+
+.env.example
+.gitignore
+README.md
+secret.txt
