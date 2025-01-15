@@ -1,0 +1,13 @@
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./problems:/app/problems:ro
+      - ./submissions:/app/submissions:rw
+      - ./instance:/app/instance:rw # Access to DB file
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped

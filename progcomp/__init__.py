@@ -2,6 +2,7 @@ import logging
 import os
 
 from flask import Flask
+import flask_migrate
 
 from uuid import uuid4 as uuid
 
@@ -31,6 +32,9 @@ def create_app() -> Flask:
 
     db.init_app(app)
     migrate.init_app(app, db)
+
+    with app.app_context():
+        flask_migrate.upgrade()
 
     from . import routes
 
