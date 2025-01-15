@@ -4,9 +4,10 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./problems:/app/problems:ro
-      - ./submissions:/app/submissions:rw
+      - ./problems:/app/problems:ro # Access to read the problem data
+      - ./submissions:/app/submissions:rw # Access to handle submissions
       - ./instance:/app/instance:rw # Access to DB file
+      - ./progcomp/templates:/app/progcomp/templates:ro # Allows for the templates to be tweaked while the server's still live
     environment:
       - FLASK_ENV=production
       - PYTHONUNBUFFERED=1
