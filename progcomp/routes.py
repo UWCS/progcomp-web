@@ -3,6 +3,7 @@ import logging
 import os
 import re
 from datetime import datetime, timedelta
+from multiprocessing import Manager
 from typing import Union
 
 from flask import (
@@ -84,7 +85,7 @@ def verify_input(inp: Optional[str], max_len: int = 100) -> bool:
         or not re.match(r"^[A-Za-z0-9_]+$", inp)
     )
 
-login_sessions = {}
+login_sessions = Manager().dict()
 
 @bp.route("/auth/callback")
 def uwcs_callback():
