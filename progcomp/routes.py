@@ -180,7 +180,10 @@ def logout() -> FlaskResponse:
     # Save their username
     session[USERNAME_SESSION_KEY] = None
     session[PROGCOMP_SESSION_KEY] = None
-    session[ADMIN_SESSION_KEY] = None
+    if sess_key := session.get(ADMIN_SESSION_KEY):
+        db.session.query(AdminSession).where(AdminSession.id == sess_key).delete()
+        db.session.commit()
+        session[ADMIN_SESSION_KEY] = None
 
     return redirect(url_for("progcomp.menu"))
 
@@ -403,29 +406,24 @@ def general_advice() -> FlaskResponse:
 
 # ADMIN
 
-# These aren't meant to persist, so keeping them in memory will do
-admin_sessions: dict[str, tuple[str, str, datetime]] = {}
-
-
 @bp.route("/admin", methods=["GET", "POST"])
 def admin() -> FlaskResponse:
 
-    progcomps = db.session.query(Progcomp)
 
     if request.method == "GET":
         session_id = session.get(ADMIN_SESSION_KEY)
-        record = admin_sessions.get(session_id)
+        record = db.session.query(AdminSession).where(AdminSession.id == session_id).first()
 
         print("=" * 100)
-        print(admin_sessions)
         print(record)
         print("=" * 100)
 
         if (
             record
-            and record[0] == request.remote_addr
-            and record[1] == request.user_agent.string
+            and record.addr == request.remote_addr
+            and record.user_agent == request.user_agent.string
         ):
+            progcomps = db.session.query(Progcomp)
             return render_template(
                 "admin.html", authenticated=True, progcomps=progcomps
             )
@@ -435,12 +433,11 @@ def admin() -> FlaskResponse:
         key_actual = os.environ["ADMIN_KEY_HASH"]
 
         if check_password_hash(key_actual, key_in):
-            new_id = uuid()
-            admin_sessions[new_id] = (
-                request.remote_addr,
-                request.user_agent.string,
-                datetime.now(),
-            )
+            new_id = str(uuid())
+
+            db.session.add(AdminSession(id=new_id, addr=request.remote_addr, user_agent=request.user_agent.string))
+            db.session.commit()
+
             session[ADMIN_SESSION_KEY] = new_id
             return redirect(url_for("progcomp.admin"))
 
@@ -450,11 +447,11 @@ def admin() -> FlaskResponse:
 @bp.route("/admin/update", methods=["POST"])
 def admin_update() -> FlaskResponse:
     session_id = session.get(ADMIN_SESSION_KEY)
-    record = admin_sessions.get(session_id)
+    record = db.session.query(AdminSession).where(AdminSession.id == session_id).first()
     if not (
         record
-        and record[0] == request.remote_addr
-        and record[1] == request.user_agent.string
+        and record.addr == request.remote_addr
+        and record.user_agent == request.user_agent.string
     ):
         return Response(status=403)
 
