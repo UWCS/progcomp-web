@@ -1,4 +1,5 @@
 import glob
+import redis
 import logging
 import os
 import re
@@ -85,8 +86,6 @@ def verify_input(inp: Optional[str], max_len: int = 100) -> bool:
         or not re.match(r"^[A-Za-z0-9_]+$", inp)
     )
 
-login_sessions = Manager().dict()
-
 @bp.route("/auth/callback")
 def uwcs_callback():
 
@@ -102,7 +101,13 @@ def uwcs_callback():
 
     print("WARWICK ID : " + warwick_id)
 
-    (username, password, pc_name) = login_sessions.get(session.get(START_ID))
+    sess = db.session.query(LoginSession).where(LoginSession.id == session.get(START_ID)).first()
+
+    (username, password, pc_name) = (sess.username, sess.passwd, sess.pc_name)
+
+    db.session.delete(sess)
+    db.session.commit()
+
     session[START_ID] = None
 
     # Get ProgComp
@@ -159,12 +164,13 @@ def start() -> FlaskResponse:
         return redirect(url_for("progcomp.menu"))
 
     # Record Login
-    start_id = uuid()
+    start_id = str(uuid())
     session[START_ID] = start_id
-    login_sessions[start_id] = (username, password, pc_name)
+
+    db.session.add(LoginSession(id=start_id, username=username, passwd=password, pc_name=pc_name))
+    db.session.commit()
     
     # Redirect to UWCS Auth
-
     keycloak = requests_oauthlib.OAuth2Session(
     	os.environ.get("CLIENT_ID")
 	)

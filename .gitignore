@@ -11,3 +11,4 @@ TODO.md
 config.json
 secret.*
 Pipfile.lock
+/tmp
