@@ -19,7 +19,7 @@ pipenv install
 > 3. Initialize the database:
 
 ```sh
-pipenv run python progcomp/scripts/initialize.py
+pipenv run python progcomp/scripts/initialize_db.py
 ```
 
 > 4. Run the server with:
@@ -34,7 +34,21 @@ You can stop it at any time by pressing **CTRL+C** in the terminal.
 
 # Admin Operation
 
-Once the server is running, you control it by using the admin panel, found at `localhost:5000/admin`. The password used is an set using environment variables.
+Once the server is running, you control it by using the admin panel, found at `localhost:5000/admin`. The password used is set using environment variables.
+
+Read `.env.example` for an example for an `.env` file. 
+
+Create a `.env` file:
+- SECRET_KEY can be anything; just used to sign the Flask stuff
+- ADMIN_KEY_HASH should be the hashed version of the password you've chosen
+
+To get the hashed version of your password:
+
+1) Load the venv with `pipenv shell`
+2) Run `python` to access the python interactive environment
+3) Run `import werkzeug`
+4) Run `print(werkzeug.security.generate_password_hash("your_password"))`
+5) Copy the output to `ADMIN_KEY_HASH`
 
 ## Custom behaviour
 - SQL-Alchemy makes editing the data while live very easy, write your queries following the template and you can do a lot
