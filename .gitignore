@@ -10,5 +10,4 @@ TODO.md
 .env
 config.json
 secret.*
-Pipfile.lock
 /tmp
