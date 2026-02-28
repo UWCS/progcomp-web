@@ -31,7 +31,7 @@ jobs:
     - name: Install pipenv
       run: pip install pipenv
     - name: Install dependencies from lockfile
-      run: pipenv sync
+      run: pipenv sync --dev
     - name: Run Black
       run: pipenv run black --check progcomp
     - name: Run MyPy
