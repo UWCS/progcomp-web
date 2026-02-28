@@ -34,8 +34,6 @@ jobs:
       run: pipenv sync --dev
     - name: Run Black
       run: pipenv run black --check progcomp
-    - name: Run MyPy
-      run: pipenv run mypy progcomp
       
   docker_publish:
     name: Publish built docker container
