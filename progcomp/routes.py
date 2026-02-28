@@ -22,7 +22,6 @@ from uuid import uuid4 as uuid
 
 import requests_oauthlib
 
-
 FlaskResponse = Union[Response, str]
 
 from .database import db
@@ -72,7 +71,6 @@ def menu() -> FlaskResponse:
     )
 
 
-
 def verify_input(inp: Optional[str], max_len: int = 100) -> bool:
     return not (
         inp is None
@@ -82,6 +80,7 @@ def verify_input(inp: Optional[str], max_len: int = 100) -> bool:
         or not re.match(r"^[A-Za-z0-9_]+$", inp)
     )
 
+
 @bp.route("/auth/callback")
 def uwcs_callback():
 
@@ -89,17 +88,23 @@ def uwcs_callback():
 
     keycloak = requests_oauthlib.OAuth2Session(os.environ.get("CLIENT_ID"))
     keycloak.fetch_token(
-    	os.environ.get("TOKEN_URL"), client_secret=os.environ.get("CLIENT_SECRET"), authorization_response=request.url
-	)
+        os.environ.get("TOKEN_URL"),
+        client_secret=os.environ.get("CLIENT_SECRET"),
+        authorization_response=request.url,
+    )
 
     user_info = keycloak.get(os.environ.get("USERINFO_URL")).json()
     warwick_id = user_info["uni_id"]
 
     print("WARWICK ID : " + warwick_id)
 
-    sess = db.session.query(LoginSession).where(LoginSession.id == session.get(START_ID)).first()
+    sess = (
+        db.session.query(LoginSession)
+        .where(LoginSession.id == session.get(START_ID))
+        .first()
+    )
 
-    (username, password, pc_name) = (sess.username, sess.passwd, sess.pc_name)
+    username, password, pc_name = (sess.username, sess.passwd, sess.pc_name)
 
     db.session.delete(sess)
     db.session.commit()
@@ -116,17 +121,20 @@ def uwcs_callback():
     if team:
         if not check_password_hash(team.password, password):
             return redirect(url_for("progcomp.menu"))
-        
+
         # Reject if they aren't a member, and there's no space for more
-        elif warwick_id not in (ids := team.member_ids) and len(ids) >= pc.max_team_members:
+        elif (
+            warwick_id not in (ids := team.member_ids)
+            and len(ids) >= pc.max_team_members
+        ):
             return redirect(url_for("progcomp.menu"))
-        
-        elif len( [team for team in pc.all_teams if warwick_id in team.member_ids] ) > 1:
+
+        elif len([team for team in pc.all_teams if warwick_id in team.member_ids]) > 1:
             return redirect(url_for("progcomp.menu"))
-        
+
         elif warwick_id not in ids:
             team.add_member(warwick_id)
-            
+
     else:
         team = pc.add_team(username, generate_password_hash(password))
         team.add_member(warwick_id)
@@ -163,14 +171,16 @@ def start() -> FlaskResponse:
     start_id = str(uuid())
     session[START_ID] = start_id
 
-    db.session.add(LoginSession(id=start_id, username=username, passwd=password, pc_name=pc_name))
+    db.session.add(
+        LoginSession(id=start_id, username=username, passwd=password, pc_name=pc_name)
+    )
     db.session.commit()
-    
+
     # Redirect to UWCS Auth
-    keycloak = requests_oauthlib.OAuth2Session(
-    	os.environ.get("CLIENT_ID")
-	)
-    authorization_url, _ = keycloak.authorization_url(os.environ.get("AUTHORIZATION_BASE_URL"))
+    keycloak = requests_oauthlib.OAuth2Session(os.environ.get("CLIENT_ID"))
+    authorization_url, _ = keycloak.authorization_url(
+        os.environ.get("AUTHORIZATION_BASE_URL")
+    )
 
     return redirect(authorization_url)
 
@@ -409,13 +419,15 @@ def general_advice() -> FlaskResponse:
 
 # ADMIN
 
+
 @bp.route("/admin", methods=["GET", "POST"])
 def admin() -> FlaskResponse:
 
-
     if request.method == "GET":
         session_id = session.get(ADMIN_SESSION_KEY)
-        record = db.session.query(AdminSession).where(AdminSession.id == session_id).first()
+        record = (
+            db.session.query(AdminSession).where(AdminSession.id == session_id).first()
+        )
 
         print("=" * 100)
         print(record)
@@ -438,7 +450,13 @@ def admin() -> FlaskResponse:
         if check_password_hash(key_actual, key_in):
             new_id = str(uuid())
 
-            db.session.add(AdminSession(id=new_id, addr=request.remote_addr, user_agent=request.user_agent.string))
+            db.session.add(
+                AdminSession(
+                    id=new_id,
+                    addr=request.remote_addr,
+                    user_agent=request.user_agent.string,
+                )
+            )
             db.session.commit()
 
             session[ADMIN_SESSION_KEY] = new_id

@@ -1,4 +1,3 @@
-
 import sqlalchemy as sa
 
 from progcomp.models.utils import auto_str

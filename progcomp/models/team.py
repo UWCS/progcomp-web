@@ -32,7 +32,7 @@ class Team(Base):
     @property
     def member_ids(self) -> list[str]:
         return [member.id for member in self.members]
-    
+
     def add_member(self, member_id):
         db.session.add(TeamMember(id=member_id, team_id=self.id))
         db.session.commit()

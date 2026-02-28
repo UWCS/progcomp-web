@@ -13,7 +13,7 @@ class TeamMember(Base):
 
     id = sa.Column(sa.String, primary_key=True)
     team_id = sa.Column(sa.Integer, ForeignKey("teams.id"))
-    
+
     __table_args__ = (sa.UniqueConstraint("id", "team_id"),)
 
     team = relationship("Team", back_populates="members")
